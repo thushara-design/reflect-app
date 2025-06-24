@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Mic, MicOff, Sparkles, Edit3, Save, X } from 'lucide-react-native';
+import { Mic, MicOff, Sparkles, CreditCard as Edit3, Save, X } from 'lucide-react-native';
 import { freeLLMService } from './FreeLLMService';
 
 // Main Journal Entry Component
