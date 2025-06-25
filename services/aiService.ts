@@ -32,10 +32,10 @@ export interface AIAnalysisResult {
 
 class AIService {
   private apiKey: string;
-  private apiUrl: string = 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium';
+  private apiUrl: string = 'https://api.fireworks.ai/inference/v1/chat/completions';
 
   constructor() {
-    this.apiKey = process.env.EXPO_PUBLIC_HUGGING_FACE_API_KEY || '';
+    this.apiKey = process.env.EXPO_PUBLIC_FIREWORKS_API_KEY || '';
     console.log('API Key loaded:', this.apiKey ? 'Yes' : 'No');
     if (!this.apiKey) {
       console.warn('Hugging Face API key not found. AI analysis will use enhanced fallback logic.');
@@ -54,19 +54,16 @@ class AIService {
       // Create a more specific prompt for emotional analysis
       const analysisPrompt = this.createAnalysisPrompt(entryText);
       
-      console.log('Making API request to Hugging Face...');
+      console.log('Making API request to Fireworks...');
       
       const response = await axios.post(
         this.apiUrl,
         {
-          inputs: analysisPrompt,
-          parameters: {
-            max_length: 300,
-            temperature: 0.8,
-            do_sample: true,
-            pad_token_id: 50256,
-            repetition_penalty: 1.1
-          }
+          messages: [
+            { role: 'user', content: analysisPrompt }
+          ],
+          model: 'accounts/fireworks/models/llama-v3p1-8b-instruct',
+          stream: false
         },
         {
           headers: {
@@ -79,8 +76,8 @@ class AIService {
 
       console.log('API Response received:', response.status);
 
-      if (response.data && Array.isArray(response.data) && response.data[0]) {
-        const generatedText = response.data[0].generated_text || '';
+      if (response.data && response.data.choices && response.data.choices[0]) {
+        const generatedText = response.data.choices[0].message.content || '';
         console.log('Generated analysis:', generatedText.substring(0, 200) + '...');
         
         return this.parseAIAnalysis(entryText, generatedText);
@@ -89,7 +86,7 @@ class AIService {
         return this.getContentBasedAnalysis(entryText);
       }
     } catch (error) {
-      console.error('Error calling Hugging Face API:', error);
+      console.error('Error calling Fireworks API:', error);
       return this.getContentBasedAnalysis(entryText);
     }
   }
