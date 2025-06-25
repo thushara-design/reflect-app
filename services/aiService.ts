@@ -64,7 +64,7 @@ class AIService {
           messages: [
             { 
               role: 'system', 
-              content: 'You are an expert cognitive behavioral therapist. You MUST respond with valid JSON only. Do not include any text before or after the JSON object. Focus on identifying specific cognitive distortions with exact quotes from the user\'s text.' 
+              content: 'You are an expert cognitive behavioral therapist. You MUST respond with valid JSON only. Do not include any text before or after the JSON object. Focus on identifying specific cognitive distortions with exact quotes from the user\'s text. For the reflection, acknowledge the specific content and emotions from the user\'s entry.' 
             },
             { 
               role: 'user', 
@@ -217,7 +217,7 @@ Respond with ONLY this JSON structure:
     }
   ],
   "key_themes": ["theme1", "theme2", "theme3"],
-  "reflection": "Compassionate 2-3 sentence reflection that acknowledges the user's experience",
+  "reflection": "A warm, empathetic 1-2 sentence reflection that specifically acknowledges what the user wrote about and validates their emotional experience. Reference actual content from their entry, not generic statements.",
   "suggested_activities": [
     {
       "title": "specific activity name",
@@ -228,7 +228,9 @@ Respond with ONLY this JSON structure:
   ]
 }
 
-CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the user's exact words. Include the exact quotes that demonstrate the distortion.`;
+CRITICAL: 
+- Only include cognitive distortions if you find CLEAR evidence in the user's exact words. Include the exact quotes that demonstrate the distortion.
+- For the reflection, specifically reference what the user wrote about (their situation, feelings, experiences) rather than giving generic emotional validation.`;
   }
 
   private parseAIAnalysis(originalText: string, aiResponse: string): AIAnalysisResult {
@@ -256,7 +258,7 @@ CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the u
         // Parse activities with validation
         const activities = this.parseActivitiesFromAI(analysisData.suggested_activities || []);
         
-        // Get reflection with fallback
+        // Get reflection from AI or generate content-based one
         const reflection = analysisData.reflection || this.generateContentBasedReflection(originalText, emotion.emotion);
 
         console.log('Successfully parsed AI analysis');
@@ -678,7 +680,7 @@ CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the u
         keywords: ['angry', 'frustrated', 'mad', 'furious', 'annoyed', 'irritated', 'rage', 'hate', 'pissed', 'outraged', 'livid', 'irate', 'infuriated'],
         contextPhrases: ['so frustrated', 'really angry', 'makes me mad', 'can\'t stand', 'drives me crazy', 'fed up'],
         emoji: '😠'
-      },
+      ],
       anxious: {
         keywords: ['anxious', 'worried', 'nervous', 'scared', 'afraid', 'panic', 'stress', 'overwhelmed', 'tense', 'uneasy', 'apprehensive', 'restless', 'fearful'],
         contextPhrases: ['so worried', 'really anxious', 'can\'t stop thinking', 'what if', 'scared that', 'nervous about'],
@@ -688,7 +690,7 @@ CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the u
         keywords: ['stressed', 'overwhelmed', 'pressure', 'deadline', 'busy', 'exhausted', 'tired', 'burnt out', 'frazzled', 'strained', 'swamped'],
         contextPhrases: ['so much to do', 'feeling overwhelmed', 'too much pressure', 'can\'t handle', 'burning out'],
         emoji: '😫'
-      },
+      ],
       frustrated: {
         keywords: ['frustrated', 'annoyed', 'irritated', 'fed up', 'stuck', 'blocked', 'hindered', 'thwarted'],
         contextPhrases: ['so frustrated', 'really annoying', 'can\'t get', 'not working', 'keeps failing'],
@@ -736,66 +738,148 @@ CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the u
   }
 
   private generateContentBasedReflection(entryText: string, emotion: string): string {
+    // Extract key themes and content from the entry
     const sentences = entryText.split(/[.!?]+/).filter(s => s.trim().length > 10);
-    const keyPhrase = sentences[0]?.trim() || entryText.substring(0, 50);
+    const firstSentence = sentences[0]?.trim() || '';
+    const lowerText = entryText.toLowerCase();
     
-    const contentReflections = {
-      happy: [
-        `It's wonderful to read about the positive experience you've shared. Your joy and enthusiasm really come through in your words.`,
-        `The happiness you describe is beautiful to witness. These moments of joy are worth celebrating and remembering.`,
-        `Your positive energy is evident in your writing. It's clear you're able to find and appreciate the good in your life.`
-      ],
-      sad: [
-        `I can feel the weight of what you're going through. Your feelings are completely valid and it takes courage to express them.`,
-        `The pain you're experiencing comes through in your words. It's okay to sit with these difficult feelings as you process them.`,
-        `Your sadness is real and understandable. Acknowledging these feelings is an important part of working through them.`
-      ],
-      anxious: [
-        `The worry and concern you're feeling shows how much you care. Anxiety often stems from things that matter deeply to us.`,
-        `I can sense the tension and uncertainty you're carrying. Recognizing anxiety is the first step toward managing it effectively.`,
-        `Your anxious thoughts are understandable given what you're facing. Sometimes our minds try to prepare us by imagining different scenarios.`
-      ],
-      angry: [
-        `Your frustration and anger come through clearly in your writing. These intense feelings often signal that something important to you has been affected.`,
-        `The strength of your emotions shows how much this situation matters to you. Your anger is a valid response to what you're experiencing.`,
-        `I can understand why this would trigger such strong feelings. Sometimes anger is our way of protecting what we value.`
-      ],
-      frustrated: [
-        `The frustration you're experiencing is completely understandable. It's natural to feel this way when things aren't going as planned.`,
-        `Your frustration shows that you care deeply about the outcome. These feelings are valid and worth acknowledging.`,
-        `I can sense the tension you're feeling when things feel stuck or blocked. This frustration is a normal response to obstacles.`
-      ],
-      stressed: [
-        `The pressure and overwhelm you're feeling sounds incredibly challenging. It's natural to feel stressed when facing multiple demands.`,
-        `Your stress reflects how much responsibility you're carrying right now. Remember that it's okay to take things one step at a time.`,
-        `The overwhelm you're experiencing shows you're juggling a lot. Your awareness of this stress is an important first step.`
-      ],
-      calm: [
-        `The peace and tranquility you've found is beautiful. These moments of calm are precious and worth savoring.`,
-        `Your sense of serenity shows your ability to find balance. This inner peace is a strength you can draw upon.`,
-        `The calm you describe reflects your capacity for mindfulness and presence in the moment.`
-      ],
-      neutral: [
-        `Your thoughtful reflection shows a balanced perspective. Sometimes the most profound insights come from quiet observation.`,
-        `The way you've described your experience demonstrates emotional awareness and self-reflection.`,
-        `Your ability to articulate your thoughts shows emotional intelligence and mindfulness.`
-      ]
+    // Identify key subjects/themes in the entry
+    const subjects = this.extractMainSubjects(entryText);
+    const mainSubject = subjects[0] || 'this situation';
+    
+    // Create content-aware reflections based on what the user actually wrote about
+    const generateSpecificReflection = (emotion: string, subject: string, content: string): string => {
+      const lowerContent = content.toLowerCase();
+      
+      // Detect specific situations mentioned
+      if (lowerContent.includes('meeting') || lowerContent.includes('presentation') || lowerContent.includes('speaking')) {
+        if (emotion === 'anxious' || emotion === 'nervous') {
+          return `I can understand how speaking up in meetings would feel nerve-wracking - your heart racing shows how much you care about contributing meaningfully.`;
+        }
+      }
+      
+      if (lowerContent.includes('work') || lowerContent.includes('job') || lowerContent.includes('deadline')) {
+        if (emotion === 'stressed' || emotion === 'overwhelmed') {
+          return `The work pressure you're describing sounds genuinely challenging - feeling overwhelmed when juggling multiple demands is completely natural.`;
+        }
+        if (emotion === 'frustrated') {
+          return `Your frustration with the work situation comes through clearly - it's understandable when professional challenges feel blocking or difficult.`;
+        }
+      }
+      
+      if (lowerContent.includes('friend') || lowerContent.includes('relationship') || lowerContent.includes('family')) {
+        if (emotion === 'sad' || emotion === 'hurt') {
+          return `The pain you're feeling in this relationship situation is real - interpersonal challenges can be some of the most difficult to navigate.`;
+        }
+        if (emotion === 'happy' || emotion === 'grateful') {
+          return `The joy you're experiencing in your relationships really shines through - these connections clearly mean a lot to you.`;
+        }
+      }
+      
+      if (lowerContent.includes('sleep') || lowerContent.includes('tired') || lowerContent.includes('exhausted')) {
+        return `The exhaustion you're describing sounds draining - your body and mind are telling you something important about needing rest.`;
+      }
+      
+      if (lowerContent.includes('progress') || lowerContent.includes('routine') || lowerContent.includes('consistent')) {
+        if (emotion === 'happy' || emotion === 'content') {
+          return `Your awareness of the positive changes in your routine is wonderful - recognizing progress, even small steps, shows real self-awareness.`;
+        }
+      }
+      
+      // Generic but content-aware fallbacks
+      const emotionReflections: Record<string, string[]> = {
+        anxious: [
+          `The worry you're expressing about ${subject} shows how much this matters to you - anxiety often reflects our deepest cares.`,
+          `I can feel the tension you're carrying about ${subject} - these concerns make sense given what you're facing.`,
+          `Your nervousness around ${subject} is completely understandable - it takes courage to acknowledge these feelings.`
+        ],
+        sad: [
+          `The sadness you're feeling about ${subject} comes through in your words - these emotions deserve acknowledgment and space.`,
+          `I can sense the weight you're carrying regarding ${subject} - it's natural to feel this way when facing difficult situations.`,
+          `Your pain around ${subject} is valid - allowing yourself to feel these emotions is part of processing them.`
+        ],
+        angry: [
+          `The frustration you're experiencing with ${subject} is palpable - anger often signals that something important to you has been affected.`,
+          `Your strong feelings about ${subject} show how much this situation matters to you - these emotions are completely valid.`,
+          `I can understand why ${subject} would trigger such intense feelings - sometimes anger is our way of protecting what we value.`
+        ],
+        frustrated: [
+          `The frustration you're feeling with ${subject} is completely understandable - it's natural when things aren't going as hoped.`,
+          `Your sense of being stuck with ${subject} comes through clearly - these feelings of blockage are valid and worth acknowledging.`,
+          `The tension you're experiencing around ${subject} makes perfect sense - frustration often arises when we care deeply about outcomes.`
+        ],
+        stressed: [
+          `The overwhelm you're feeling about ${subject} sounds genuinely challenging - you're managing a lot right now.`,
+          `Your stress regarding ${subject} is completely valid - it's natural to feel this way when facing pressure.`,
+          `The burden you're carrying with ${subject} comes through in your words - recognizing this stress is an important first step.`
+        ],
+        happy: [
+          `The joy you're experiencing with ${subject} is beautiful to witness - your positive energy really shines through.`,
+          `Your happiness about ${subject} is wonderful to read about - these moments of joy are worth celebrating.`,
+          `The contentment you're feeling around ${subject} is lovely - it's clear this brings you genuine satisfaction.`
+        ],
+        calm: [
+          `The peace you've found in ${subject} is beautiful - these moments of tranquility are precious and worth savoring.`,
+          `Your sense of calm regarding ${subject} shows your ability to find balance - this inner peace is a real strength.`,
+          `The serenity you're experiencing with ${subject} comes through clearly - it's wonderful when we can find this stillness.`
+        ],
+        grateful: [
+          `The gratitude you're expressing about ${subject} is touching - your appreciation for these moments shows real awareness.`,
+          `Your thankfulness regarding ${subject} really shines through - this perspective is a beautiful way to approach life.`,
+          `The appreciation you're feeling for ${subject} is wonderful - recognizing these gifts shows emotional wisdom.`
+        ]
+      };
+      
+      const templates = emotionReflections[emotion] || [
+        `Your feelings about ${subject} are completely valid - the way you've expressed this shows real emotional awareness.`,
+        `What you're experiencing with ${subject} makes perfect sense - your ability to reflect on this shows insight.`,
+        `The emotions you're processing around ${subject} deserve acknowledgment - this kind of self-reflection is valuable.`
+      ];
+      
+      return templates[Math.floor(Math.random() * templates.length)];
     };
-
-    const emotionReflections = contentReflections[emotion as keyof typeof contentReflections] || contentReflections.neutral;
-    const baseReflection = emotionReflections[Math.floor(Math.random() * emotionReflections.length)];
     
-    const insights = [
-      " Your self-awareness in expressing these thoughts is a sign of emotional growth.",
-      " Taking time to reflect like this shows you're actively working on understanding yourself.",
-      " The fact that you're processing these experiences through writing is a healthy coping strategy.",
-      " Your willingness to explore these feelings demonstrates resilience and courage.",
-      " This kind of honest self-reflection is valuable for your emotional well-being."
+    return generateSpecificReflection(emotion, mainSubject, entryText);
+  }
+
+  private extractMainSubjects(text: string): string[] {
+    const lowerText = text.toLowerCase();
+    const subjects: string[] = [];
+    
+    // Common subject patterns
+    const subjectPatterns = [
+      { pattern: /\b(meeting|presentation|speaking|conference|interview)\b/g, subject: 'the meeting situation' },
+      { pattern: /\b(work|job|career|office|deadline|project|boss|colleague)\b/g, subject: 'work' },
+      { pattern: /\b(friend|friendship|relationship|partner|spouse|family|parent|sibling)\b/g, subject: 'your relationships' },
+      { pattern: /\b(school|study|exam|class|university|college|homework)\b/g, subject: 'your studies' },
+      { pattern: /\b(health|doctor|medical|illness|pain|therapy)\b/g, subject: 'your health' },
+      { pattern: /\b(sleep|tired|exhausted|insomnia|rest)\b/g, subject: 'your sleep and energy' },
+      { pattern: /\b(money|financial|budget|bills|debt|income)\b/g, subject: 'financial matters' },
+      { pattern: /\b(future|goals|dreams|plans|decisions|choice)\b/g, subject: 'your future plans' },
+      { pattern: /\b(routine|habit|progress|improvement|change)\b/g, subject: 'your personal growth' },
+      { pattern: /\b(home|house|apartment|moving|living)\b/g, subject: 'your living situation' }
     ];
     
-    const insight = insights[Math.floor(Math.random() * insights.length)];
+    for (const { pattern, subject } of subjectPatterns) {
+      if (pattern.test(lowerText)) {
+        subjects.push(subject);
+      }
+    }
     
-    return baseReflection + insight;
+    // If no specific subjects found, try to extract from first sentence
+    if (subjects.length === 0) {
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+      if (sentences.length > 0) {
+        const firstSentence = sentences[0].trim();
+        // Extract potential subjects from first sentence
+        const words = firstSentence.split(' ').filter(word => word.length > 4);
+        if (words.length > 0) {
+          subjects.push('what you\'re going through');
+        }
+      }
+    }
+    
+    return subjects.length > 0 ? subjects : ['this situation'];
   }
 
   private detectCognitiveDistortions(text: string): CognitiveDistortion[] {

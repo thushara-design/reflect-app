@@ -97,98 +97,6 @@ export default function AIAnalysisModal({
     }
   };
 
-  // Generate a gentle reflection based on the user's entry and detected emotion
-  const generateGentleReflection = (emotion: string, entryText: string): string => {
-    const sentences = entryText.split(/[.!?]+/).filter(s => s.trim().length > 10);
-    const firstSentence = sentences[0]?.trim() || '';
-    
-    const reflections = {
-      happy: [
-        `The joy and positivity in your words really shine through - it's wonderful to witness your happiness.`,
-        `Your enthusiasm and positive energy are beautiful to read about.`,
-        `The happiness you're experiencing comes through so clearly in your writing.`
-      ],
-      sad: [
-        `I can feel the weight of what you're going through, and your courage in expressing these feelings is meaningful.`,
-        `The sadness you're experiencing is valid, and it takes strength to acknowledge these emotions.`,
-        `Your willingness to share these difficult feelings shows real emotional awareness.`
-      ],
-      anxious: [
-        `The worry you're carrying shows how much you care, and it's completely understandable to feel this way.`,
-        `Your anxiety reflects the importance of what you're facing - these feelings make sense.`,
-        `The concern in your words shows your thoughtful nature and how deeply you feel things.`
-      ],
-      angry: [
-        `The frustration and intensity in your words shows how much this situation matters to you.`,
-        `Your anger is a valid response - it often signals that something important to you has been affected.`,
-        `The strength of your feelings comes through clearly, and these emotions deserve acknowledgment.`
-      ],
-      frustrated: [
-        `The frustration you're experiencing is completely understandable given what you're facing.`,
-        `Your feelings of being stuck or blocked are valid - it's natural to feel this way when things aren't flowing.`,
-        `The tension you're describing makes perfect sense in this situation.`
-      ],
-      stressed: [
-        `The overwhelm you're feeling comes through in your words - you're carrying a lot right now.`,
-        `The pressure you're describing sounds genuinely challenging, and your stress is completely valid.`,
-        `Your awareness of feeling overwhelmed shows important self-knowledge.`
-      ],
-      calm: [
-        `The peace and tranquility you've found is beautiful - these moments of calm are precious.`,
-        `Your sense of serenity really comes through in your writing, and it's lovely to witness.`,
-        `The calm you're experiencing is a gift - it's wonderful that you're able to find this balance.`
-      ],
-      excited: [
-        `Your excitement and anticipation are infectious - it's wonderful to feel your energy through your words.`,
-        `The enthusiasm you're expressing is beautiful and shows your capacity for joy.`,
-        `Your excitement comes through so clearly - it's lovely to witness this positive energy.`
-      ],
-      grateful: [
-        `The gratitude in your words is touching - your appreciation for life's moments is beautiful.`,
-        `Your thankfulness really shines through, and it's wonderful to see this perspective.`,
-        `The appreciation you're expressing shows a beautiful awareness of life's gifts.`
-      ],
-      lonely: [
-        `The loneliness you're feeling is real and valid - it takes courage to acknowledge these feelings.`,
-        `Your sense of isolation comes through in your words, and these feelings deserve recognition.`,
-        `The loneliness you're experiencing is understandable, and you're not alone in feeling this way.`
-      ],
-      confused: [
-        `The uncertainty you're feeling makes complete sense - it's natural to feel confused when facing complex situations.`,
-        `Your confusion shows you're thoughtfully processing something important, which is valuable.`,
-        `The mixed feelings you're experiencing are completely valid and show your emotional depth.`
-      ],
-      hopeful: [
-        `The hope in your words is beautiful - your optimism and forward-looking perspective shine through.`,
-        `Your sense of possibility and hope is inspiring to read about.`,
-        `The hopefulness you're expressing shows your resilience and positive outlook.`
-      ],
-      disappointed: [
-        `The disappointment you're feeling is completely valid - it shows how much this mattered to you.`,
-        `Your sense of letdown comes through clearly, and these feelings deserve acknowledgment.`,
-        `The disappointment you're experiencing makes perfect sense given your expectations and hopes.`
-      ],
-      content: [
-        `The contentment in your words is lovely - there's something beautiful about this sense of satisfaction.`,
-        `Your feeling of peace and satisfaction really comes through in your writing.`,
-        `The contentment you're experiencing is wonderful - these moments of satisfaction are precious.`
-      ],
-      overwhelmed: [
-        `The overwhelm you're feeling is completely understandable - you're managing so much right now.`,
-        `Your sense of being overwhelmed comes through clearly, and it's natural to feel this way.`,
-        `The intensity of everything you're juggling would overwhelm anyone - your feelings make perfect sense.`
-      ]
-    };
-
-    const emotionReflections = reflections[emotion as keyof typeof reflections] || [
-      `Your emotional awareness in sharing these thoughts shows real insight and courage.`,
-      `The feelings you're expressing are valid and deserve acknowledgment.`,
-      `Your willingness to reflect on your emotions shows meaningful self-awareness.`
-    ];
-
-    return emotionReflections[Math.floor(Math.random() * emotionReflections.length)];
-  };
-
   const dynamicStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -488,7 +396,7 @@ export default function AIAnalysisModal({
                 </View>
               </View>
               <Text style={dynamicStyles.gentleReflection}>
-                {generateGentleReflection(analysis.emotion.emotion, entryText)}
+                {analysis.reflection}
               </Text>
             </View>
           </View>
