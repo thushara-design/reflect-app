@@ -43,21 +43,14 @@ const darkColors: ThemeColors = {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const systemColorScheme = useColorScheme();
-  const [isDark, setIsDark] = useState(systemColorScheme === 'dark');
+  // const systemColorScheme = useColorScheme();
+  // const [isDark, setIsDark] = useState(systemColorScheme === 'dark');
+  const isDark = false; // Always light mode
 
-  useEffect(() => {
-    setIsDark(systemColorScheme === 'dark');
-  }, [systemColorScheme]);
-
-  const toggleTheme = () => {
-    setIsDark(!isDark);
-  };
-
-  const colors = isDark ? darkColors : lightColors;
+  const colors = lightColors;
 
   return (
-    <ThemeContext.Provider value={{ isDark, colors, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark, colors, toggleTheme: () => {} }}>
       {children}
     </ThemeContext.Provider>
   );

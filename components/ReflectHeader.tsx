@@ -1,6 +1,7 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { useState } from 'react';
-import { Menu, LogOut, Phone, Palette } from 'lucide-react-native';
+import { Menu, LogOut, Phone } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ReflectHeaderProps {
@@ -9,7 +10,7 @@ interface ReflectHeaderProps {
 
 export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
-  const { colors, toggleTheme } = useTheme();
+  const { colors } = useTheme();
 
   const handleMenuPress = () => {
     setShowMenu(true);
@@ -24,11 +25,6 @@ export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
   const handleCrisisSupport = () => {
     setShowMenu(false);
     console.log('Crisis support pressed');
-  };
-
-  const handleThemeSettings = () => {
-    setShowMenu(false);
-    toggleTheme();
   };
 
   const dynamicStyles = StyleSheet.create({
@@ -104,11 +100,6 @@ export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
             <TouchableOpacity style={styles.menuItem} onPress={handleCrisisSupport}>
               <Phone size={20} color={colors.text} strokeWidth={1.5} />
               <Text style={dynamicStyles.menuItemText}>Crisis Support</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity style={styles.menuItem} onPress={handleThemeSettings}>
-              <Palette size={20} color={colors.text} strokeWidth={1.5} />
-              <Text style={dynamicStyles.menuItemText}>Toggle Theme</Text>
             </TouchableOpacity>
           </View>
         </TouchableOpacity>
