@@ -30,100 +30,7 @@ export default function AIAnalysisModal({
 
   console.log('AIAnalysisModal render - visible:', visible, 'analysis:', !!analysis);
 
-  if (!analysis) {
-    console.log('No analysis data, not rendering modal content');
-    return (
-      <Modal
-        visible={visible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={onClose}
-      >
-        <View style={[dynamicStyles.container, { backgroundColor: colors.background }]}>
-          <View style={[dynamicStyles.header, { borderBottomColor: colors.border }]}>
-            <View style={dynamicStyles.headerLeft}>
-              <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
-              <Text style={[dynamicStyles.headerTitle, { color: colors.text }]}>AI Analysis</Text>
-            </View>
-            <TouchableOpacity style={dynamicStyles.closeButton} onPress={onClose}>
-              <X size={24} color={colors.text} strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: colors.text }}>Loading analysis...</Text>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  const handleActivityToggle = (activityId: string) => {
-    const newSelected = new Set(selectedActivities);
-    if (newSelected.has(activityId)) {
-      newSelected.delete(activityId);
-    } else {
-      newSelected.add(activityId);
-    }
-    setSelectedActivities(newSelected);
-    onActivitySelect(activityId);
-  };
-
-  const handleReframeToggle = (distortionType: string) => {
-    setShowReframing(prev => ({
-      ...prev,
-      [distortionType]: !prev[distortionType]
-    }));
-  };
-
-  const handleGenerateAIReframe = async (distortion: CognitiveDistortion) => {
-    setIsGeneratingReframe(prev => ({ ...prev, [distortion.type]: true }));
-    
-    try {
-      const originalThought = distortion.userQuotes.join(' ') || distortion.detectedText.join(' ');
-      const reframedThought = await aiService.generateReframedThought(
-        originalThought, 
-        distortion.type, 
-        entryText
-      );
-      
-      setReframedThoughts(prev => ({
-        ...prev,
-        [distortion.type]: reframedThought
-      }));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to generate reframed thought. Please try writing your own.');
-    } finally {
-      setIsGeneratingReframe(prev => ({ ...prev, [distortion.type]: false }));
-    }
-  };
-
-  const handleReframeSave = (distortion: CognitiveDistortion) => {
-    const reframedText = reframedThoughts[distortion.type];
-    if (reframedText?.trim()) {
-      const originalThought = distortion.userQuotes.join(' ') || distortion.detectedText.join(' ');
-      onSaveReframe(originalThought, reframedText);
-      setShowReframing(prev => ({ ...prev, [distortion.type]: false }));
-    }
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'high': return '#FF6B6B';
-      case 'medium': return '#FF9800';
-      case 'low': return '#FFA726';
-      default: return '#FF9800';
-    }
-  };
-
-  const getSeverityLabel = (severity: string) => {
-    switch (severity) {
-      case 'high': return 'High Priority';
-      case 'medium': return 'Medium Priority';
-      case 'low': return 'Low Priority';
-      default: return 'Medium Priority';
-    }
-  };
-
+  // Move dynamicStyles definition to the top, before any conditional rendering
   const dynamicStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -390,6 +297,100 @@ export default function AIAnalysisModal({
       marginLeft: 32,
     },
   });
+
+  if (!analysis) {
+    console.log('No analysis data, not rendering modal content');
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={onClose}
+      >
+        <View style={dynamicStyles.container}>
+          <View style={dynamicStyles.header}>
+            <View style={dynamicStyles.headerLeft}>
+              <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
+              <Text style={dynamicStyles.headerTitle}>AI Analysis</Text>
+            </View>
+            <TouchableOpacity style={dynamicStyles.closeButton} onPress={onClose}>
+              <X size={24} color={colors.text} strokeWidth={1.5} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: colors.text }}>Loading analysis...</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  const handleActivityToggle = (activityId: string) => {
+    const newSelected = new Set(selectedActivities);
+    if (newSelected.has(activityId)) {
+      newSelected.delete(activityId);
+    } else {
+      newSelected.add(activityId);
+    }
+    setSelectedActivities(newSelected);
+    onActivitySelect(activityId);
+  };
+
+  const handleReframeToggle = (distortionType: string) => {
+    setShowReframing(prev => ({
+      ...prev,
+      [distortionType]: !prev[distortionType]
+    }));
+  };
+
+  const handleGenerateAIReframe = async (distortion: CognitiveDistortion) => {
+    setIsGeneratingReframe(prev => ({ ...prev, [distortion.type]: true }));
+    
+    try {
+      const originalThought = distortion.userQuotes.join(' ') || distortion.detectedText.join(' ');
+      const reframedThought = await aiService.generateReframedThought(
+        originalThought, 
+        distortion.type, 
+        entryText
+      );
+      
+      setReframedThoughts(prev => ({
+        ...prev,
+        [distortion.type]: reframedThought
+      }));
+    } catch (error) {
+      Alert.alert('Error', 'Failed to generate reframed thought. Please try writing your own.');
+    } finally {
+      setIsGeneratingReframe(prev => ({ ...prev, [distortion.type]: false }));
+    }
+  };
+
+  const handleReframeSave = (distortion: CognitiveDistortion) => {
+    const reframedText = reframedThoughts[distortion.type];
+    if (reframedText?.trim()) {
+      const originalThought = distortion.userQuotes.join(' ') || distortion.detectedText.join(' ');
+      onSaveReframe(originalThought, reframedText);
+      setShowReframing(prev => ({ ...prev, [distortion.type]: false }));
+    }
+  };
+
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case 'high': return '#FF6B6B';
+      case 'medium': return '#FF9800';
+      case 'low': return '#FFA726';
+      default: return '#FF9800';
+    }
+  };
+
+  const getSeverityLabel = (severity: string) => {
+    switch (severity) {
+      case 'high': return 'High Priority';
+      case 'medium': return 'Medium Priority';
+      case 'low': return 'Low Priority';
+      default: return 'Medium Priority';
+    }
+  };
 
   return (
     <Modal
