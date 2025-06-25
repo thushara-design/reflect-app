@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
-import AIAnalysisModal from '@/components/AIAnalysisModal';
 import PatternDetectionModal from '@/components/PatternDetectionModal';
+import InlineAIAnalysis from '@/components/InlineAIAnalysis';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -22,11 +22,11 @@ export default function NewEntryPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isRecording, setIsRecording] = useState(false);
-  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
   const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showPatternDetection, setShowPatternDetection] = useState(false);
   const [detectedPattern, setDetectedPattern] = useState<any>(null);
+  const [showInlineAnalysis, setShowInlineAnalysis] = useState(false);
   const { addEntry, updateEntry, deleteEntry } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
@@ -127,8 +127,8 @@ export default function NewEntryPage() {
       console.log('AI Analysis completed:', analysis);
       
       setAIAnalysis(analysis);
-      setShowAIAnalysis(true);
-      console.log('Modal should now be visible');
+      setShowInlineAnalysis(true);
+      console.log('Inline analysis should now be visible');
     } catch (error) {
       console.error('AI Analysis error:', error);
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
@@ -149,6 +149,11 @@ export default function NewEntryPage() {
 
   const handleActivitySelect = (activityId: string) => {
     console.log('Activity selected:', activityId);
+  };
+
+  const handleCloseInlineAnalysis = () => {
+    setShowInlineAnalysis(false);
+    setAIAnalysis(null);
   };
 
   const handleSave = () => {
@@ -353,6 +358,18 @@ export default function NewEntryPage() {
               textAlignVertical="top"
               autoFocus={!isEditing}
             />
+            
+            {/* Inline AI Analysis */}
+            {showInlineAnalysis && aiAnalysis && (
+              <InlineAIAnalysis
+                analysis={aiAnalysis}
+                onClose={handleCloseInlineAnalysis}
+                onSaveReframe={handleSaveReframe}
+                onActivitySelect={handleActivitySelect}
+                entryText={content}
+                userProfile={userProfile}
+              />
+            )}
           </View>
 
           <View style={dynamicStyles.bottomInfo}>
@@ -364,19 +381,7 @@ export default function NewEntryPage() {
         </View>
       </View>
 
-      {/* Modals rendered at root level - OUTSIDE the main container */}
-      <AIAnalysisModal
-        visible={showAIAnalysis}
-        onClose={() => {
-          console.log('Closing AI Analysis modal');
-          setShowAIAnalysis(false);
-        }}
-        analysis={aiAnalysis}
-        onSaveReframe={handleSaveReframe}
-        onActivitySelect={handleActivitySelect}
-        entryText={content}
-      />
-
+      {/* Pattern Detection Modal */}
       <PatternDetectionModal
         visible={showPatternDetection}
         onClose={() => setShowPatternDetection(false)}
