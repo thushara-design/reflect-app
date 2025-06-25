@@ -5,6 +5,8 @@ import { ArrowLeft } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import AIAnalysisModal from '@/components/AIAnalysisModal';
 import { useEntries } from '@/contexts/EntriesContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { aiService, AIAnalysisResult } from '@/services/aiService';
 
 export default function NewEntryPage() {
@@ -23,6 +25,8 @@ export default function NewEntryPage() {
   const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { addEntry, updateEntry, deleteEntry } = useEntries();
+  const { userProfile } = useOnboarding();
+  const { colors } = useTheme();
   
   const isEditing = !!entryId;
   const showContextMenu = fromEntries === 'true';
@@ -87,7 +91,33 @@ export default function NewEntryPage() {
     try {
       const analysis = await aiService.analyzeEntry(content);
       setAIAnalysis(analysis);
-      setShowAIAnalysis(true);
+      
+      // Navigate to reflection results with analysis data
+      const emotion = analysis.emotion.emotion;
+      const confidence = Math.round(analysis.emotion.confidence * 100).toString();
+      const reflection = "Your entry shows emotional awareness and self-reflection. It's healthy to acknowledge these feelings and seek ways to process them constructively.";
+      
+      // Get user's configured activities for this emotion
+      const userActivities = userProfile?.emotionalToolkit.find(
+        item => item.emotion.toLowerCase() === emotion.toLowerCase()
+      )?.actions || [];
+      
+      const activities = userActivities.map((action, index) => ({
+        id: `user-${index}`,
+        title: action,
+        description: `Your personalized coping strategy for ${emotion}`,
+        duration: '5-15 minutes'
+      }));
+
+      router.push({
+        pathname: '/reflection-results',
+        params: {
+          emotion,
+          confidence,
+          reflection,
+          activities: JSON.stringify(activities)
+        }
+      });
     } catch (error) {
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
     } finally {
@@ -202,14 +232,77 @@ export default function NewEntryPage() {
     }
   };
 
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 24,
+      paddingTop: 50,
+      paddingBottom: 16,
+      backgroundColor: colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: 18,
+      fontWeight: '400',
+      color: colors.text,
+      letterSpacing: -0.3,
+      flex: 1,
+      textAlign: 'center',
+      marginHorizontal: 16,
+    },
+    content: {
+      flex: 1,
+      paddingHorizontal: 24,
+    },
+    titleInput: {
+      fontSize: 24,
+      fontWeight: '600',
+      color: colors.text,
+      lineHeight: 32,
+      minHeight: 40,
+    },
+    contentInput: {
+      flex: 1,
+      fontSize: 16,
+      color: colors.text,
+      lineHeight: 24,
+      fontWeight: '300',
+    },
+    bottomInfo: {
+      paddingVertical: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      alignItems: 'center',
+    },
+    timestamp: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontWeight: '300',
+      textAlign: 'center',
+    },
+    analyzingText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontStyle: 'italic',
+      marginTop: 4,
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
+    <View style={dynamicStyles.container}>
+      <View style={dynamicStyles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <ArrowLeft size={24} color="#2A2A2A" strokeWidth={1.5} />
+          <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
         </TouchableOpacity>
         
-        <Text style={styles.headerTitle}>
+        <Text style={dynamicStyles.headerTitle}>
           {isEditing ? 'Edit Entry' : 'New Entry'}
         </Text>
         
@@ -226,12 +319,12 @@ export default function NewEntryPage() {
         />
       </View>
 
-      <View style={styles.content}>
+      <View style={dynamicStyles.content}>
         <View style={styles.titleSection}>
           <TextInput
-            style={styles.titleInput}
+            style={dynamicStyles.titleInput}
             placeholder="Title here"
-            placeholderTextColor="#A5B8C8"
+            placeholderTextColor={colors.textSecondary}
             value={title}
             onChangeText={setTitle}
             multiline
@@ -240,9 +333,9 @@ export default function NewEntryPage() {
 
         <View style={styles.contentSection}>
           <TextInput
-            style={styles.contentInput}
+            style={dynamicStyles.contentInput}
             placeholder="Start writing..."
-            placeholderTextColor="#A5B8C8"
+            placeholderTextColor={colors.textSecondary}
             value={content}
             onChangeText={setContent}
             multiline
@@ -251,10 +344,10 @@ export default function NewEntryPage() {
           />
         </View>
 
-        <View style={styles.bottomInfo}>
-          <Text style={styles.timestamp}>{getCurrentDateTime()}</Text>
+        <View style={dynamicStyles.bottomInfo}>
+          <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
           {isAnalyzing && (
-            <Text style={styles.analyzingText}>Analyzing with AI...</Text>
+            <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
           )}
         </View>
       </View>
@@ -271,75 +364,15 @@ export default function NewEntryPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAFAFA',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 50,
-    paddingBottom: 16,
-    backgroundColor: '#FAFAFA',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-  },
   backButton: {
     padding: 8,
     borderRadius: 8,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '400',
-    color: '#2A2A2A',
-    letterSpacing: -0.3,
-    flex: 1,
-    textAlign: 'center',
-    marginHorizontal: 16,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 24,
   },
   titleSection: {
     paddingTop: 16,
     paddingBottom: 16,
   },
-  titleInput: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#2A2A2A',
-    lineHeight: 32,
-    minHeight: 40,
-  },
   contentSection: {
     flex: 1,
-  },
-  contentInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#2A2A2A',
-    lineHeight: 24,
-    fontWeight: '300',
-  },
-  bottomInfo: {
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: '#EAEAEA',
-    alignItems: 'center',
-  },
-  timestamp: {
-    fontSize: 12,
-    color: '#A5B8C8',
-    fontWeight: '300',
-    textAlign: 'center',
-  },
-  analyzingText: {
-    fontSize: 12,
-    color: '#A5B8C8',
-    fontStyle: 'italic',
-    marginTop: 4,
   },
 });
