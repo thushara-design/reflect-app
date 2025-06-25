@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Sparkles, CheckCircle } from 'lucide-react-native';
+import { ArrowLeft, Sparkles, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ReflectionResultsPage() {

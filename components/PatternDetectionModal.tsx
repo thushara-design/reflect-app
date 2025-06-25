@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { useState } from 'react';
-import { X, AlertTriangle, Lightbulb } from 'lucide-react-native';
+import { X, TriangleAlert as AlertTriangle, Lightbulb } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface PatternDetectionModalProps {
