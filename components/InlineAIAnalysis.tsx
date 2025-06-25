@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useState } from 'react';
-import { X, ChevronDown, ChevronUp, Square, CheckSquare, Lightbulb } from 'lucide-react-native';
+import { X, ChevronDown, ChevronUp, Square, SquareCheck as CheckSquare, Lightbulb } from 'lucide-react-native';
 import { AIAnalysisResult, CognitiveDistortion } from '@/services/aiService';
 import { aiService } from '@/services/aiService';
 import { useTheme } from '@/contexts/ThemeContext';
