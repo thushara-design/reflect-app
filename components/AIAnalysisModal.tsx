@@ -30,7 +30,6 @@ export default function AIAnalysisModal({
 
   console.log('AIAnalysisModal render - visible:', visible, 'analysis:', !!analysis);
 
-  // Move dynamicStyles definition to the top, before any conditional rendering
   const dynamicStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -296,34 +295,42 @@ export default function AIAnalysisModal({
       lineHeight: 20,
       marginLeft: 32,
     },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: 40,
+    },
+    loadingText: {
+      fontSize: 16,
+      color: colors.text,
+      marginBottom: 8,
+    },
+    loadingSubtext: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textAlign: 'center',
+    },
+    debugContainer: {
+      backgroundColor: colors.surface,
+      borderRadius: 8,
+      padding: 16,
+      margin: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    debugTitle: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+      marginBottom: 8,
+    },
+    debugText: {
+      fontSize: 12,
+      color: colors.textSecondary,
+      fontFamily: 'monospace',
+    },
   });
-
-  if (!analysis) {
-    console.log('No analysis data, not rendering modal content');
-    return (
-      <Modal
-        visible={visible}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={onClose}
-      >
-        <View style={dynamicStyles.container}>
-          <View style={dynamicStyles.header}>
-            <View style={dynamicStyles.headerLeft}>
-              <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
-              <Text style={dynamicStyles.headerTitle}>AI Analysis</Text>
-            </View>
-            <TouchableOpacity style={dynamicStyles.closeButton} onPress={onClose}>
-              <X size={24} color={colors.text} strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: colors.text }}>Loading analysis...</Text>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
 
   const handleActivityToggle = (activityId: string) => {
     const newSelected = new Set(selectedActivities);
@@ -392,6 +399,7 @@ export default function AIAnalysisModal({
     }
   };
 
+  // Always render the modal container, but show different content based on state
   return (
     <Modal
       visible={visible}
@@ -410,149 +418,182 @@ export default function AIAnalysisModal({
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={dynamicStyles.content} showsVerticalScrollIndicator={false}>
-          <View style={dynamicStyles.section}>
-            <Text style={dynamicStyles.sectionTitle}>Emotional Tone Detected</Text>
-            <View style={dynamicStyles.emotionCard}>
-              <View style={dynamicStyles.emotionHeader}>
-                <Text style={dynamicStyles.emotionEmoji}>{analysis.emotion.emoji}</Text>
-                <View style={dynamicStyles.emotionInfo}>
-                  <Text style={dynamicStyles.emotionName}>{analysis.emotion.emotion}</Text>
-                  <Text style={dynamicStyles.emotionConfidence}>
-                    {Math.round(analysis.emotion.confidence * 100)}% confidence
-                  </Text>
-                </View>
-              </View>
-              <Text style={dynamicStyles.gentleReflection}>
-                {analysis.reflection}
-              </Text>
-            </View>
+        {/* Show loading state if no analysis */}
+        {!analysis ? (
+          <View style={dynamicStyles.loadingContainer}>
+            <Text style={dynamicStyles.loadingText}>Analyzing your entry...</Text>
+            <Text style={dynamicStyles.loadingSubtext}>
+              This may take a moment while we process your thoughts
+            </Text>
           </View>
+        ) : (
+          <ScrollView style={dynamicStyles.content} showsVerticalScrollIndicator={false}>
+            {/* Debug information in development */}
+            {__DEV__ && (
+              <View style={dynamicStyles.debugContainer}>
+                <Text style={dynamicStyles.debugTitle}>Debug Info:</Text>
+                <Text style={dynamicStyles.debugText}>
+                  Analysis present: {!!analysis}{'\n'}
+                  Emotion: {analysis.emotion?.emotion || 'none'}{'\n'}
+                  Distortions: {analysis.distortions?.length || 0}{'\n'}
+                  Activities: {analysis.activities?.length || 0}{'\n'}
+                  Reflection: {analysis.reflection ? 'present' : 'missing'}
+                </Text>
+              </View>
+            )}
 
-          {analysis.distortions.length > 0 && (
+            {/* Emotional Tone Section */}
             <View style={dynamicStyles.section}>
-              <Text style={dynamicStyles.sectionTitle}>⚠️ Unhelpful Thinking Patterns Detected</Text>
-              <Text style={dynamicStyles.sectionSubtitle}>
-                These patterns might be making you feel worse. Let's work on reframing them:
-              </Text>
-              {analysis.distortions.map((distortion, index) => (
-                <View 
-                  key={index} 
-                  style={[
-                    dynamicStyles.distortionCard,
-                    { borderColor: getSeverityColor(distortion.severity) }
-                  ]}
-                >
-                  <View style={dynamicStyles.distortionHeader}>
-                    <AlertTriangle size={20} color={getSeverityColor(distortion.severity)} strokeWidth={1.5} />
-                    <Text style={dynamicStyles.distortionType}>{distortion.type}</Text>
-                    <View style={[dynamicStyles.severityBadge, { backgroundColor: getSeverityColor(distortion.severity) }]}>
-                      <Text style={dynamicStyles.severityText}>{getSeverityLabel(distortion.severity)}</Text>
-                    </View>
-                  </View>
-                  
-                  <Text style={dynamicStyles.distortionDescription}>{distortion.description}</Text>
-                  
-                  {distortion.userQuotes.length > 0 && (
-                    <View style={dynamicStyles.quotesSection}>
-                      <Text style={dynamicStyles.quotesTitle}>Your words that triggered this detection:</Text>
-                      {distortion.userQuotes.map((quote, quoteIndex) => (
-                        <Text key={quoteIndex} style={dynamicStyles.userQuote}>
-                          "{quote.trim()}"
-                        </Text>
-                      ))}
-                    </View>
-                  )}
-
-                  <Text style={dynamicStyles.evidenceTitle}>Let's check some facts:</Text>
-                  {distortion.evidence.map((fact, factIndex) => (
-                    <Text key={factIndex} style={dynamicStyles.evidenceItem}>• {fact}</Text>
-                  ))}
-
-                  <TouchableOpacity
-                    style={dynamicStyles.reframeButton}
-                    onPress={() => handleReframeToggle(distortion.type)}
-                  >
-                    <Text style={dynamicStyles.reframeButtonText}>
-                      {showReframing[distortion.type] ? 'Hide Reframing' : 'Reframe This Thought'}
+              <Text style={dynamicStyles.sectionTitle}>Emotional Tone Detected</Text>
+              <View style={dynamicStyles.emotionCard}>
+                <View style={dynamicStyles.emotionHeader}>
+                  <Text style={dynamicStyles.emotionEmoji}>
+                    {analysis.emotion?.emoji || '😐'}
+                  </Text>
+                  <View style={dynamicStyles.emotionInfo}>
+                    <Text style={dynamicStyles.emotionName}>
+                      {analysis.emotion?.emotion || 'neutral'}
                     </Text>
-                  </TouchableOpacity>
+                    <Text style={dynamicStyles.emotionConfidence}>
+                      {Math.round((analysis.emotion?.confidence || 0.7) * 100)}% confidence
+                    </Text>
+                  </View>
+                </View>
+                <Text style={dynamicStyles.gentleReflection}>
+                  {analysis.reflection || 'Your entry shows emotional awareness and self-reflection.'}
+                </Text>
+              </View>
+            </View>
 
-                  {showReframing[distortion.type] && (
-                    <View style={dynamicStyles.reframingSection}>
-                      <Text style={dynamicStyles.reframingPrompt}>{distortion.reframingPrompt}</Text>
-                      
-                      <TouchableOpacity
-                        style={dynamicStyles.aiSuggestionButton}
-                        onPress={() => handleGenerateAIReframe(distortion)}
-                        disabled={isGeneratingReframe[distortion.type]}
-                      >
-                        <Lightbulb size={16} color={colors.primary} strokeWidth={1.5} />
-                        <Text style={dynamicStyles.aiSuggestionText}>
-                          {isGeneratingReframe[distortion.type] ? 'Generating...' : 'Generate AI suggestion'}
-                        </Text>
-                      </TouchableOpacity>
-
-                      <TextInput
-                        style={dynamicStyles.reframingInput}
-                        placeholder="Write a more balanced version of this thought..."
-                        placeholderTextColor={colors.textSecondary}
-                        value={reframedThoughts[distortion.type] || ''}
-                        onChangeText={(text) => setReframedThoughts(prev => ({
-                          ...prev,
-                          [distortion.type]: text
-                        }))}
-                        multiline
-                        textAlignVertical="top"
-                      />
-                      <View style={dynamicStyles.reframingActions}>
-                        <TouchableOpacity
-                          style={dynamicStyles.saveReframeButton}
-                          onPress={() => handleReframeSave(distortion)}
-                        >
-                          <Text style={dynamicStyles.saveReframeText}>Save to Entry</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={dynamicStyles.cancelReframeButton}
-                          onPress={() => setShowReframing(prev => ({ ...prev, [distortion.type]: false }))}
-                        >
-                          <Text style={dynamicStyles.cancelReframeText}>Cancel</Text>
-                        </TouchableOpacity>
+            {/* Cognitive Distortions Section */}
+            {analysis.distortions && analysis.distortions.length > 0 && (
+              <View style={dynamicStyles.section}>
+                <Text style={dynamicStyles.sectionTitle}>⚠️ Unhelpful Thinking Patterns Detected</Text>
+                <Text style={dynamicStyles.sectionSubtitle}>
+                  These patterns might be making you feel worse. Let's work on reframing them:
+                </Text>
+                {analysis.distortions.map((distortion, index) => (
+                  <View 
+                    key={index} 
+                    style={[
+                      dynamicStyles.distortionCard,
+                      { borderColor: getSeverityColor(distortion.severity) }
+                    ]}
+                  >
+                    <View style={dynamicStyles.distortionHeader}>
+                      <AlertTriangle size={20} color={getSeverityColor(distortion.severity)} strokeWidth={1.5} />
+                      <Text style={dynamicStyles.distortionType}>{distortion.type}</Text>
+                      <View style={[dynamicStyles.severityBadge, { backgroundColor: getSeverityColor(distortion.severity) }]}>
+                        <Text style={dynamicStyles.severityText}>{getSeverityLabel(distortion.severity)}</Text>
                       </View>
                     </View>
-                  )}
-                </View>
-              ))}
-            </View>
-          )}
-
-          {analysis.activities.length > 0 && (
-            <View style={dynamicStyles.section}>
-              <Text style={dynamicStyles.sectionTitle}>Suggested Activities</Text>
-              <Text style={dynamicStyles.sectionSubtitle}>
-                Based on your emotional state, here are some activities that might help:
-              </Text>
-              {analysis.activities.map((activity) => (
-                <TouchableOpacity
-                  key={activity.id}
-                  style={dynamicStyles.activityCard}
-                  onPress={() => handleActivityToggle(activity.id)}
-                >
-                  <View style={dynamicStyles.activityHeader}>
-                    {selectedActivities.has(activity.id) ? (
-                      <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
-                    ) : (
-                      <Square size={20} color={colors.border} strokeWidth={1.5} />
+                    
+                    <Text style={dynamicStyles.distortionDescription}>{distortion.description}</Text>
+                    
+                    {distortion.userQuotes && distortion.userQuotes.length > 0 && (
+                      <View style={dynamicStyles.quotesSection}>
+                        <Text style={dynamicStyles.quotesTitle}>Your words that triggered this detection:</Text>
+                        {distortion.userQuotes.map((quote, quoteIndex) => (
+                          <Text key={quoteIndex} style={dynamicStyles.userQuote}>
+                            "{quote.trim()}"
+                          </Text>
+                        ))}
+                      </View>
                     )}
-                    <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
-                    <Text style={dynamicStyles.activityDuration}>{activity.duration}</Text>
+
+                    <Text style={dynamicStyles.evidenceTitle}>Let's check some facts:</Text>
+                    {(distortion.evidence || []).map((fact, factIndex) => (
+                      <Text key={factIndex} style={dynamicStyles.evidenceItem}>• {fact}</Text>
+                    ))}
+
+                    <TouchableOpacity
+                      style={dynamicStyles.reframeButton}
+                      onPress={() => handleReframeToggle(distortion.type)}
+                    >
+                      <Text style={dynamicStyles.reframeButtonText}>
+                        {showReframing[distortion.type] ? 'Hide Reframing' : 'Reframe This Thought'}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {showReframing[distortion.type] && (
+                      <View style={dynamicStyles.reframingSection}>
+                        <Text style={dynamicStyles.reframingPrompt}>
+                          {distortion.reframingPrompt || 'How might I view this situation more objectively?'}
+                        </Text>
+                        
+                        <TouchableOpacity
+                          style={dynamicStyles.aiSuggestionButton}
+                          onPress={() => handleGenerateAIReframe(distortion)}
+                          disabled={isGeneratingReframe[distortion.type]}
+                        >
+                          <Lightbulb size={16} color={colors.primary} strokeWidth={1.5} />
+                          <Text style={dynamicStyles.aiSuggestionText}>
+                            {isGeneratingReframe[distortion.type] ? 'Generating...' : 'Generate AI suggestion'}
+                          </Text>
+                        </TouchableOpacity>
+
+                        <TextInput
+                          style={dynamicStyles.reframingInput}
+                          placeholder="Write a more balanced version of this thought..."
+                          placeholderTextColor={colors.textSecondary}
+                          value={reframedThoughts[distortion.type] || ''}
+                          onChangeText={(text) => setReframedThoughts(prev => ({
+                            ...prev,
+                            [distortion.type]: text
+                          }))}
+                          multiline
+                          textAlignVertical="top"
+                        />
+                        <View style={dynamicStyles.reframingActions}>
+                          <TouchableOpacity
+                            style={dynamicStyles.saveReframeButton}
+                            onPress={() => handleReframeSave(distortion)}
+                          >
+                            <Text style={dynamicStyles.saveReframeText}>Save to Entry</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            style={dynamicStyles.cancelReframeButton}
+                            onPress={() => setShowReframing(prev => ({ ...prev, [distortion.type]: false }))}
+                          >
+                            <Text style={dynamicStyles.cancelReframeText}>Cancel</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
                   </View>
-                  <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </ScrollView>
+                ))}
+              </View>
+            )}
+
+            {/* Suggested Activities Section */}
+            {analysis.activities && analysis.activities.length > 0 && (
+              <View style={dynamicStyles.section}>
+                <Text style={dynamicStyles.sectionTitle}>Suggested Activities</Text>
+                <Text style={dynamicStyles.sectionSubtitle}>
+                  Based on your emotional state, here are some activities that might help:
+                </Text>
+                {analysis.activities.map((activity) => (
+                  <TouchableOpacity
+                    key={activity.id}
+                    style={dynamicStyles.activityCard}
+                    onPress={() => handleActivityToggle(activity.id)}
+                  >
+                    <View style={dynamicStyles.activityHeader}>
+                      {selectedActivities.has(activity.id) ? (
+                        <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
+                      ) : (
+                        <Square size={20} color={colors.border} strokeWidth={1.5} />
+                      )}
+                      <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
+                      <Text style={dynamicStyles.activityDuration}>{activity.duration}</Text>
+                    </View>
+                    <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </ScrollView>
+        )}
       </View>
     </Modal>
   );
