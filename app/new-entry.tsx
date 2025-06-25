@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import PatternDetectionModal from '@/components/PatternDetectionModal';
-import InlineAIAnalysis from '@/components/InlineAIAnalysis';
+import AIAnalysisCards from '@/components/AIAnalysisCards';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -26,7 +26,8 @@ export default function NewEntryPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showPatternDetection, setShowPatternDetection] = useState(false);
   const [detectedPattern, setDetectedPattern] = useState<any>(null);
-  const [showInlineAnalysis, setShowInlineAnalysis] = useState(false);
+  const [showAnalysisCards, setShowAnalysisCards] = useState(false);
+  const [savedAnalysis, setSavedAnalysis] = useState<AIAnalysisResult | null>(null);
   const { addEntry, updateEntry, deleteEntry } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
@@ -118,6 +119,13 @@ export default function NewEntryPage() {
       return;
     }
 
+    // If we already have saved analysis for this content, show it
+    if (savedAnalysis) {
+      setAIAnalysis(savedAnalysis);
+      setShowAnalysisCards(true);
+      return;
+    }
+
     console.log('Starting AI analysis...');
     setIsAnalyzing(true);
     
@@ -127,8 +135,9 @@ export default function NewEntryPage() {
       console.log('AI Analysis completed:', analysis);
       
       setAIAnalysis(analysis);
-      setShowInlineAnalysis(true);
-      console.log('Inline analysis should now be visible');
+      setSavedAnalysis(analysis); // Save for future clicks
+      setShowAnalysisCards(true);
+      console.log('Analysis cards should now be visible');
     } catch (error) {
       console.error('AI Analysis error:', error);
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
@@ -151,9 +160,8 @@ export default function NewEntryPage() {
     console.log('Activity selected:', activityId);
   };
 
-  const handleCloseInlineAnalysis = () => {
-    setShowInlineAnalysis(false);
-    setAIAnalysis(null);
+  const handleCloseAnalysisCards = () => {
+    setShowAnalysisCards(false);
   };
 
   const handleSave = () => {
@@ -186,20 +194,20 @@ export default function NewEntryPage() {
       finalTitle = `${aiAnalysis.emotion.emoji} ${finalTitle}`;
     }
 
+    const entryData = {
+      title: finalTitle,
+      content: content.trim(),
+      preview,
+      mood: determineMood(content),
+      aiAnalysis: savedAnalysis, // Save the analysis with the entry
+    };
+
     if (isEditing && entryId) {
-      updateEntry(parseInt(entryId), {
-        title: finalTitle,
-        content: content.trim(),
-        preview,
-        mood: determineMood(content),
-      });
+      updateEntry(parseInt(entryId), entryData);
     } else {
       const newEntry = {
-        title: finalTitle,
-        content: content.trim(),
-        preview,
+        ...entryData,
         date: getCurrentDateTime(),
-        mood: determineMood(content),
       };
       addEntry(newEntry);
     }
@@ -271,9 +279,12 @@ export default function NewEntryPage() {
       textAlign: 'center',
       marginHorizontal: 16,
     },
-    content: {
+    scrollContainer: {
       flex: 1,
+    },
+    content: {
       paddingHorizontal: 24,
+      paddingBottom: 20,
     },
     titleInput: {
       fontSize: 24,
@@ -281,19 +292,44 @@ export default function NewEntryPage() {
       color: colors.text,
       lineHeight: 32,
       minHeight: 40,
+      marginTop: 16,
+      marginBottom: 16,
     },
     contentInput: {
-      flex: 1,
       fontSize: 16,
       color: colors.text,
       lineHeight: 24,
       fontWeight: '300',
+      minHeight: 200,
+      textAlignVertical: 'top',
+      marginBottom: 20,
+    },
+    userTextSection: {
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: 16,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    userTextTitle: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.text,
+      marginBottom: 12,
+    },
+    userText: {
+      fontSize: 14,
+      color: colors.text,
+      lineHeight: 20,
     },
     bottomInfo: {
       paddingVertical: 16,
+      paddingHorizontal: 24,
       borderTopWidth: 1,
       borderTopColor: colors.border,
       alignItems: 'center',
+      backgroundColor: colors.background,
     },
     timestamp: {
       fontSize: 12,
@@ -309,9 +345,46 @@ export default function NewEntryPage() {
     },
   });
 
+  if (showAnalysisCards && aiAnalysis) {
+    return (
+      <View style={dynamicStyles.container}>
+        <View style={dynamicStyles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleCloseAnalysisCards}>
+            <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
+          </TouchableOpacity>
+          
+          <Text style={dynamicStyles.headerTitle}>AI Analysis</Text>
+          
+          <TouchableOpacity style={styles.backButton} onPress={handleSave}>
+            <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '500' }}>Save</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <View style={dynamicStyles.content}>
+            {/* User's Text Display */}
+            <View style={dynamicStyles.userTextSection}>
+              <Text style={dynamicStyles.userTextTitle}>Your Entry</Text>
+              <Text style={dynamicStyles.userText}>{content}</Text>
+            </View>
+
+            {/* AI Analysis Cards */}
+            <AIAnalysisCards
+              analysis={aiAnalysis}
+              onSaveReframe={handleSaveReframe}
+              onActivitySelect={handleActivitySelect}
+              entryText={content}
+              userProfile={userProfile}
+            />
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
     <>
-      {/* Main Screen Content */}
+      {/* Main Entry Screen */}
       <View style={dynamicStyles.container}>
         <View style={dynamicStyles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
@@ -335,8 +408,8 @@ export default function NewEntryPage() {
           />
         </View>
 
-        <View style={dynamicStyles.content}>
-          <View style={styles.titleSection}>
+        <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
+          <View style={dynamicStyles.content}>
             <TextInput
               style={dynamicStyles.titleInput}
               placeholder="Title here"
@@ -345,9 +418,7 @@ export default function NewEntryPage() {
               onChangeText={setTitle}
               multiline
             />
-          </View>
 
-          <View style={styles.contentSection}>
             <TextInput
               style={dynamicStyles.contentInput}
               placeholder="Start writing..."
@@ -358,26 +429,14 @@ export default function NewEntryPage() {
               textAlignVertical="top"
               autoFocus={!isEditing}
             />
-            
-            {/* Inline AI Analysis */}
-            {showInlineAnalysis && aiAnalysis && (
-              <InlineAIAnalysis
-                analysis={aiAnalysis}
-                onClose={handleCloseInlineAnalysis}
-                onSaveReframe={handleSaveReframe}
-                onActivitySelect={handleActivitySelect}
-                entryText={content}
-                userProfile={userProfile}
-              />
-            )}
           </View>
+        </ScrollView>
 
-          <View style={dynamicStyles.bottomInfo}>
-            <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-            {isAnalyzing && (
-              <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
-            )}
-          </View>
+        <View style={dynamicStyles.bottomInfo}>
+          <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
+          {isAnalyzing && (
+            <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
+          )}
         </View>
       </View>
 
@@ -398,12 +457,5 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     borderRadius: 8,
-  },
-  titleSection: {
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  contentSection: {
-    flex: 1,
   },
 });

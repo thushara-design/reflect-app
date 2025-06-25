@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { AIAnalysisResult } from '@/services/aiService';
 
 export interface Entry {
   id: number;
@@ -8,6 +9,7 @@ export interface Entry {
   title?: string;
   content: string;
   createdAt: Date;
+  aiAnalysis?: AIAnalysisResult | null;
 }
 
 interface EntriesContextType {
