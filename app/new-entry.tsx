@@ -120,43 +120,7 @@ export default function NewEntryPage() {
     try {
       const analysis = await aiService.analyzeEntry(content);
       setAIAnalysis(analysis);
-      
-      // Navigate to reflection results with analysis data
-      const emotion = analysis.emotion.emotion;
-      const confidence = Math.round(analysis.emotion.confidence * 100).toString();
-      const reflection = analysis.reflection;
-      
-      // Get user's configured activities for this emotion
-      const userActivities = userProfile?.emotionalToolkit.find(
-        item => item.emotion.toLowerCase() === emotion.toLowerCase()
-      )?.actions || [];
-      
-      const activities = userActivities.map((action, index) => ({
-        id: `user-${index}`,
-        title: action,
-        description: `Your personalized coping strategy for ${emotion}`,
-        duration: '5-15 minutes'
-      }));
-
-      // Add AI-suggested activities
-      const aiActivities = analysis.activities.map(activity => ({
-        ...activity,
-        id: `ai-${activity.id}`,
-        title: `💡 ${activity.title}`,
-        description: `AI suggests: ${activity.description}`
-      }));
-
-      const allActivities = [...activities, ...aiActivities];
-
-      router.push({
-        pathname: '/reflection-results',
-        params: {
-          emotion,
-          confidence,
-          reflection,
-          activities: JSON.stringify(allActivities)
-        }
-      });
+      setShowAIAnalysis(true);
     } catch (error) {
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
     } finally {
@@ -394,6 +358,7 @@ export default function NewEntryPage() {
         analysis={aiAnalysis}
         onSaveReframe={handleSaveReframe}
         onActivitySelect={handleActivitySelect}
+        entryText={content}
       />
 
       <PatternDetectionModal

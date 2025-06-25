@@ -10,8 +10,10 @@ export interface CognitiveDistortion {
   type: string;
   description: string;
   detectedText: string[];
+  userQuotes: string[];
   evidence: string[];
   reframingPrompt: string;
+  severity: 'low' | 'medium' | 'high';
 }
 
 export interface ActivitySuggestion {
@@ -62,7 +64,7 @@ class AIService {
           messages: [
             { 
               role: 'system', 
-              content: 'You are an expert therapist and emotional intelligence coach. You MUST respond with valid JSON only. Do not include any text before or after the JSON object.' 
+              content: 'You are an expert cognitive behavioral therapist. You MUST respond with valid JSON only. Do not include any text before or after the JSON object. Focus on identifying specific cognitive distortions with exact quotes from the user\'s text.' 
             },
             { 
               role: 'user', 
@@ -71,8 +73,8 @@ class AIService {
           ],
           model: 'accounts/fireworks/models/llama-v3p1-8b-instruct',
           stream: false,
-          temperature: 0.3, // Lower temperature for more consistent JSON
-          max_tokens: 2000 // Increased to ensure complete responses
+          temperature: 0.2, // Even lower for more consistent analysis
+          max_tokens: 2500 // Increased for detailed analysis
         },
         {
           headers: {
@@ -100,40 +102,133 @@ class AIService {
     }
   }
 
+  async generateReframedThought(originalThought: string, distortionType: string, userContext: string): Promise<string> {
+    if (!this.apiKey) {
+      return this.generateFallbackReframe(originalThought, distortionType);
+    }
+
+    try {
+      const reframingPrompt = `As a cognitive behavioral therapist, help reframe this unhelpful thought:
+
+ORIGINAL THOUGHT: "${originalThought}"
+DISTORTION TYPE: ${distortionType}
+USER CONTEXT: "${userContext}"
+
+Provide a more balanced, realistic reframe that:
+1. Acknowledges the person's feelings
+2. Challenges the distortion with evidence
+3. Offers a more balanced perspective
+4. Is written in first person ("I" statements)
+
+Respond with ONLY the reframed thought, no additional text:`;
+
+      const response = await axios.post(
+        this.apiUrl,
+        {
+          messages: [
+            { 
+              role: 'system', 
+              content: 'You are a cognitive behavioral therapist helping someone reframe unhelpful thoughts. Respond with only the reframed thought, nothing else.' 
+            },
+            { 
+              role: 'user', 
+              content: reframingPrompt 
+            }
+          ],
+          model: 'accounts/fireworks/models/llama-v3p1-8b-instruct',
+          stream: false,
+          temperature: 0.3,
+          max_tokens: 200
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 15000,
+        }
+      );
+
+      if (response.data && response.data.choices && response.data.choices[0]) {
+        const reframedThought = response.data.choices[0].message.content?.trim() || '';
+        return reframedThought || this.generateFallbackReframe(originalThought, distortionType);
+      }
+    } catch (error) {
+      console.error('Error generating reframed thought:', error);
+    }
+
+    return this.generateFallbackReframe(originalThought, distortionType);
+  }
+
+  private generateFallbackReframe(originalThought: string, distortionType: string): string {
+    const reframingTemplates: Record<string, string[]> = {
+      'Catastrophizing': [
+        'While this situation is challenging, I can handle it step by step. Most outcomes aren\'t as extreme as I initially fear.',
+        'I\'ve faced difficult situations before and found ways through them. This situation likely has multiple possible outcomes.',
+        'Instead of focusing on the worst case, I can prepare for realistic scenarios and trust in my ability to cope.'
+      ],
+      'All-or-Nothing Thinking': [
+        'This situation isn\'t completely good or bad - there are aspects I can acknowledge and learn from.',
+        'Progress happens gradually. Even partial success is still meaningful progress toward my goals.',
+        'I can recognize the gray areas in this situation rather than seeing it as completely one way or another.'
+      ],
+      'Mind Reading': [
+        'I don\'t actually know what others are thinking. There could be many explanations for their behavior that have nothing to do with me.',
+        'People are usually focused on their own concerns. I can\'t read minds, so I\'ll focus on what I actually know.',
+        'Instead of assuming what others think, I can communicate directly or focus on my own actions and responses.'
+      ],
+      'Fortune Telling': [
+        'I cannot predict the future with certainty. I can prepare for different outcomes while staying open to possibilities.',
+        'While I feel uncertain about what will happen, I can focus on what I can control right now.',
+        'My predictions about the future are just thoughts, not facts. I can take positive action despite uncertainty.'
+      ],
+      'Emotional Reasoning': [
+        'Just because I feel this way doesn\'t mean it\'s completely true. My emotions are valid, but they don\'t define reality.',
+        'I can acknowledge my feelings while also looking at the facts of the situation objectively.',
+        'My emotions are giving me information, but I can also consider evidence that might contradict how I\'m feeling.'
+      ]
+    };
+
+    const templates = reframingTemplates[distortionType] || reframingTemplates['Catastrophizing'];
+    return templates[Math.floor(Math.random() * templates.length)];
+  }
+
   private createComprehensiveAnalysisPrompt(entryText: string): string {
-    return `Analyze this journal entry and respond with ONLY valid JSON in this exact format:
+    return `Analyze this journal entry for cognitive distortions and emotional content. Find EXACT QUOTES from the user's text that demonstrate unhelpful thinking patterns.
 
 JOURNAL ENTRY: "${entryText}"
 
-Respond with this JSON structure (no additional text):
+Respond with ONLY this JSON structure:
 
 {
   "emotion": {
     "primary_emotion": "happy|sad|angry|anxious|stressed|calm|frustrated|excited|lonely|grateful|confused|hopeful|disappointed|content|overwhelmed",
     "confidence": 0.8,
-    "explanation": "brief explanation"
+    "explanation": "brief explanation of why this emotion was detected"
   },
   "cognitive_distortions": [
     {
-      "type": "catastrophizing",
-      "description": "explanation of the distortion",
-      "evidence_against": ["fact 1", "fact 2", "fact 3"],
-      "reframing_question": "helpful question"
+      "type": "Catastrophizing|All-or-Nothing Thinking|Mind Reading|Fortune Telling|Emotional Reasoning|Mental Filter|Personalization",
+      "description": "Specific explanation of how this distortion appears in the user's text",
+      "user_quotes": ["exact quote 1 from user", "exact quote 2 from user"],
+      "severity": "low|medium|high",
+      "evidence_against": ["challenging fact 1", "challenging fact 2", "challenging fact 3"],
+      "reframing_question": "helpful question to challenge this thought"
     }
   ],
-  "key_themes": ["theme1", "theme2"],
-  "reflection": "Compassionate 2-3 sentence reflection",
+  "key_themes": ["theme1", "theme2", "theme3"],
+  "reflection": "Compassionate 2-3 sentence reflection that acknowledges the user's experience",
   "suggested_activities": [
     {
-      "title": "activity name",
-      "description": "how this helps",
+      "title": "specific activity name",
+      "description": "how this activity helps with the detected emotion/situation",
       "duration": "5-10 minutes",
-      "category": "breathing"
+      "category": "breathing|movement|mindfulness|journaling|social"
     }
   ]
 }
 
-IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or after.`;
+CRITICAL: Only include cognitive distortions if you find CLEAR evidence in the user's exact words. Include the exact quotes that demonstrate the distortion.`;
   }
 
   private parseAIAnalysis(originalText: string, aiResponse: string): AIAnalysisResult {
@@ -155,8 +250,8 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
         // Parse emotion with validation
         const emotion = this.parseEmotionFromAI(analysisData.emotion);
         
-        // Parse cognitive distortions with validation
-        const distortions = this.parseDistortionsFromAI(analysisData.cognitive_distortions || []);
+        // Parse cognitive distortions with enhanced validation
+        const distortions = this.parseDistortionsFromAI(analysisData.cognitive_distortions || [], originalText);
         
         // Parse activities with validation
         const activities = this.parseActivitiesFromAI(analysisData.suggested_activities || []);
@@ -180,9 +275,65 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
       console.warn('Failed to parse AI JSON response:', error);
       console.log('Raw AI response:', aiResponse);
       
-      // Fallback to text-based parsing
+      // Fallback to enhanced text-based parsing
       return this.parseTextualAIResponse(originalText, aiResponse);
     }
+  }
+
+  private parseDistortionsFromAI(distortionsData: any[], originalText: string): CognitiveDistortion[] {
+    if (!Array.isArray(distortionsData)) {
+      return this.detectCognitiveDistortions(originalText);
+    }
+
+    const parsedDistortions = distortionsData.map((distortion) => {
+      // Validate user quotes are actually from the original text
+      const userQuotes = Array.isArray(distortion?.user_quotes) 
+        ? distortion.user_quotes.filter((quote: string) => 
+            originalText.toLowerCase().includes(quote.toLowerCase().trim())
+          )
+        : [];
+
+      // If no valid quotes found, try to find relevant sentences
+      const detectedText = userQuotes.length > 0 
+        ? userQuotes 
+        : this.findRelevantSentences(originalText, distortion?.type || '');
+
+      return {
+        type: distortion?.type || 'Unhelpful Thinking Pattern',
+        description: distortion?.description || 'An unhelpful thinking pattern was detected in your entry.',
+        detectedText: detectedText,
+        userQuotes: userQuotes,
+        evidence: Array.isArray(distortion?.evidence_against) ? distortion.evidence_against : [
+          'Consider alternative perspectives on this situation',
+          'Look for evidence that contradicts this thought',
+          'Remember past experiences that challenge this pattern'
+        ],
+        reframingPrompt: distortion?.reframing_question || 'How might I view this situation more objectively?',
+        severity: distortion?.severity || 'medium'
+      };
+    }).filter(d => d.detectedText.length > 0); // Only include distortions with evidence
+
+    return parsedDistortions.slice(0, 3); // Limit to 3 distortions
+  }
+
+  private findRelevantSentences(text: string, distortionType: string): string[] {
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    
+    const distortionKeywords: Record<string, string[]> = {
+      'Catastrophizing': ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined', 'doomed', 'hopeless'],
+      'All-or-Nothing Thinking': ['completely', 'totally', 'perfect', 'failure', 'useless', 'worthless', 'all', 'none'],
+      'Mind Reading': ['they think', 'he thinks', 'she thinks', 'everyone thinks', 'they hate', 'they judge'],
+      'Fortune Telling': ['will never', 'going to fail', 'won\'t work', 'always happen', 'bound to'],
+      'Emotional Reasoning': ['feel like', 'must be true', 'because I feel', 'feeling means']
+    };
+
+    const keywords = distortionKeywords[distortionType] || [];
+    
+    const relevantSentences = sentences.filter(sentence => 
+      keywords.some(keyword => sentence.toLowerCase().includes(keyword))
+    );
+
+    return relevantSentences.slice(0, 2);
   }
 
   private parseEmotionFromAI(emotionData: any): EmotionResult {
@@ -223,25 +374,6 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
     };
   }
 
-  private parseDistortionsFromAI(distortionsData: any[]): CognitiveDistortion[] {
-    if (!Array.isArray(distortionsData)) {
-      return [];
-    }
-
-    return distortionsData.map((distortion, index) => ({
-      type: distortion?.type || 'Unhelpful Thinking Pattern',
-      description: distortion?.description || 'An unhelpful thinking pattern was detected.',
-      detectedText: Array.isArray(distortion?.detected_text) ? distortion.detected_text : 
-                   [distortion?.example || 'Pattern detected in text'],
-      evidence: Array.isArray(distortion?.evidence_against) ? distortion.evidence_against : [
-        'Consider alternative perspectives',
-        'Look for evidence that contradicts this thought',
-        'Remember past experiences that challenge this pattern'
-      ],
-      reframingPrompt: distortion?.reframing_question || 'How might I view this situation more objectively?'
-    })).slice(0, 3); // Limit to 3 distortions
-  }
-
   private parseActivitiesFromAI(activitiesData: any[]): ActivitySuggestion[] {
     if (!Array.isArray(activitiesData)) {
       return [];
@@ -257,13 +389,13 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
   }
 
   private parseTextualAIResponse(originalText: string, aiResponse: string): AIAnalysisResult {
-    console.log('Using textual parsing fallback');
+    console.log('Using enhanced textual parsing fallback');
     
     // Extract emotion from AI response text
     const emotion = this.extractEmotionFromAIText(aiResponse, originalText);
     
-    // Extract distortions mentioned in AI response
-    const distortions = this.extractDistortionsFromAIText(aiResponse, originalText);
+    // Extract distortions mentioned in AI response with better detection
+    const distortions = this.detectCognitiveDistortions(originalText);
     
     // Generate activities based on AI insights and emotion
     const activities = this.generateContextualActivities(originalText, emotion.emotion, aiResponse);
@@ -305,6 +437,10 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
         keywords: ['stressed', 'overwhelmed', 'pressure', 'burden', 'exhausted', 'strained', 'frazzled'],
         emoji: '😫'
       },
+      frustrated: {
+        keywords: ['frustrated', 'annoyed', 'irritated', 'fed up', 'stuck', 'blocked'],
+        emoji: '😤'
+      },
       calm: {
         keywords: ['calm', 'peaceful', 'serene', 'tranquil', 'relaxed', 'centered', 'balanced'],
         emoji: '😌'
@@ -336,74 +472,6 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
       emoji,
       confidence
     };
-  }
-
-  private extractDistortionsFromAIText(aiText: string, originalText: string): CognitiveDistortion[] {
-    const distortions: CognitiveDistortion[] = [];
-    const lowerAI = aiText.toLowerCase();
-    const lowerOriginal = originalText.toLowerCase();
-
-    // Look for distortion mentions in AI response
-    const distortionPatterns = {
-      'Catastrophizing': {
-        aiKeywords: ['catastroph', 'worst case', 'disaster', 'extreme'],
-        originalKeywords: ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined'],
-        description: 'You might be imagining the worst-case scenario or thinking in extremes about this situation.',
-        evidence: [
-          'Most situations have multiple possible outcomes, not just the worst one',
-          'You have successfully handled difficult situations before',
-          'Even challenging situations often have solutions or ways to cope'
-        ],
-        reframingPrompt: 'What evidence do I have that this worst-case scenario will actually happen? What are some more realistic outcomes?'
-      },
-      'All-or-Nothing Thinking': {
-        aiKeywords: ['black and white', 'all or nothing', 'extreme', 'absolute'],
-        originalKeywords: ['completely', 'totally', 'perfect', 'failure', 'always', 'never'],
-        description: 'You might be seeing this situation in black and white, missing the gray areas and partial successes.',
-        evidence: [
-          'Most situations exist on a spectrum rather than being completely good or bad',
-          'Partial success is still success and worth acknowledging',
-          'Learning and growth happen gradually, with ups and downs along the way'
-        ],
-        reframingPrompt: 'Instead of seeing this as completely good or bad, what middle ground or partial success can I acknowledge?'
-      },
-      'Mind Reading': {
-        aiKeywords: ['mind reading', 'assuming', 'think you know'],
-        originalKeywords: ['they think', 'he thinks', 'she thinks', 'everyone thinks', 'they hate', 'they judge'],
-        description: 'You might be assuming you know what others are thinking without having concrete evidence.',
-        evidence: [
-          'You cannot know for certain what others are thinking',
-          'People often have their own concerns and may not be focused on judging you',
-          'There could be many explanations for someone\'s behavior that have nothing to do with you'
-        ],
-        reframingPrompt: 'What evidence do I actually have about what this person is thinking? What other explanations could there be for their behavior?'
-      }
-    };
-
-    for (const [type, pattern] of Object.entries(distortionPatterns)) {
-      const aiMentioned = pattern.aiKeywords.some(keyword => lowerAI.includes(keyword));
-      const originalContains = pattern.originalKeywords.some(keyword => lowerOriginal.includes(keyword));
-
-      if (aiMentioned || originalContains) {
-        // Find example text from original
-        const sentences = originalText.split(/[.!?]+/);
-        const exampleSentences = sentences.filter(sentence => 
-          pattern.originalKeywords.some(keyword => 
-            sentence.toLowerCase().includes(keyword)
-          )
-        );
-
-        distortions.push({
-          type,
-          description: pattern.description,
-          detectedText: exampleSentences.slice(0, 2),
-          evidence: pattern.evidence,
-          reframingPrompt: pattern.reframingPrompt
-        });
-      }
-    }
-
-    return distortions.slice(0, 3);
   }
 
   private extractReflectionFromAIText(aiText: string): string | null {
@@ -733,80 +801,112 @@ IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or afte
   private detectCognitiveDistortions(text: string): CognitiveDistortion[] {
     const distortions: CognitiveDistortion[] = [];
     const lowerText = text.toLowerCase();
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 5);
 
-    // Catastrophizing detection
-    const catastrophizingWords = ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined', 'doomed', 'hopeless', 'everything', 'nothing'];
+    // Enhanced Catastrophizing detection
+    const catastrophizingWords = ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined', 'doomed', 'hopeless', 'everything', 'nothing', 'completely destroyed', 'total failure'];
     const foundCatastrophizing = catastrophizingWords.filter(word => lowerText.includes(word));
     
     if (foundCatastrophizing.length >= 2) {
-      const sentences = text.split(/[.!?]+/);
       const problematicSentences = sentences.filter(sentence => 
         foundCatastrophizing.some(word => sentence.toLowerCase().includes(word))
       );
       
       distortions.push({
         type: 'Catastrophizing',
-        description: 'You might be imagining the worst-case scenario or thinking in extremes about this situation.',
+        description: `You're imagining the worst-case scenario. Words like "${foundCatastrophizing.join('", "')}" suggest you might be thinking in extremes about this situation.`,
         detectedText: problematicSentences.slice(0, 2),
+        userQuotes: problematicSentences.slice(0, 2),
         evidence: [
           'Most situations have multiple possible outcomes, not just the worst one',
           'You have successfully navigated difficult situations before',
-          'Even challenging situations often have solutions or ways to cope'
+          'Even challenging situations often have solutions or ways to cope',
+          'Extreme outcomes are statistically less likely than moderate ones'
         ],
-        reframingPrompt: 'What evidence do I have that this worst-case scenario will actually happen? What are some more realistic outcomes?'
+        reframingPrompt: 'What evidence do I have that this worst-case scenario will actually happen? What are some more realistic outcomes?',
+        severity: foundCatastrophizing.length >= 4 ? 'high' : 'medium'
       });
     }
 
-    // Mind reading detection
-    const mindReadingPhrases = ['they think', 'he thinks', 'she thinks', 'everyone thinks', 'they hate', 'they judge', 'they must think'];
+    // Enhanced Mind reading detection
+    const mindReadingPhrases = ['they think', 'he thinks', 'she thinks', 'everyone thinks', 'they hate', 'they judge', 'they must think', 'probably thinks', 'they\'re thinking'];
     const foundMindReading = mindReadingPhrases.filter(phrase => lowerText.includes(phrase));
     
     if (foundMindReading.length > 0) {
-      const sentences = text.split(/[.!?]+/);
       const mindReadingSentences = sentences.filter(sentence => 
         foundMindReading.some(phrase => sentence.toLowerCase().includes(phrase))
       );
       
       distortions.push({
         type: 'Mind Reading',
-        description: 'You might be assuming you know what others are thinking without having concrete evidence.',
+        description: `You're assuming you know what others are thinking without concrete evidence. Phrases like "${foundMindReading.join('", "')}" suggest you might be mind reading.`,
         detectedText: mindReadingSentences.slice(0, 2),
+        userQuotes: mindReadingSentences.slice(0, 2),
         evidence: [
           'You cannot know for certain what others are thinking',
           'People often have their own concerns and may not be focused on judging you',
-          'There could be many explanations for someone\'s behavior that have nothing to do with you'
+          'There could be many explanations for someone\'s behavior that have nothing to do with you',
+          'Most people are more focused on themselves than on judging others'
         ],
-        reframingPrompt: 'What evidence do I actually have about what this person is thinking? What other explanations could there be for their behavior?'
+        reframingPrompt: 'What evidence do I actually have about what this person is thinking? What other explanations could there be for their behavior?',
+        severity: mindReadingSentences.length >= 2 ? 'high' : 'medium'
       });
     }
 
-    // All-or-nothing thinking
-    const allOrNothingWords = ['completely', 'totally', 'perfect', 'failure', 'useless', 'worthless', 'all', 'none'];
+    // Enhanced All-or-nothing thinking
+    const allOrNothingWords = ['completely', 'totally', 'perfect', 'failure', 'useless', 'worthless', 'all', 'none', 'entirely', 'absolutely'];
     const foundAllOrNothing = allOrNothingWords.filter(word => {
       const regex = new RegExp(`\\b${word}\\b`, 'i');
       return regex.test(text);
     });
     
     if (foundAllOrNothing.length >= 2) {
-      const sentences = text.split(/[.!?]+/);
       const blackWhiteSentences = sentences.filter(sentence => 
         foundAllOrNothing.some(word => new RegExp(`\\b${word}\\b`, 'i').test(sentence))
       );
       
       distortions.push({
         type: 'All-or-Nothing Thinking',
-        description: 'You might be seeing this situation in black and white, missing the gray areas and partial successes.',
+        description: `You're seeing this situation in black and white terms. Words like "${foundAllOrNothing.join('", "')}" suggest you might be missing the gray areas and partial successes.`,
         detectedText: blackWhiteSentences.slice(0, 2),
+        userQuotes: blackWhiteSentences.slice(0, 2),
         evidence: [
           'Most situations exist on a spectrum rather than being completely good or bad',
           'Partial success is still success and worth acknowledging',
-          'Learning and growth happen gradually, with ups and downs along the way'
+          'Learning and growth happen gradually, with ups and downs along the way',
+          'Very few things in life are truly "all" or "nothing"'
         ],
-        reframingPrompt: 'Instead of seeing this as completely good or bad, what middle ground or partial success can I acknowledge?'
+        reframingPrompt: 'Instead of seeing this as completely good or bad, what middle ground or partial success can I acknowledge?',
+        severity: foundAllOrNothing.length >= 4 ? 'high' : 'medium'
       });
     }
 
-    return distortions;
+    // Fortune Telling detection
+    const fortuneTellingPhrases = ['will never', 'going to fail', 'won\'t work', 'always happen', 'bound to', 'definitely will', 'for sure will'];
+    const foundFortuneTelling = fortuneTellingPhrases.filter(phrase => lowerText.includes(phrase));
+    
+    if (foundFortuneTelling.length > 0) {
+      const fortuneTellingSentences = sentences.filter(sentence => 
+        foundFortuneTelling.some(phrase => sentence.toLowerCase().includes(phrase))
+      );
+      
+      distortions.push({
+        type: 'Fortune Telling',
+        description: `You're predicting negative outcomes without sufficient evidence. Phrases like "${foundFortuneTelling.join('", "')}" suggest you might be fortune telling.`,
+        detectedText: fortuneTellingSentences.slice(0, 2),
+        userQuotes: fortuneTellingSentences.slice(0, 2),
+        evidence: [
+          'The future is uncertain and has many possible outcomes',
+          'You cannot predict the future with complete accuracy',
+          'Past negative experiences don\'t guarantee future negative outcomes',
+          'You have influence over many factors that affect outcomes'
+        ],
+        reframingPrompt: 'What evidence do I have that this prediction will come true? What positive actions can I take to influence the outcome?',
+        severity: 'medium'
+      });
+    }
+
+    return distortions.slice(0, 3); // Limit to top 3 most significant distortions
   }
 }
 
