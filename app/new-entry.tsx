@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import AIAnalysisModal from '@/components/AIAnalysisModal';
+import PatternDetectionModal from '@/components/PatternDetectionModal';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -24,6 +25,8 @@ export default function NewEntryPage() {
   const [showAIAnalysis, setShowAIAnalysis] = useState(false);
   const [aiAnalysis, setAIAnalysis] = useState<AIAnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showPatternDetection, setShowPatternDetection] = useState(false);
+  const [detectedPattern, setDetectedPattern] = useState<any>(null);
   const { addEntry, updateEntry, deleteEntry } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
@@ -62,8 +65,35 @@ export default function NewEntryPage() {
     }
   }, [content, title, isEditing]);
 
+  // Check for unhelpful patterns as user types
+  useEffect(() => {
+    if (content.length > 50) {
+      checkForUnhelpfulPatterns(content);
+    }
+  }, [content]);
+
+  const checkForUnhelpfulPatterns = (text: string) => {
+    const lowerText = text.toLowerCase();
+    
+    // Check for catastrophizing
+    const catastrophizingWords = ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined'];
+    const foundCatastrophizing = catastrophizingWords.filter(word => lowerText.includes(word));
+    
+    if (foundCatastrophizing.length >= 2 && !showPatternDetection) {
+      setDetectedPattern({
+        type: 'Catastrophizing',
+        explanation: 'This pattern involves imagining the worst-case scenario or thinking that something is far worse than it actually is.',
+        challengingFacts: [
+          'Most situations have multiple possible outcomes, not just the worst one',
+          'You have successfully handled difficult situations before',
+          'Even challenging situations often have solutions or ways to cope'
+        ]
+      });
+      setShowPatternDetection(true);
+    }
+  };
+
   const handleVoiceTranscript = (transcript: string) => {
-    // Add the transcript with proper spacing
     setContent(prev => {
       const trimmedPrev = prev.trim();
       const trimmedTranscript = transcript.trim();
@@ -72,7 +102,6 @@ export default function NewEntryPage() {
         return trimmedTranscript;
       }
       
-      // Add a space between existing content and new transcript
       return trimmedPrev + ' ' + trimmedTranscript;
     });
   };
@@ -95,7 +124,7 @@ export default function NewEntryPage() {
       // Navigate to reflection results with analysis data
       const emotion = analysis.emotion.emotion;
       const confidence = Math.round(analysis.emotion.confidence * 100).toString();
-      const reflection = "Your entry shows emotional awareness and self-reflection. It's healthy to acknowledge these feelings and seek ways to process them constructively.";
+      const reflection = analysis.reflection;
       
       // Get user's configured activities for this emotion
       const userActivities = userProfile?.emotionalToolkit.find(
@@ -109,13 +138,23 @@ export default function NewEntryPage() {
         duration: '5-15 minutes'
       }));
 
+      // Add AI-suggested activities
+      const aiActivities = analysis.activities.map(activity => ({
+        ...activity,
+        id: `ai-${activity.id}`,
+        title: `💡 ${activity.title}`,
+        description: `AI suggests: ${activity.description}`
+      }));
+
+      const allActivities = [...activities, ...aiActivities];
+
       router.push({
         pathname: '/reflection-results',
         params: {
           emotion,
           confidence,
           reflection,
-          activities: JSON.stringify(activities)
+          activities: JSON.stringify(allActivities)
         }
       });
     } catch (error) {
@@ -126,12 +165,16 @@ export default function NewEntryPage() {
   };
 
   const handleSaveReframe = (originalThought: string, reframedThought: string) => {
+    const reframedSection = `\n\n--- Reframed Thought ---\nOriginal: ${originalThought}\nReframed: ${reframedThought}\n`;
+    setContent(prev => prev + reframedSection);
+  };
+
+  const handlePatternReframe = (reframedThought: string) => {
     const reframedSection = `\n\n--- Reframed Thought ---\n${reframedThought}\n`;
     setContent(prev => prev + reframedSection);
   };
 
   const handleActivitySelect = (activityId: string) => {
-    // Could track selected activities for future recommendations
     console.log('Activity selected:', activityId);
   };
 
@@ -141,12 +184,10 @@ export default function NewEntryPage() {
       return;
     }
 
-    // Create preview from content (first 150 characters)
     const preview = content.trim().length > 150 
       ? content.trim().substring(0, 150) + '...'
       : content.trim();
 
-    // Determine mood based on content (simple keyword analysis)
     const determineMood = (text: string) => {
       const lowerText = text.toLowerCase();
       if (lowerText.includes('happy') || lowerText.includes('joy') || lowerText.includes('excited') || lowerText.includes('grateful')) {
@@ -162,14 +203,12 @@ export default function NewEntryPage() {
       }
     };
 
-    // Add emoji to title if AI analysis was performed
     let finalTitle = title.trim() || getCurrentDateTime();
     if (aiAnalysis?.emotion.emoji) {
       finalTitle = `${aiAnalysis.emotion.emoji} ${finalTitle}`;
     }
 
     if (isEditing && entryId) {
-      // Update existing entry
       updateEntry(parseInt(entryId), {
         title: finalTitle,
         content: content.trim(),
@@ -177,7 +216,6 @@ export default function NewEntryPage() {
         mood: determineMood(content),
       });
     } else {
-      // Create new entry
       const newEntry = {
         title: finalTitle,
         content: content.trim(),
@@ -188,12 +226,10 @@ export default function NewEntryPage() {
       addEntry(newEntry);
     }
     
-    // Navigate back to entries tab
     router.replace('/(tabs)');
   };
 
   const handleEdit = () => {
-    // Already in edit mode, this could toggle to a different edit state
     console.log('Edit pressed');
   };
 
@@ -358,6 +394,15 @@ export default function NewEntryPage() {
         analysis={aiAnalysis}
         onSaveReframe={handleSaveReframe}
         onActivitySelect={handleActivitySelect}
+      />
+
+      <PatternDetectionModal
+        visible={showPatternDetection}
+        onClose={() => setShowPatternDetection(false)}
+        patternType={detectedPattern?.type || ''}
+        explanation={detectedPattern?.explanation || ''}
+        challengingFacts={detectedPattern?.challengingFacts || []}
+        onSaveReframe={handlePatternReframe}
       />
     </View>
   );

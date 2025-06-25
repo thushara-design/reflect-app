@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export interface EmotionResult {
   emotion: string;
   emoji: string;
@@ -25,14 +27,156 @@ export interface AIAnalysisResult {
   distortions: CognitiveDistortion[];
   activities: ActivitySuggestion[];
   suggestedEmoji: string;
+  reflection: string;
 }
 
 class AIService {
-  async analyzeEntry(entryText: string): Promise<AIAnalysisResult> {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+  private apiKey: string;
+  private apiUrl: string = 'https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-8B-Instruct';
 
-    // Analyze the entry text
+  constructor() {
+    this.apiKey = process.env.EXPO_PUBLIC_HUGGING_FACE_API_KEY || '';
+    if (!this.apiKey) {
+      console.warn('Hugging Face API key not found. AI analysis will use fallback logic.');
+    }
+  }
+
+  async analyzeEntry(entryText: string): Promise<AIAnalysisResult> {
+    if (!this.apiKey) {
+      console.log('Using fallback AI analysis due to missing API key');
+      return this.getFallbackAnalysis(entryText);
+    }
+
+    try {
+      const prompt = this.constructPrompt(entryText);
+      
+      const response = await axios.post(
+        this.apiUrl,
+        {
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: 1000,
+            temperature: 0.7,
+            do_sample: true,
+            return_full_text: false
+          }
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          timeout: 30000, // 30 second timeout
+        }
+      );
+
+      if (response.data && response.data[0] && response.data[0].generated_text) {
+        const generatedText = response.data[0].generated_text;
+        return this.parseAIResponse(generatedText, entryText);
+      } else {
+        console.warn('Unexpected API response format, using fallback');
+        return this.getFallbackAnalysis(entryText);
+      }
+    } catch (error) {
+      console.error('Error calling Hugging Face API:', error);
+      
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 503) {
+          console.log('Model is loading, using fallback analysis');
+        } else if (error.response?.status === 401) {
+          console.error('Invalid API key');
+        } else if (error.response?.status === 429) {
+          console.log('Rate limit exceeded, using fallback analysis');
+        }
+      }
+      
+      return this.getFallbackAnalysis(entryText);
+    }
+  }
+
+  private constructPrompt(entryText: string): string {
+    return `You are a compassionate AI therapist analyzing a journal entry. Please analyze the following journal entry and respond with a JSON object containing the following structure:
+
+{
+  "emotion": {
+    "emotion": "primary emotion detected (happy, sad, anxious, angry, stressed, calm, neutral)",
+    "emoji": "appropriate emoji for the emotion",
+    "confidence": "confidence score between 0 and 1"
+  },
+  "reflection": "A supportive, therapeutic reflection on the entry (2-3 sentences)",
+  "distortions": [
+    {
+      "type": "type of cognitive distortion if detected",
+      "description": "explanation of the distortion",
+      "detectedText": ["specific phrases that show this pattern"],
+      "evidence": ["facts that challenge this thinking pattern"],
+      "reframingPrompt": "question to help reframe the thought"
+    }
+  ],
+  "activities": [
+    {
+      "id": "unique_id",
+      "title": "activity name",
+      "description": "brief description of the activity",
+      "duration": "estimated time needed",
+      "category": "type of activity"
+    }
+  ]
+}
+
+Journal Entry: "${entryText}"
+
+Please respond only with the JSON object, no additional text:`;
+  }
+
+  private parseAIResponse(generatedText: string, originalText: string): AIAnalysisResult {
+    try {
+      // Try to extract JSON from the response
+      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response');
+      }
+
+      const parsedResponse = JSON.parse(jsonMatch[0]);
+      
+      // Validate and structure the response
+      const emotion: EmotionResult = {
+        emotion: parsedResponse.emotion?.emotion || 'neutral',
+        emoji: parsedResponse.emotion?.emoji || '😐',
+        confidence: parsedResponse.emotion?.confidence || 0.75
+      };
+
+      const distortions: CognitiveDistortion[] = (parsedResponse.distortions || []).map((d: any) => ({
+        type: d.type || 'Unknown Pattern',
+        description: d.description || 'Potential unhelpful thinking pattern detected',
+        detectedText: Array.isArray(d.detectedText) ? d.detectedText : [],
+        evidence: Array.isArray(d.evidence) ? d.evidence : ['Consider alternative perspectives'],
+        reframingPrompt: d.reframingPrompt || 'How might you view this situation differently?'
+      }));
+
+      const activities: ActivitySuggestion[] = (parsedResponse.activities || []).map((a: any, index: number) => ({
+        id: a.id || `ai-activity-${index}`,
+        title: a.title || 'Mindful Breathing',
+        description: a.description || 'Take a few deep breaths to center yourself',
+        duration: a.duration || '5 minutes',
+        category: a.category || 'mindfulness'
+      }));
+
+      return {
+        emotion,
+        distortions,
+        activities,
+        suggestedEmoji: emotion.emoji,
+        reflection: parsedResponse.reflection || 'Your entry shows self-awareness and reflection, which are important steps in emotional growth.'
+      };
+    } catch (error) {
+      console.error('Error parsing AI response:', error);
+      return this.getFallbackAnalysis(originalText);
+    }
+  }
+
+  private getFallbackAnalysis(entryText: string): AIAnalysisResult {
+    // Fallback to the original hardcoded logic when API is unavailable
     const emotion = this.detectEmotion(entryText);
     const distortions = this.detectCognitiveDistortions(entryText);
     const activities = this.generateActivitySuggestions(emotion.emotion);
@@ -41,14 +185,14 @@ class AIService {
       emotion,
       distortions,
       activities,
-      suggestedEmoji: emotion.emoji
+      suggestedEmoji: emotion.emoji,
+      reflection: "Your entry shows emotional awareness and self-reflection. It's healthy to acknowledge these feelings and seek ways to process them constructively."
     };
   }
 
   private detectEmotion(text: string): EmotionResult {
     const lowerText = text.toLowerCase();
     
-    // Enhanced emotion detection with more keywords
     const emotionPatterns = {
       happy: ['happy', 'joy', 'excited', 'grateful', 'amazing', 'wonderful', 'great', 'fantastic', 'love', 'blessed', 'thrilled', 'delighted'],
       sad: ['sad', 'upset', 'down', 'depressed', 'lonely', 'empty', 'hopeless', 'disappointed', 'hurt', 'crying', 'tears'],
@@ -149,24 +293,6 @@ class AIService {
       });
     }
 
-    // Emotional reasoning
-    const emotionalReasoningPhrases = ['i feel like', 'i feel that', 'it feels like'];
-    const foundEmotionalReasoning = emotionalReasoningPhrases.some(phrase => lowerText.includes(phrase));
-    
-    if (foundEmotionalReasoning && (lowerText.includes('failure') || lowerText.includes('stupid') || lowerText.includes('worthless'))) {
-      distortions.push({
-        type: 'Emotional Reasoning',
-        description: 'You might be assuming that because you feel a certain way, it must be true.',
-        detectedText: emotionalReasoningPhrases.filter(phrase => lowerText.includes(phrase)),
-        evidence: [
-          'Feelings are valid but they don\'t always reflect facts',
-          'Emotions can be influenced by many factors like stress, fatigue, or past experiences',
-          'You can feel something strongly and still question whether it\'s accurate'
-        ],
-        reframingPrompt: 'Just because I feel this way doesn\'t mean it\'s true. What facts support or contradict this feeling?'
-      });
-    }
-
     return distortions;
   }
 
@@ -186,13 +312,6 @@ class AIService {
           description: 'Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste.',
           duration: '5 minutes',
           category: 'grounding'
-        },
-        {
-          id: 'progressive-relaxation',
-          title: 'Progressive Muscle Relaxation',
-          description: 'Tense and release each muscle group from toes to head.',
-          duration: '10 minutes',
-          category: 'relaxation'
         }
       ],
       sad: [
@@ -209,13 +328,6 @@ class AIService {
           description: 'Speak to yourself as you would to a good friend going through this.',
           duration: '5 minutes',
           category: 'self-care'
-        },
-        {
-          id: 'gentle-movement',
-          title: 'Gentle Movement',
-          description: 'Take a slow walk or do some gentle stretching.',
-          duration: '15 minutes',
-          category: 'movement'
         }
       ],
       angry: [
@@ -232,13 +344,6 @@ class AIService {
           description: 'Take slow, deep breaths while counting backwards from 10.',
           duration: '3 minutes',
           category: 'breathing'
-        },
-        {
-          id: 'anger-journal',
-          title: 'Anger Journaling',
-          description: 'Write about what triggered your anger without censoring yourself.',
-          duration: '10 minutes',
-          category: 'writing'
         }
       ],
       stressed: [
@@ -255,13 +360,6 @@ class AIService {
           description: 'Take a brisk walk while focusing on your surroundings.',
           duration: '15 minutes',
           category: 'movement'
-        },
-        {
-          id: 'boundary-setting',
-          title: 'Boundary Check',
-          description: 'Identify one thing you can say no to today to reduce stress.',
-          duration: '5 minutes',
-          category: 'boundaries'
         }
       ],
       happy: [
@@ -278,13 +376,6 @@ class AIService {
           description: 'Tell someone about what made you happy or write about it.',
           duration: '10 minutes',
           category: 'connection'
-        },
-        {
-          id: 'gratitude-expansion',
-          title: 'Expand Gratitude',
-          description: 'Think of all the people and circumstances that contributed to this happiness.',
-          duration: '5 minutes',
-          category: 'gratitude'
         }
       ],
       calm: [
@@ -294,18 +385,10 @@ class AIService {
           description: 'Spend time observing something in nature or your environment mindfully.',
           duration: '10 minutes',
           category: 'mindfulness'
-        },
-        {
-          id: 'creative-expression',
-          title: 'Creative Expression',
-          description: 'Draw, write, or create something that expresses your current state.',
-          duration: '15 minutes',
-          category: 'creativity'
         }
       ]
     };
 
-    // Return activities for the detected emotion, or default to anxious activities
     return activityDatabase[emotion] || activityDatabase['anxious'];
   }
 }
