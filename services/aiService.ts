@@ -534,22 +534,11 @@ CRITICAL:
           category: 'movement'
         }
       ],
-      angry: [
-        {
-          id: 'physical-release',
-          title: 'Physical Release',
-          description: 'Do jumping jacks, punch a pillow, or go for a brisk walk to release the physical tension from anger.',
-          duration: '5-10 minutes',
-          category: 'physical'
-        },
-        {
-          id: 'cooling-breath',
-          title: 'Cooling Breath',
-          description: 'Take slow, deep breaths while counting backwards from 10 to help cool down intense emotions.',
-          duration: '3-5 minutes',
-          category: 'breathing'
-        }
-      ],
+      angry: {
+        keywords: ['angry', 'frustrated', 'mad', 'furious', 'irritated', 'annoyed', 'rage', 'outraged'],
+        contextPhrases: ['so frustrated', 'really angry', 'makes me mad', 'can\'t stand', 'drives me crazy', 'fed up'],
+        emoji: '😠'
+      },
       stressed: [
         {
           id: 'priority-reset',
@@ -680,7 +669,7 @@ CRITICAL:
         keywords: ['angry', 'frustrated', 'mad', 'furious', 'annoyed', 'irritated', 'rage', 'hate', 'pissed', 'outraged', 'livid', 'irate', 'infuriated'],
         contextPhrases: ['so frustrated', 'really angry', 'makes me mad', 'can\'t stand', 'drives me crazy', 'fed up'],
         emoji: '😠'
-      ],
+      },
       anxious: {
         keywords: ['anxious', 'worried', 'nervous', 'scared', 'afraid', 'panic', 'stress', 'overwhelmed', 'tense', 'uneasy', 'apprehensive', 'restless', 'fearful'],
         contextPhrases: ['so worried', 'really anxious', 'can\'t stop thinking', 'what if', 'scared that', 'nervous about'],
@@ -690,7 +679,7 @@ CRITICAL:
         keywords: ['stressed', 'overwhelmed', 'pressure', 'deadline', 'busy', 'exhausted', 'tired', 'burnt out', 'frazzled', 'strained', 'swamped'],
         contextPhrases: ['so much to do', 'feeling overwhelmed', 'too much pressure', 'can\'t handle', 'burning out'],
         emoji: '😫'
-      ],
+      },
       frustrated: {
         keywords: ['frustrated', 'annoyed', 'irritated', 'fed up', 'stuck', 'blocked', 'hindered', 'thwarted'],
         contextPhrases: ['so frustrated', 'really annoying', 'can\'t get', 'not working', 'keeps failing'],
