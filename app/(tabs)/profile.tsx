@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Linking } from 'react-native';
 import { useState } from 'react';
-import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, Edit3, X, Plus, Trash2, Download, Brain, Zap } from 'lucide-react-native';
+import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, CreditCard as Edit3, X, Plus, Trash2, Download, Brain, Zap } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';

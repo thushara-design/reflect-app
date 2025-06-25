@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput, Alert } from 'react-native';
 import { useState } from 'react';
-import { X, Plus, Trash2, Edit3 } from 'lucide-react-native';
+import { X, Plus, Trash2, CreditCard as Edit3 } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding, EmotionalToolkitItem } from '@/contexts/OnboardingContext';
 
