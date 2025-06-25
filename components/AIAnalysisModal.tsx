@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput, Alert, StatusBar } from 'react-native';
 import { useState } from 'react';
 import { X, Sparkles, SquareCheck as CheckSquare, Square, TriangleAlert as AlertTriangle, Lightbulb } from 'lucide-react-native';
 import { AIAnalysisResult, CognitiveDistortion } from '@/services/aiService';
@@ -97,21 +97,17 @@ export default function AIAnalysisModal({
     }
   };
 
-  // Don't render anything if not visible - let React Native handle the modal
-  if (!visible) {
-    return null;
-  }
-
   return (
     <Modal
       visible={visible}
       animationType="slide"
       presentationStyle="fullScreen"
       onRequestClose={onClose}
-      statusBarTranslucent={false}
+      statusBarTranslucent={true}
     >
-      <View style={styles.container}>
-        <View style={styles.header}>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <View style={styles.modalContainer}>
+        <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
           <View style={styles.headerLeft}>
             <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
             <Text style={[styles.headerTitle, { color: colors.text }]}>AI Analysis</Text>
@@ -123,14 +119,18 @@ export default function AIAnalysisModal({
 
         {/* Show loading state if no analysis */}
         {!analysis ? (
-          <View style={styles.loadingContainer}>
+          <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
             <Text style={[styles.loadingText, { color: colors.text }]}>Analyzing your entry...</Text>
             <Text style={[styles.loadingSubtext, { color: colors.textSecondary }]}>
               This may take a moment while we process your thoughts
             </Text>
           </View>
         ) : (
-          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView 
+            style={[styles.content, { backgroundColor: colors.background }]} 
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.contentContainer}
+          >
             {/* Debug information in development */}
             {__DEV__ && (
               <View style={[styles.debugContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -313,9 +313,16 @@ export default function AIAnalysisModal({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  modalContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: '100%',
+    height: '100%',
     backgroundColor: '#FAFAFA',
+    zIndex: 9999,
   },
   header: {
     flexDirection: 'row',
@@ -325,8 +332,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-    backgroundColor: '#FAFAFA',
+    zIndex: 10000,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -344,6 +350,9 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 24,
+  },
+  contentContainer: {
+    paddingBottom: 40,
   },
   section: {
     marginVertical: 20,
