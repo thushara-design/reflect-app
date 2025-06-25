@@ -62,7 +62,7 @@ class AIService {
           messages: [
             { 
               role: 'system', 
-              content: 'You are an expert therapist and emotional intelligence coach. Provide detailed, empathetic analysis of journal entries.' 
+              content: 'You are an expert therapist and emotional intelligence coach. You MUST respond with valid JSON only. Do not include any text before or after the JSON object.' 
             },
             { 
               role: 'user', 
@@ -71,8 +71,8 @@ class AIService {
           ],
           model: 'accounts/fireworks/models/llama-v3p1-8b-instruct',
           stream: false,
-          temperature: 0.7,
-          max_tokens: 1500
+          temperature: 0.3, // Lower temperature for more consistent JSON
+          max_tokens: 2000 // Increased to ensure complete responses
         },
         {
           headers: {
@@ -87,7 +87,7 @@ class AIService {
 
       if (response.data && response.data.choices && response.data.choices[0]) {
         const generatedText = response.data.choices[0].message.content || '';
-        console.log('Generated analysis:', generatedText.substring(0, 200) + '...');
+        console.log('Generated analysis (first 300 chars):', generatedText.substring(0, 300));
         
         return this.parseAIAnalysis(entryText, generatedText);
       } else {
@@ -101,61 +101,71 @@ class AIService {
   }
 
   private createComprehensiveAnalysisPrompt(entryText: string): string {
-    return `Please analyze this journal entry comprehensively and provide a structured response:
+    return `Analyze this journal entry and respond with ONLY valid JSON in this exact format:
 
-JOURNAL ENTRY:
-"${entryText}"
+JOURNAL ENTRY: "${entryText}"
 
-Please provide your analysis in the following JSON format:
+Respond with this JSON structure (no additional text):
 
 {
   "emotion": {
-    "primary_emotion": "one of: happy, sad, angry, anxious, stressed, calm, frustrated, excited, lonely, grateful, confused, hopeful, disappointed, content, overwhelmed",
-    "confidence": "number between 0.1 and 1.0",
-    "explanation": "brief explanation of why you identified this emotion"
+    "primary_emotion": "happy|sad|angry|anxious|stressed|calm|frustrated|excited|lonely|grateful|confused|hopeful|disappointed|content|overwhelmed",
+    "confidence": 0.8,
+    "explanation": "brief explanation"
   },
   "cognitive_distortions": [
     {
-      "type": "name of distortion (e.g., catastrophizing, all-or-nothing thinking, mind reading, fortune telling, emotional reasoning, personalization, should statements, mental filter, disqualifying the positive, jumping to conclusions)",
-      "description": "explanation of how this distortion appears in the text",
+      "type": "catastrophizing",
+      "description": "explanation of the distortion",
       "evidence_against": ["fact 1", "fact 2", "fact 3"],
-      "reframing_question": "a helpful question to challenge this thinking pattern"
+      "reframing_question": "helpful question"
     }
   ],
-  "key_themes": ["theme1", "theme2", "theme3"],
-  "reflection": "A compassionate, personalized reflection that acknowledges the person's experience and offers gentle insight or validation (2-3 sentences)",
+  "key_themes": ["theme1", "theme2"],
+  "reflection": "Compassionate 2-3 sentence reflection",
   "suggested_activities": [
     {
       "title": "activity name",
-      "description": "how this activity could help based on the specific content",
-      "duration": "estimated time",
-      "category": "type of activity"
+      "description": "how this helps",
+      "duration": "5-10 minutes",
+      "category": "breathing"
     }
   ]
 }
 
-Focus on being empathetic, accurate, and helpful. Base your analysis on the actual content rather than generic responses.`;
+IMPORTANT: Respond with ONLY the JSON object. No explanatory text before or after.`;
   }
 
   private parseAIAnalysis(originalText: string, aiResponse: string): AIAnalysisResult {
     try {
-      // Try to extract JSON from the AI response
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const analysisData = JSON.parse(jsonMatch[0]);
+      // Clean the response - remove any text before the first { and after the last }
+      let cleanedResponse = aiResponse.trim();
+      
+      // Find the first { and last }
+      const firstBrace = cleanedResponse.indexOf('{');
+      const lastBrace = cleanedResponse.lastIndexOf('}');
+      
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        cleanedResponse = cleanedResponse.substring(firstBrace, lastBrace + 1);
         
-        // Parse emotion
+        console.log('Attempting to parse cleaned JSON:', cleanedResponse.substring(0, 200) + '...');
+        
+        const analysisData = JSON.parse(cleanedResponse);
+        
+        // Parse emotion with validation
         const emotion = this.parseEmotionFromAI(analysisData.emotion);
         
-        // Parse cognitive distortions
+        // Parse cognitive distortions with validation
         const distortions = this.parseDistortionsFromAI(analysisData.cognitive_distortions || []);
         
-        // Parse activities
+        // Parse activities with validation
         const activities = this.parseActivitiesFromAI(analysisData.suggested_activities || []);
         
-        // Get reflection
+        // Get reflection with fallback
         const reflection = analysisData.reflection || this.generateContentBasedReflection(originalText, emotion.emotion);
 
+        console.log('Successfully parsed AI analysis');
+        
         return {
           emotion,
           distortions,
@@ -163,13 +173,16 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
           suggestedEmoji: emotion.emoji,
           reflection
         };
+      } else {
+        throw new Error('No valid JSON structure found');
       }
     } catch (error) {
-      console.warn('Failed to parse AI JSON response, falling back to text analysis:', error);
+      console.warn('Failed to parse AI JSON response:', error);
+      console.log('Raw AI response:', aiResponse);
+      
+      // Fallback to text-based parsing
+      return this.parseTextualAIResponse(originalText, aiResponse);
     }
-
-    // Fallback to parsing the text response
-    return this.parseTextualAIResponse(originalText, aiResponse);
   }
 
   private parseEmotionFromAI(emotionData: any): EmotionResult {
@@ -191,42 +204,61 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
       overwhelmed: '😵‍💫'
     };
 
+    // Validate and extract emotion data
     const emotion = emotionData?.primary_emotion || 'neutral';
-    const confidence = emotionData?.confidence || 0.7;
+    let confidence = emotionData?.confidence || 0.7;
+    
+    // Ensure confidence is a valid number between 0.1 and 1.0
+    if (typeof confidence !== 'number' || isNaN(confidence)) {
+      confidence = 0.7;
+    }
+    confidence = Math.min(1.0, Math.max(0.1, confidence));
+    
     const emoji = emotionMap[emotion] || '😐';
 
     return {
       emotion,
       emoji,
-      confidence: Math.min(1.0, Math.max(0.1, confidence))
+      confidence
     };
   }
 
   private parseDistortionsFromAI(distortionsData: any[]): CognitiveDistortion[] {
+    if (!Array.isArray(distortionsData)) {
+      return [];
+    }
+
     return distortionsData.map((distortion, index) => ({
-      type: distortion.type || 'Unhelpful Thinking Pattern',
-      description: distortion.description || 'An unhelpful thinking pattern was detected.',
-      detectedText: [distortion.example || 'Pattern detected in text'],
-      evidence: distortion.evidence_against || [
+      type: distortion?.type || 'Unhelpful Thinking Pattern',
+      description: distortion?.description || 'An unhelpful thinking pattern was detected.',
+      detectedText: Array.isArray(distortion?.detected_text) ? distortion.detected_text : 
+                   [distortion?.example || 'Pattern detected in text'],
+      evidence: Array.isArray(distortion?.evidence_against) ? distortion.evidence_against : [
         'Consider alternative perspectives',
         'Look for evidence that contradicts this thought',
         'Remember past experiences that challenge this pattern'
       ],
-      reframingPrompt: distortion.reframing_question || 'How might I view this situation more objectively?'
+      reframingPrompt: distortion?.reframing_question || 'How might I view this situation more objectively?'
     })).slice(0, 3); // Limit to 3 distortions
   }
 
   private parseActivitiesFromAI(activitiesData: any[]): ActivitySuggestion[] {
+    if (!Array.isArray(activitiesData)) {
+      return [];
+    }
+
     return activitiesData.map((activity, index) => ({
       id: `ai-activity-${index}`,
-      title: activity.title || 'Mindful Activity',
-      description: activity.description || 'A helpful activity based on your current state.',
-      duration: activity.duration || '5-10 minutes',
-      category: activity.category || 'mindfulness'
+      title: activity?.title || 'Mindful Activity',
+      description: activity?.description || 'A helpful activity based on your current state.',
+      duration: activity?.duration || '5-10 minutes',
+      category: activity?.category || 'mindfulness'
     })).slice(0, 4); // Limit to 4 activities
   }
 
   private parseTextualAIResponse(originalText: string, aiResponse: string): AIAnalysisResult {
+    console.log('Using textual parsing fallback');
+    
     // Extract emotion from AI response text
     const emotion = this.extractEmotionFromAIText(aiResponse, originalText);
     
@@ -313,7 +345,7 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
 
     // Look for distortion mentions in AI response
     const distortionPatterns = {
-      'catastrophizing': {
+      'Catastrophizing': {
         aiKeywords: ['catastroph', 'worst case', 'disaster', 'extreme'],
         originalKeywords: ['always', 'never', 'worst', 'terrible', 'disaster', 'ruined'],
         description: 'You might be imagining the worst-case scenario or thinking in extremes about this situation.',
@@ -324,7 +356,7 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
         ],
         reframingPrompt: 'What evidence do I have that this worst-case scenario will actually happen? What are some more realistic outcomes?'
       },
-      'all-or-nothing thinking': {
+      'All-or-Nothing Thinking': {
         aiKeywords: ['black and white', 'all or nothing', 'extreme', 'absolute'],
         originalKeywords: ['completely', 'totally', 'perfect', 'failure', 'always', 'never'],
         description: 'You might be seeing this situation in black and white, missing the gray areas and partial successes.',
@@ -335,7 +367,7 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
         ],
         reframingPrompt: 'Instead of seeing this as completely good or bad, what middle ground or partial success can I acknowledge?'
       },
-      'mind reading': {
+      'Mind Reading': {
         aiKeywords: ['mind reading', 'assuming', 'think you know'],
         originalKeywords: ['they think', 'he thinks', 'she thinks', 'everyone thinks', 'they hate', 'they judge'],
         description: 'You might be assuming you know what others are thinking without having concrete evidence.',
@@ -464,6 +496,22 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
           category: 'movement'
         }
       ],
+      frustrated: [
+        {
+          id: 'frustration-release',
+          title: 'Frustration Release',
+          description: 'Write down what\'s frustrating you, then crumple up the paper and throw it away as a symbolic release.',
+          duration: '5-10 minutes',
+          category: 'expression'
+        },
+        {
+          id: 'progressive-relaxation',
+          title: 'Progressive Muscle Relaxation',
+          description: 'Tense and release each muscle group to help release physical tension from frustration.',
+          duration: '10-15 minutes',
+          category: 'relaxation'
+        }
+      ],
       happy: [
         {
           id: 'savor-moment',
@@ -573,6 +621,11 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
         contextPhrases: ['so much to do', 'feeling overwhelmed', 'too much pressure', 'can\'t handle', 'burning out'],
         emoji: '😫'
       },
+      frustrated: {
+        keywords: ['frustrated', 'annoyed', 'irritated', 'fed up', 'stuck', 'blocked', 'hindered', 'thwarted'],
+        contextPhrases: ['so frustrated', 'really annoying', 'can\'t get', 'not working', 'keeps failing'],
+        emoji: '😤'
+      },
       calm: {
         keywords: ['calm', 'peaceful', 'serene', 'relaxed', 'tranquil', 'centered', 'balanced', 'content', 'zen', 'composed', 'still', 'quiet'],
         contextPhrases: ['feeling calm', 'so peaceful', 'really relaxed', 'at peace', 'centered myself'],
@@ -638,6 +691,11 @@ Focus on being empathetic, accurate, and helpful. Base your analysis on the actu
         `Your frustration and anger come through clearly in your writing. These intense feelings often signal that something important to you has been affected.`,
         `The strength of your emotions shows how much this situation matters to you. Your anger is a valid response to what you're experiencing.`,
         `I can understand why this would trigger such strong feelings. Sometimes anger is our way of protecting what we value.`
+      ],
+      frustrated: [
+        `The frustration you're experiencing is completely understandable. It's natural to feel this way when things aren't going as planned.`,
+        `Your frustration shows that you care deeply about the outcome. These feelings are valid and worth acknowledging.`,
+        `I can sense the tension you're feeling when things feel stuck or blocked. This frustration is a normal response to obstacles.`
       ],
       stressed: [
         `The pressure and overwhelm you're feeling sounds incredibly challenging. It's natural to feel stressed when facing multiple demands.`,
