@@ -6,7 +6,7 @@ import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import EmotionChart from '@/components/EmotionChart';
-import ThinkingPatternsChart from '@/components/ThinkingPatternsChart';
+import HealingStrengthChart from '@/components/HealingStrengthChart';
 import CrisisHelpModal from '@/components/CrisisHelpModal';
 import ActivityManagementModal from '@/components/ActivityManagementModal';
 
@@ -432,8 +432,8 @@ export default function ProfileTab() {
                 <BarChart3 size={20} color={colors.primary} strokeWidth={1.5} />
               </View>
               <View style={dynamicStyles.featureContent}>
-                <Text style={dynamicStyles.featureTitle}>Insights</Text>
-                <Text style={dynamicStyles.featureDescription}>View your emotional patterns, thinking trends, and personal growth</Text>
+                <Text style={dynamicStyles.featureTitle}>Healing Analytics</Text>
+                <Text style={dynamicStyles.featureDescription}>Track your emotional patterns and healing strength over time</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -550,7 +550,7 @@ export default function ProfileTab() {
         </View>
       </Modal>
 
-      {/* Insights Modal */}
+      {/* Healing Analytics Modal */}
       <Modal
         visible={showInsights}
         animationType="slide"
@@ -559,14 +559,14 @@ export default function ProfileTab() {
       >
         <View style={dynamicStyles.container}>
           <View style={styles.modalHeader}>
-            <Text style={[dynamicStyles.modalTitle, { fontSize: 24, marginBottom: 0 }]}>Insights</Text>
+            <Text style={[dynamicStyles.modalTitle, { fontSize: 24, marginBottom: 0 }]}>Healing Analytics</Text>
             <TouchableOpacity onPress={() => setShowInsights(false)}>
               <X size={24} color={colors.text} strokeWidth={1.5} />
             </TouchableOpacity>
           </View>
           <ScrollView style={dynamicStyles.content}>
             <EmotionChart entries={entries} />
-            <ThinkingPatternsChart entries={entries} />
+            <HealingStrengthChart entries={entries} />
           </ScrollView>
         </View>
       </Modal>
