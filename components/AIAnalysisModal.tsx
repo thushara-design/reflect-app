@@ -30,308 +30,6 @@ export default function AIAnalysisModal({
 
   console.log('AIAnalysisModal render - visible:', visible, 'analysis:', !!analysis);
 
-  const dynamicStyles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 24,
-      paddingTop: 50,
-      paddingBottom: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    headerLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: '400',
-      color: colors.text,
-    },
-    closeButton: {
-      padding: 8,
-      borderRadius: 8,
-    },
-    content: {
-      flex: 1,
-      paddingHorizontal: 24,
-    },
-    section: {
-      marginVertical: 20,
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: '400',
-      color: colors.text,
-      marginBottom: 8,
-    },
-    sectionSubtitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginBottom: 16,
-      lineHeight: 20,
-    },
-    emotionCard: {
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 12,
-      padding: 16,
-    },
-    emotionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-      marginBottom: 12,
-    },
-    emotionEmoji: {
-      fontSize: 32,
-    },
-    emotionInfo: {
-      flex: 1,
-    },
-    emotionName: {
-      fontSize: 18,
-      fontWeight: '400',
-      color: colors.text,
-      textTransform: 'capitalize',
-    },
-    emotionConfidence: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginTop: 2,
-    },
-    gentleReflection: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-      fontStyle: 'italic',
-      paddingTop: 8,
-      borderTopWidth: 1,
-      borderTopColor: colors.border + '40',
-    },
-    distortionCard: {
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 16,
-    },
-    distortionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      marginBottom: 8,
-    },
-    severityBadge: {
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 12,
-      marginLeft: 'auto',
-    },
-    severityText: {
-      fontSize: 10,
-      fontWeight: '500',
-      color: colors.background,
-    },
-    distortionType: {
-      fontSize: 16,
-      fontWeight: '400',
-      color: colors.text,
-      flex: 1,
-    },
-    distortionDescription: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginBottom: 12,
-      lineHeight: 20,
-    },
-    quotesSection: {
-      backgroundColor: colors.background,
-      borderRadius: 8,
-      padding: 12,
-      marginBottom: 12,
-    },
-    quotesTitle: {
-      fontSize: 12,
-      fontWeight: '500',
-      color: colors.textSecondary,
-      marginBottom: 6,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-    },
-    userQuote: {
-      fontSize: 14,
-      color: colors.text,
-      fontStyle: 'italic',
-      marginBottom: 4,
-      lineHeight: 18,
-    },
-    evidenceTitle: {
-      fontSize: 14,
-      fontWeight: '400',
-      color: colors.text,
-      marginBottom: 8,
-    },
-    evidenceItem: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      marginBottom: 4,
-      lineHeight: 20,
-    },
-    reframeButton: {
-      backgroundColor: colors.primary,
-      borderRadius: 8,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      marginTop: 12,
-      alignItems: 'center',
-    },
-    reframeButtonText: {
-      fontSize: 14,
-      color: colors.background,
-      fontWeight: '400',
-    },
-    reframingSection: {
-      marginTop: 16,
-      paddingTop: 16,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    reframingPrompt: {
-      fontSize: 14,
-      color: colors.text,
-      marginBottom: 12,
-      fontWeight: '400',
-    },
-    aiSuggestionButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-      paddingVertical: 8,
-      marginBottom: 12,
-    },
-    aiSuggestionText: {
-      fontSize: 14,
-      color: colors.primary,
-      fontWeight: '400',
-    },
-    reframingInput: {
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 8,
-      padding: 12,
-      fontSize: 14,
-      color: colors.text,
-      minHeight: 80,
-      textAlignVertical: 'top',
-      marginBottom: 12,
-    },
-    reframingActions: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-    saveReframeButton: {
-      flex: 1,
-      backgroundColor: colors.primary,
-      borderRadius: 8,
-      paddingVertical: 12,
-      alignItems: 'center',
-    },
-    saveReframeText: {
-      fontSize: 14,
-      color: colors.background,
-      fontWeight: '400',
-    },
-    cancelReframeButton: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 8,
-      paddingVertical: 12,
-      alignItems: 'center',
-    },
-    cancelReframeText: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      fontWeight: '400',
-    },
-    activityCard: {
-      backgroundColor: colors.surface,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
-    },
-    activityHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 8,
-      gap: 12,
-    },
-    activityTitle: {
-      flex: 1,
-      fontSize: 16,
-      fontWeight: '400',
-      color: colors.text,
-    },
-    activityDuration: {
-      fontSize: 12,
-      color: colors.textSecondary,
-    },
-    activityDescription: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-      marginLeft: 32,
-    },
-    loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingVertical: 40,
-    },
-    loadingText: {
-      fontSize: 16,
-      color: colors.text,
-      marginBottom: 8,
-    },
-    loadingSubtext: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      textAlign: 'center',
-    },
-    debugContainer: {
-      backgroundColor: colors.surface,
-      borderRadius: 8,
-      padding: 16,
-      margin: 16,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    debugTitle: {
-      fontSize: 14,
-      fontWeight: '500',
-      color: colors.text,
-      marginBottom: 8,
-    },
-    debugText: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      fontFamily: 'monospace',
-    },
-  });
-
   const handleActivityToggle = (activityId: string) => {
     const newSelected = new Set(selectedActivities);
     if (newSelected.has(activityId)) {
@@ -399,40 +97,45 @@ export default function AIAnalysisModal({
     }
   };
 
-  // Always render the modal container, but show different content based on state
+  // Don't render anything if not visible - let React Native handle the modal
+  if (!visible) {
+    return null;
+  }
+
   return (
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle="fullScreen"
       onRequestClose={onClose}
+      statusBarTranslucent={false}
     >
-      <View style={dynamicStyles.container}>
-        <View style={dynamicStyles.header}>
-          <View style={dynamicStyles.headerLeft}>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
             <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
-            <Text style={dynamicStyles.headerTitle}>AI Analysis</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>AI Analysis</Text>
           </View>
-          <TouchableOpacity style={dynamicStyles.closeButton} onPress={onClose}>
+          <TouchableOpacity style={styles.closeButton} onPress={onClose}>
             <X size={24} color={colors.text} strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
 
         {/* Show loading state if no analysis */}
         {!analysis ? (
-          <View style={dynamicStyles.loadingContainer}>
-            <Text style={dynamicStyles.loadingText}>Analyzing your entry...</Text>
-            <Text style={dynamicStyles.loadingSubtext}>
+          <View style={styles.loadingContainer}>
+            <Text style={[styles.loadingText, { color: colors.text }]}>Analyzing your entry...</Text>
+            <Text style={[styles.loadingSubtext, { color: colors.textSecondary }]}>
               This may take a moment while we process your thoughts
             </Text>
           </View>
         ) : (
-          <ScrollView style={dynamicStyles.content} showsVerticalScrollIndicator={false}>
+          <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Debug information in development */}
             {__DEV__ && (
-              <View style={dynamicStyles.debugContainer}>
-                <Text style={dynamicStyles.debugTitle}>Debug Info:</Text>
-                <Text style={dynamicStyles.debugText}>
+              <View style={[styles.debugContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.debugTitle, { color: colors.text }]}>Debug Info:</Text>
+                <Text style={[styles.debugText, { color: colors.textSecondary }]}>
                   Analysis present: {!!analysis}{'\n'}
                   Emotion: {analysis.emotion?.emotion || 'none'}{'\n'}
                   Distortions: {analysis.distortions?.length || 0}{'\n'}
@@ -443,23 +146,23 @@ export default function AIAnalysisModal({
             )}
 
             {/* Emotional Tone Section */}
-            <View style={dynamicStyles.section}>
-              <Text style={dynamicStyles.sectionTitle}>Emotional Tone Detected</Text>
-              <View style={dynamicStyles.emotionCard}>
-                <View style={dynamicStyles.emotionHeader}>
-                  <Text style={dynamicStyles.emotionEmoji}>
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Emotional Tone Detected</Text>
+              <View style={[styles.emotionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <View style={styles.emotionHeader}>
+                  <Text style={styles.emotionEmoji}>
                     {analysis.emotion?.emoji || '😐'}
                   </Text>
-                  <View style={dynamicStyles.emotionInfo}>
-                    <Text style={dynamicStyles.emotionName}>
+                  <View style={styles.emotionInfo}>
+                    <Text style={[styles.emotionName, { color: colors.text }]}>
                       {analysis.emotion?.emotion || 'neutral'}
                     </Text>
-                    <Text style={dynamicStyles.emotionConfidence}>
+                    <Text style={[styles.emotionConfidence, { color: colors.textSecondary }]}>
                       {Math.round((analysis.emotion?.confidence || 0.7) * 100)}% confidence
                     </Text>
                   </View>
                 </View>
-                <Text style={dynamicStyles.gentleReflection}>
+                <Text style={[styles.gentleReflection, { color: colors.textSecondary, borderTopColor: colors.border + '40' }]}>
                   {analysis.reflection || 'Your entry shows emotional awareness and self-reflection.'}
                 </Text>
               </View>
@@ -467,73 +170,80 @@ export default function AIAnalysisModal({
 
             {/* Cognitive Distortions Section */}
             {analysis.distortions && analysis.distortions.length > 0 && (
-              <View style={dynamicStyles.section}>
-                <Text style={dynamicStyles.sectionTitle}>⚠️ Unhelpful Thinking Patterns Detected</Text>
-                <Text style={dynamicStyles.sectionSubtitle}>
+              <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>⚠️ Unhelpful Thinking Patterns Detected</Text>
+                <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
                   These patterns might be making you feel worse. Let's work on reframing them:
                 </Text>
                 {analysis.distortions.map((distortion, index) => (
                   <View 
                     key={index} 
                     style={[
-                      dynamicStyles.distortionCard,
-                      { borderColor: getSeverityColor(distortion.severity) }
+                      styles.distortionCard,
+                      { 
+                        backgroundColor: colors.surface,
+                        borderColor: getSeverityColor(distortion.severity)
+                      }
                     ]}
                   >
-                    <View style={dynamicStyles.distortionHeader}>
+                    <View style={styles.distortionHeader}>
                       <AlertTriangle size={20} color={getSeverityColor(distortion.severity)} strokeWidth={1.5} />
-                      <Text style={dynamicStyles.distortionType}>{distortion.type}</Text>
-                      <View style={[dynamicStyles.severityBadge, { backgroundColor: getSeverityColor(distortion.severity) }]}>
-                        <Text style={dynamicStyles.severityText}>{getSeverityLabel(distortion.severity)}</Text>
+                      <Text style={[styles.distortionType, { color: colors.text }]}>{distortion.type}</Text>
+                      <View style={[styles.severityBadge, { backgroundColor: getSeverityColor(distortion.severity) }]}>
+                        <Text style={[styles.severityText, { color: colors.background }]}>{getSeverityLabel(distortion.severity)}</Text>
                       </View>
                     </View>
                     
-                    <Text style={dynamicStyles.distortionDescription}>{distortion.description}</Text>
+                    <Text style={[styles.distortionDescription, { color: colors.textSecondary }]}>{distortion.description}</Text>
                     
                     {distortion.userQuotes && distortion.userQuotes.length > 0 && (
-                      <View style={dynamicStyles.quotesSection}>
-                        <Text style={dynamicStyles.quotesTitle}>Your words that triggered this detection:</Text>
+                      <View style={[styles.quotesSection, { backgroundColor: colors.background }]}>
+                        <Text style={[styles.quotesTitle, { color: colors.textSecondary }]}>Your words that triggered this detection:</Text>
                         {distortion.userQuotes.map((quote, quoteIndex) => (
-                          <Text key={quoteIndex} style={dynamicStyles.userQuote}>
+                          <Text key={quoteIndex} style={[styles.userQuote, { color: colors.text }]}>
                             "{quote.trim()}"
                           </Text>
                         ))}
                       </View>
                     )}
 
-                    <Text style={dynamicStyles.evidenceTitle}>Let's check some facts:</Text>
+                    <Text style={[styles.evidenceTitle, { color: colors.text }]}>Let's check some facts:</Text>
                     {(distortion.evidence || []).map((fact, factIndex) => (
-                      <Text key={factIndex} style={dynamicStyles.evidenceItem}>• {fact}</Text>
+                      <Text key={factIndex} style={[styles.evidenceItem, { color: colors.textSecondary }]}>• {fact}</Text>
                     ))}
 
                     <TouchableOpacity
-                      style={dynamicStyles.reframeButton}
+                      style={[styles.reframeButton, { backgroundColor: colors.primary }]}
                       onPress={() => handleReframeToggle(distortion.type)}
                     >
-                      <Text style={dynamicStyles.reframeButtonText}>
+                      <Text style={[styles.reframeButtonText, { color: colors.background }]}>
                         {showReframing[distortion.type] ? 'Hide Reframing' : 'Reframe This Thought'}
                       </Text>
                     </TouchableOpacity>
 
                     {showReframing[distortion.type] && (
-                      <View style={dynamicStyles.reframingSection}>
-                        <Text style={dynamicStyles.reframingPrompt}>
+                      <View style={[styles.reframingSection, { borderTopColor: colors.border }]}>
+                        <Text style={[styles.reframingPrompt, { color: colors.text }]}>
                           {distortion.reframingPrompt || 'How might I view this situation more objectively?'}
                         </Text>
                         
                         <TouchableOpacity
-                          style={dynamicStyles.aiSuggestionButton}
+                          style={styles.aiSuggestionButton}
                           onPress={() => handleGenerateAIReframe(distortion)}
                           disabled={isGeneratingReframe[distortion.type]}
                         >
                           <Lightbulb size={16} color={colors.primary} strokeWidth={1.5} />
-                          <Text style={dynamicStyles.aiSuggestionText}>
+                          <Text style={[styles.aiSuggestionText, { color: colors.primary }]}>
                             {isGeneratingReframe[distortion.type] ? 'Generating...' : 'Generate AI suggestion'}
                           </Text>
                         </TouchableOpacity>
 
                         <TextInput
-                          style={dynamicStyles.reframingInput}
+                          style={[styles.reframingInput, { 
+                            backgroundColor: colors.surface, 
+                            borderColor: colors.border,
+                            color: colors.text
+                          }]}
                           placeholder="Write a more balanced version of this thought..."
                           placeholderTextColor={colors.textSecondary}
                           value={reframedThoughts[distortion.type] || ''}
@@ -544,18 +254,21 @@ export default function AIAnalysisModal({
                           multiline
                           textAlignVertical="top"
                         />
-                        <View style={dynamicStyles.reframingActions}>
+                        <View style={styles.reframingActions}>
                           <TouchableOpacity
-                            style={dynamicStyles.saveReframeButton}
+                            style={[styles.saveReframeButton, { backgroundColor: colors.primary }]}
                             onPress={() => handleReframeSave(distortion)}
                           >
-                            <Text style={dynamicStyles.saveReframeText}>Save to Entry</Text>
+                            <Text style={[styles.saveReframeText, { color: colors.background }]}>Save to Entry</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
-                            style={dynamicStyles.cancelReframeButton}
+                            style={[styles.cancelReframeButton, { 
+                              backgroundColor: colors.surface,
+                              borderColor: colors.border
+                            }]}
                             onPress={() => setShowReframing(prev => ({ ...prev, [distortion.type]: false }))}
                           >
-                            <Text style={dynamicStyles.cancelReframeText}>Cancel</Text>
+                            <Text style={[styles.cancelReframeText, { color: colors.textSecondary }]}>Cancel</Text>
                           </TouchableOpacity>
                         </View>
                       </View>
@@ -567,27 +280,27 @@ export default function AIAnalysisModal({
 
             {/* Suggested Activities Section */}
             {analysis.activities && analysis.activities.length > 0 && (
-              <View style={dynamicStyles.section}>
-                <Text style={dynamicStyles.sectionTitle}>Suggested Activities</Text>
-                <Text style={dynamicStyles.sectionSubtitle}>
+              <View style={styles.section}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Suggested Activities</Text>
+                <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>
                   Based on your emotional state, here are some activities that might help:
                 </Text>
                 {analysis.activities.map((activity) => (
                   <TouchableOpacity
                     key={activity.id}
-                    style={dynamicStyles.activityCard}
+                    style={[styles.activityCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                     onPress={() => handleActivityToggle(activity.id)}
                   >
-                    <View style={dynamicStyles.activityHeader}>
+                    <View style={styles.activityHeader}>
                       {selectedActivities.has(activity.id) ? (
                         <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
                       ) : (
                         <Square size={20} color={colors.border} strokeWidth={1.5} />
                       )}
-                      <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
-                      <Text style={dynamicStyles.activityDuration}>{activity.duration}</Text>
+                      <Text style={[styles.activityTitle, { color: colors.text }]}>{activity.title}</Text>
+                      <Text style={[styles.activityDuration, { color: colors.textSecondary }]}>{activity.duration}</Text>
                     </View>
-                    <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
+                    <Text style={[styles.activityDescription, { color: colors.textSecondary }]}>{activity.description}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -598,3 +311,264 @@ export default function AIAnalysisModal({
     </Modal>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FAFAFA',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 50,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EAEAEA',
+    backgroundColor: '#FAFAFA',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '400',
+  },
+  closeButton: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  section: {
+    marginVertical: 20,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '400',
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  emotionCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+  },
+  emotionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginBottom: 12,
+  },
+  emotionEmoji: {
+    fontSize: 32,
+  },
+  emotionInfo: {
+    flex: 1,
+  },
+  emotionName: {
+    fontSize: 18,
+    fontWeight: '400',
+    textTransform: 'capitalize',
+  },
+  emotionConfidence: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  gentleReflection: {
+    fontSize: 14,
+    lineHeight: 20,
+    fontStyle: 'italic',
+    paddingTop: 8,
+    borderTopWidth: 1,
+  },
+  distortionCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+  },
+  distortionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  severityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 'auto',
+  },
+  severityText: {
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  distortionType: {
+    fontSize: 16,
+    fontWeight: '400',
+    flex: 1,
+  },
+  distortionDescription: {
+    fontSize: 14,
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  quotesSection: {
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+  },
+  quotesTitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  userQuote: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginBottom: 4,
+    lineHeight: 18,
+  },
+  evidenceTitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    marginBottom: 8,
+  },
+  evidenceItem: {
+    fontSize: 14,
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  reframeButton: {
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginTop: 12,
+    alignItems: 'center',
+  },
+  reframeButtonText: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  reframingSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+  },
+  reframingPrompt: {
+    fontSize: 14,
+    marginBottom: 12,
+    fontWeight: '400',
+  },
+  aiSuggestionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+    marginBottom: 12,
+  },
+  aiSuggestionText: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  reframingInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    minHeight: 80,
+    textAlignVertical: 'top',
+    marginBottom: 12,
+  },
+  reframingActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  saveReframeButton: {
+    flex: 1,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  saveReframeText: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  cancelReframeButton: {
+    flex: 1,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  cancelReframeText: {
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  activityCard: {
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 12,
+  },
+  activityTitle: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '400',
+  },
+  activityDuration: {
+    fontSize: 12,
+  },
+  activityDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginLeft: 32,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginBottom: 8,
+  },
+  loadingSubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  debugContainer: {
+    borderRadius: 8,
+    padding: 16,
+    margin: 16,
+    borderWidth: 1,
+  },
+  debugTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  debugText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+  },
+});

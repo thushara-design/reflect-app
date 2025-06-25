@@ -305,63 +305,66 @@ export default function NewEntryPage() {
   });
 
   return (
-    <View style={dynamicStyles.container}>
-      <View style={dynamicStyles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
-        </TouchableOpacity>
-        
-        <Text style={dynamicStyles.headerTitle}>
-          {isEditing ? 'Edit Entry' : 'New Entry'}
-        </Text>
-        
-        <EntryActions
-          onSavePress={handleSave}
-          onAIAnalysis={handleAIAnalysis}
-          showContextMenu={showContextMenu}
-          onEditPress={handleEdit}
-          onDeletePress={handleDelete}
-          isRecording={isRecording}
-          onRecordingChange={setIsRecording}
-          onVoiceTranscript={handleVoiceTranscript}
-          onVoiceError={handleVoiceError}
-        />
-      </View>
-
-      <View style={dynamicStyles.content}>
-        <View style={styles.titleSection}>
-          <TextInput
-            style={dynamicStyles.titleInput}
-            placeholder="Title here"
-            placeholderTextColor={colors.textSecondary}
-            value={title}
-            onChangeText={setTitle}
-            multiline
+    <>
+      {/* Main Screen Content */}
+      <View style={dynamicStyles.container}>
+        <View style={dynamicStyles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
+          </TouchableOpacity>
+          
+          <Text style={dynamicStyles.headerTitle}>
+            {isEditing ? 'Edit Entry' : 'New Entry'}
+          </Text>
+          
+          <EntryActions
+            onSavePress={handleSave}
+            onAIAnalysis={handleAIAnalysis}
+            showContextMenu={showContextMenu}
+            onEditPress={handleEdit}
+            onDeletePress={handleDelete}
+            isRecording={isRecording}
+            onRecordingChange={setIsRecording}
+            onVoiceTranscript={handleVoiceTranscript}
+            onVoiceError={handleVoiceError}
           />
         </View>
 
-        <View style={styles.contentSection}>
-          <TextInput
-            style={dynamicStyles.contentInput}
-            placeholder="Start writing..."
-            placeholderTextColor={colors.textSecondary}
-            value={content}
-            onChangeText={setContent}
-            multiline
-            textAlignVertical="top"
-            autoFocus={!isEditing}
-          />
-        </View>
+        <View style={dynamicStyles.content}>
+          <View style={styles.titleSection}>
+            <TextInput
+              style={dynamicStyles.titleInput}
+              placeholder="Title here"
+              placeholderTextColor={colors.textSecondary}
+              value={title}
+              onChangeText={setTitle}
+              multiline
+            />
+          </View>
 
-        <View style={dynamicStyles.bottomInfo}>
-          <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-          {isAnalyzing && (
-            <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
-          )}
+          <View style={styles.contentSection}>
+            <TextInput
+              style={dynamicStyles.contentInput}
+              placeholder="Start writing..."
+              placeholderTextColor={colors.textSecondary}
+              value={content}
+              onChangeText={setContent}
+              multiline
+              textAlignVertical="top"
+              autoFocus={!isEditing}
+            />
+          </View>
+
+          <View style={dynamicStyles.bottomInfo}>
+            <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
+            {isAnalyzing && (
+              <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
+            )}
+          </View>
         </View>
       </View>
 
-      {/* AI Analysis Modal */}
+      {/* Modals rendered at root level - OUTSIDE the main container */}
       <AIAnalysisModal
         visible={showAIAnalysis}
         onClose={() => {
@@ -374,7 +377,6 @@ export default function NewEntryPage() {
         entryText={content}
       />
 
-      {/* Pattern Detection Modal */}
       <PatternDetectionModal
         visible={showPatternDetection}
         onClose={() => setShowPatternDetection(false)}
@@ -383,7 +385,7 @@ export default function NewEntryPage() {
         challengingFacts={detectedPattern?.challengingFacts || []}
         onSaveReframe={handlePatternReframe}
       />
-    </View>
+    </>
   );
 }
 
