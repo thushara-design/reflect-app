@@ -10,22 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourname.reflect",
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "This app uses the microphone to record voice notes for your journal entries.",
-        "NSSpeechRecognitionUsageDescription": "This app uses speech recognition to convert your voice to text for journal entries."
-      }
+      "bundleIdentifier": "com.yourname.reflect"
     },
     "android": {
       "package": "com.yourname.reflect",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#A5B8C8"
-      },
-      "permissions": [
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
-      ]
+      }
     },
     "web": {
       "bundler": "metro",
@@ -35,13 +27,7 @@
     "plugins": [
       "expo-router", 
       "expo-font", 
-      "expo-web-browser",
-      [
-        "expo-av",
-        {
-          "microphonePermission": "Allow Reflect to access your microphone to record voice notes for your journal entries."
-        }
-      ]
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
