@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useState } from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Entry } from '@/contexts/EntriesContext';
+import { aiService } from '@/services/aiService';
 
 interface EmotionChartProps {
   entries: Entry[];
@@ -14,7 +15,7 @@ export default function EmotionChart({ entries }: EmotionChartProps) {
   const screenWidth = Dimensions.get('window').width;
   const chartWidth = screenWidth - 48; // Account for padding
   
-  // Process emotion data
+  // Process emotion data from actual entries
   const processEmotionData = () => {
     const now = new Date();
     const daysToShow = timeframe === 'week' ? 7 : 30;
@@ -29,13 +30,17 @@ export default function EmotionChart({ entries }: EmotionChartProps) {
       dailyEmotions[dateKey] = [];
     }
     
-    // Process entries
+    // Process entries and detect emotions from content
     entries.forEach(entry => {
       const entryDate = new Date(entry.createdAt);
       const dateKey = entryDate.toISOString().split('T')[0];
       
       if (dailyEmotions[dateKey] !== undefined) {
-        const emotion = entry.mood || 'neutral';
+        // Use AI service to detect emotion from entry content
+        const emotionDetector = new (aiService as any).emotionDetector.constructor();
+        const detectedEmotion = emotionDetector.detectEmotion(entry.content, '');
+        
+        const emotion = detectedEmotion.emotion || entry.mood || 'neutral';
         dailyEmotions[dateKey].push(emotion);
         emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
       }
@@ -56,15 +61,40 @@ export default function EmotionChart({ entries }: EmotionChartProps) {
     calm: '#00BCD4',
     frustrated: '#FF5722',
     neutral: '#9E9E9E',
+    grateful: '#8BC34A',
+    excited: '#E91E63',
+    lonely: '#607D8B',
+    content: '#4CAF50',
+    overwhelmed: '#795548',
   };
   
   // Get top emotions
   const topEmotions = Object.entries(emotionCounts)
     .sort(([,a], [,b]) => b - a)
-    .slice(0, 5);
+    .slice(0, 6);
   
   const totalEntries = Object.values(emotionCounts).reduce((sum, count) => sum + count, 0);
   
+  // Calculate weekly trends
+  const getWeeklyTrend = () => {
+    if (timeframe !== 'week' || totalEntries === 0) return '';
+    
+    const thisWeekEmotions = Object.values(dailyEmotions).flat();
+    const positiveEmotions = ['happy', 'grateful', 'excited', 'content', 'calm'];
+    const negativeEmotions = ['sad', 'angry', 'anxious', 'stressed', 'frustrated', 'lonely', 'overwhelmed'];
+    
+    const positiveCount = thisWeekEmotions.filter(e => positiveEmotions.includes(e)).length;
+    const negativeCount = thisWeekEmotions.filter(e => negativeEmotions.includes(e)).length;
+    
+    if (positiveCount > negativeCount) {
+      return 'You\'ve had more positive emotions this week. Keep nurturing what brings you joy!';
+    } else if (negativeCount > positiveCount) {
+      return 'This week has been challenging emotionally. Remember to be kind to yourself and use your coping strategies.';
+    } else {
+      return 'Your emotions have been balanced this week. This shows good emotional regulation.';
+    }
+  };
+
   const dynamicStyles = StyleSheet.create({
     container: {
       backgroundColor: colors.surface,
@@ -247,7 +277,7 @@ export default function EmotionChart({ entries }: EmotionChartProps) {
         <Text style={dynamicStyles.summaryTitle}>Insights</Text>
         <Text style={dynamicStyles.summaryText}>
           {topEmotions.length > 0 
-            ? `Your most frequent emotion this ${timeframe} was ${topEmotions[0][0]}. You've logged ${totalEntries} emotional check-ins, showing great self-awareness.`
+            ? `Your most frequent emotion this ${timeframe} was ${topEmotions[0][0]}. You've logged ${totalEntries} emotional check-ins. ${getWeeklyTrend()}`
             : `Keep tracking your emotions to see patterns and insights about your emotional wellbeing.`
           }
         </Text>
