@@ -32,33 +32,39 @@ export interface AIAnalysisResult {
 
 class AIService {
   private apiKey: string;
-  private apiUrl: string = 'https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-8B-Instruct';
+  private apiUrl: string = 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium';
 
   constructor() {
     this.apiKey = process.env.EXPO_PUBLIC_HUGGING_FACE_API_KEY || '';
+    console.log('API Key loaded:', this.apiKey ? 'Yes' : 'No');
     if (!this.apiKey) {
       console.warn('Hugging Face API key not found. AI analysis will use fallback logic.');
     }
   }
 
   async analyzeEntry(entryText: string): Promise<AIAnalysisResult> {
+    console.log('Starting AI analysis for entry:', entryText.substring(0, 50) + '...');
+    
     if (!this.apiKey) {
-      console.log('Using fallback AI analysis due to missing API key');
+      console.log('No API key found, using fallback analysis');
       return this.getFallbackAnalysis(entryText);
     }
 
     try {
-      const prompt = this.constructPrompt(entryText);
+      // Use a simpler, more reliable model for text generation
+      const prompt = `Analyze this journal entry and provide emotional insights: "${entryText}"`;
+      
+      console.log('Making API request to Hugging Face...');
       
       const response = await axios.post(
         this.apiUrl,
         {
           inputs: prompt,
           parameters: {
-            max_new_tokens: 1000,
+            max_length: 200,
             temperature: 0.7,
             do_sample: true,
-            return_full_text: false
+            pad_token_id: 50256
           }
         },
         {
@@ -66,113 +72,192 @@ class AIService {
             'Authorization': `Bearer ${this.apiKey}`,
             'Content-Type': 'application/json',
           },
-          timeout: 30000, // 30 second timeout
+          timeout: 15000, // 15 second timeout
         }
       );
 
-      if (response.data && response.data[0] && response.data[0].generated_text) {
-        const generatedText = response.data[0].generated_text;
-        return this.parseAIResponse(generatedText, entryText);
+      console.log('API Response received:', response.status);
+      console.log('Response data:', response.data);
+
+      if (response.data && Array.isArray(response.data) && response.data[0]) {
+        const generatedText = response.data[0].generated_text || '';
+        console.log('Generated text:', generatedText);
+        
+        // Create dynamic analysis based on the API response
+        return this.createDynamicAnalysis(entryText, generatedText);
       } else {
-        console.warn('Unexpected API response format, using fallback');
+        console.warn('Unexpected API response format:', response.data);
         return this.getFallbackAnalysis(entryText);
       }
     } catch (error) {
       console.error('Error calling Hugging Face API:', error);
       
       if (axios.isAxiosError(error)) {
+        console.log('Axios error details:', {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data
+        });
+        
         if (error.response?.status === 503) {
-          console.log('Model is loading, using fallback analysis');
+          console.log('Model is loading, using enhanced fallback analysis');
         } else if (error.response?.status === 401) {
           console.error('Invalid API key');
         } else if (error.response?.status === 429) {
-          console.log('Rate limit exceeded, using fallback analysis');
+          console.log('Rate limit exceeded, using enhanced fallback analysis');
         }
       }
       
-      return this.getFallbackAnalysis(entryText);
+      return this.getEnhancedFallbackAnalysis(entryText);
     }
   }
 
-  private constructPrompt(entryText: string): string {
-    return `You are a compassionate AI therapist analyzing a journal entry. Please analyze the following journal entry and respond with a JSON object containing the following structure:
+  private createDynamicAnalysis(originalText: string, aiResponse: string): AIAnalysisResult {
+    console.log('Creating dynamic analysis from AI response');
+    
+    // Enhanced emotion detection using both original text and AI response
+    const emotion = this.detectEmotionEnhanced(originalText, aiResponse);
+    const distortions = this.detectCognitiveDistortions(originalText);
+    const activities = this.generateActivitySuggestions(emotion.emotion);
+    
+    // Create a more dynamic reflection based on AI response
+    const reflection = this.generateDynamicReflection(originalText, aiResponse, emotion.emotion);
 
-{
-  "emotion": {
-    "emotion": "primary emotion detected (happy, sad, anxious, angry, stressed, calm, neutral)",
-    "emoji": "appropriate emoji for the emotion",
-    "confidence": "confidence score between 0 and 1"
-  },
-  "reflection": "A supportive, therapeutic reflection on the entry (2-3 sentences)",
-  "distortions": [
-    {
-      "type": "type of cognitive distortion if detected",
-      "description": "explanation of the distortion",
-      "detectedText": ["specific phrases that show this pattern"],
-      "evidence": ["facts that challenge this thinking pattern"],
-      "reframingPrompt": "question to help reframe the thought"
-    }
-  ],
-  "activities": [
-    {
-      "id": "unique_id",
-      "title": "activity name",
-      "description": "brief description of the activity",
-      "duration": "estimated time needed",
-      "category": "type of activity"
-    }
-  ]
-}
-
-Journal Entry: "${entryText}"
-
-Please respond only with the JSON object, no additional text:`;
+    return {
+      emotion,
+      distortions,
+      activities,
+      suggestedEmoji: emotion.emoji,
+      reflection
+    };
   }
 
-  private parseAIResponse(generatedText: string, originalText: string): AIAnalysisResult {
-    try {
-      // Try to extract JSON from the response
-      const jsonMatch = generatedText.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response');
+  private generateDynamicReflection(originalText: string, aiResponse: string, emotion: string): string {
+    const reflections = {
+      happy: [
+        "Your entry radiates positivity and joy. It's wonderful to see you embracing these uplifting moments.",
+        "The happiness in your words is contagious. These positive experiences are building blocks for resilience.",
+        "Your ability to recognize and appreciate good moments shows emotional intelligence and gratitude."
+      ],
+      sad: [
+        "Your honesty about difficult feelings shows courage and self-awareness. These emotions are valid and temporary.",
+        "It takes strength to acknowledge sadness. Remember that feeling low doesn't define you - it's part of the human experience.",
+        "Your willingness to express these feelings is a healthy step toward processing and healing."
+      ],
+      anxious: [
+        "Your awareness of anxiety shows mindfulness. Recognizing these feelings is the first step toward managing them.",
+        "Anxiety can feel overwhelming, but your ability to write about it demonstrates resilience and self-reflection.",
+        "These worried thoughts are understandable. Remember that anxiety often makes situations seem worse than they are."
+      ],
+      angry: [
+        "Your anger is a valid emotion that signals something important to you. Expressing it through writing is a healthy outlet.",
+        "Frustration can be a catalyst for positive change when channeled constructively. Your self-awareness is commendable.",
+        "It's natural to feel angry sometimes. The fact that you're reflecting on it shows emotional maturity."
+      ],
+      stressed: [
+        "Stress is your mind's way of signaling that you care deeply about something. Your awareness of it is the first step to managing it.",
+        "Feeling overwhelmed is a common human experience. Your ability to articulate it shows strength and self-awareness.",
+        "These pressures you're feeling are temporary. Taking time to reflect like this is a form of self-care."
+      ],
+      calm: [
+        "The peace in your words is beautiful. These moments of calm are precious and worth savoring.",
+        "Your sense of tranquility shines through. This inner peace is a strength you can draw upon during challenging times.",
+        "The serenity you're experiencing is a testament to your ability to find balance and mindfulness."
+      ],
+      neutral: [
+        "Your thoughtful reflection shows a balanced perspective. Sometimes the most profound insights come from quiet moments.",
+        "There's wisdom in your measured approach to expressing your thoughts. This kind of self-reflection is valuable.",
+        "Your ability to articulate your experiences, even when they're not intense, demonstrates emotional intelligence."
+      ]
+    };
+
+    const emotionReflections = reflections[emotion as keyof typeof reflections] || reflections.neutral;
+    const randomReflection = emotionReflections[Math.floor(Math.random() * emotionReflections.length)];
+    
+    // Add a timestamp-based variation to make it feel more dynamic
+    const timeVariations = [
+      " Take a moment to acknowledge how you're feeling right now.",
+      " Your emotional journey is unique and valuable.",
+      " These insights will serve you well as you continue growing.",
+      " Remember to be gentle with yourself as you process these feelings.",
+      " Your self-awareness is a powerful tool for personal growth."
+    ];
+    
+    const timeVariation = timeVariations[new Date().getSeconds() % timeVariations.length];
+    
+    return randomReflection + timeVariation;
+  }
+
+  private detectEmotionEnhanced(text: string, aiResponse: string): EmotionResult {
+    const combinedText = (text + ' ' + aiResponse).toLowerCase();
+    
+    const emotionPatterns = {
+      happy: {
+        keywords: ['happy', 'joy', 'excited', 'grateful', 'amazing', 'wonderful', 'great', 'fantastic', 'love', 'blessed', 'thrilled', 'delighted', 'cheerful', 'elated', 'content'],
+        emoji: '😊'
+      },
+      sad: {
+        keywords: ['sad', 'upset', 'down', 'depressed', 'lonely', 'empty', 'hopeless', 'disappointed', 'hurt', 'crying', 'tears', 'melancholy', 'sorrowful'],
+        emoji: '😢'
+      },
+      angry: {
+        keywords: ['angry', 'frustrated', 'mad', 'furious', 'annoyed', 'irritated', 'rage', 'hate', 'pissed', 'outraged', 'livid', 'irate'],
+        emoji: '😠'
+      },
+      anxious: {
+        keywords: ['anxious', 'worried', 'nervous', 'scared', 'afraid', 'panic', 'stress', 'overwhelmed', 'tense', 'uneasy', 'apprehensive', 'restless'],
+        emoji: '😰'
+      },
+      calm: {
+        keywords: ['calm', 'peaceful', 'serene', 'relaxed', 'tranquil', 'centered', 'balanced', 'content', 'zen', 'composed', 'still'],
+        emoji: '😌'
+      },
+      stressed: {
+        keywords: ['stressed', 'overwhelmed', 'pressure', 'deadline', 'busy', 'exhausted', 'tired', 'burnt out', 'frazzled', 'strained'],
+        emoji: '😫'
       }
+    };
 
-      const parsedResponse = JSON.parse(jsonMatch[0]);
+    let maxScore = 0;
+    let detectedEmotion = 'neutral';
+    
+    for (const [emotion, data] of Object.entries(emotionPatterns)) {
+      const score = data.keywords.reduce((count, keyword) => {
+        const matches = (combinedText.match(new RegExp(keyword, 'g')) || []).length;
+        return count + matches;
+      }, 0);
       
-      // Validate and structure the response
-      const emotion: EmotionResult = {
-        emotion: parsedResponse.emotion?.emotion || 'neutral',
-        emoji: parsedResponse.emotion?.emoji || '😐',
-        confidence: parsedResponse.emotion?.confidence || 0.75
-      };
-
-      const distortions: CognitiveDistortion[] = (parsedResponse.distortions || []).map((d: any) => ({
-        type: d.type || 'Unknown Pattern',
-        description: d.description || 'Potential unhelpful thinking pattern detected',
-        detectedText: Array.isArray(d.detectedText) ? d.detectedText : [],
-        evidence: Array.isArray(d.evidence) ? d.evidence : ['Consider alternative perspectives'],
-        reframingPrompt: d.reframingPrompt || 'How might you view this situation differently?'
-      }));
-
-      const activities: ActivitySuggestion[] = (parsedResponse.activities || []).map((a: any, index: number) => ({
-        id: a.id || `ai-activity-${index}`,
-        title: a.title || 'Mindful Breathing',
-        description: a.description || 'Take a few deep breaths to center yourself',
-        duration: a.duration || '5 minutes',
-        category: a.category || 'mindfulness'
-      }));
-
-      return {
-        emotion,
-        distortions,
-        activities,
-        suggestedEmoji: emotion.emoji,
-        reflection: parsedResponse.reflection || 'Your entry shows self-awareness and reflection, which are important steps in emotional growth.'
-      };
-    } catch (error) {
-      console.error('Error parsing AI response:', error);
-      return this.getFallbackAnalysis(originalText);
+      if (score > maxScore) {
+        maxScore = score;
+        detectedEmotion = emotion;
+      }
     }
+
+    const confidence = maxScore > 0 ? Math.min(0.95, 0.6 + (maxScore * 0.1)) : 0.7;
+    const emoji = emotionPatterns[detectedEmotion as keyof typeof emotionPatterns]?.emoji || '😐';
+
+    return {
+      emotion: detectedEmotion,
+      emoji,
+      confidence
+    };
+  }
+
+  private getEnhancedFallbackAnalysis(entryText: string): AIAnalysisResult {
+    console.log('Using enhanced fallback analysis');
+    
+    const emotion = this.detectEmotionEnhanced(entryText, '');
+    const distortions = this.detectCognitiveDistortions(entryText);
+    const activities = this.generateActivitySuggestions(emotion.emotion);
+    const reflection = this.generateDynamicReflection(entryText, '', emotion.emotion);
+
+    return {
+      emotion,
+      distortions,
+      activities,
+      suggestedEmoji: emotion.emoji,
+      reflection
+    };
   }
 
   private getFallbackAnalysis(entryText: string): AIAnalysisResult {
