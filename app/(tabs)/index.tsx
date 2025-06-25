@@ -3,16 +3,12 @@ import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import ReflectHeader from '@/components/ReflectHeader';
-import EntryActions from '@/components/EntryActions';
 import { useEntries } from '@/contexts/EntriesContext';
 
 export default function EntriesTab() {
   const [searchText, setSearchText] = useState('');
   const [screenData, setScreenData] = useState(Dimensions.get('window'));
-  const [isCreatingEntry, setIsCreatingEntry] = useState(false);
-  const [entryContent, setEntryContent] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
-  const { entries, addEntry } = useEntries();
+  const { entries } = useEntries();
 
   useEffect(() => {
     const onChange = (result: { window: any }) => {
@@ -76,58 +72,6 @@ export default function EntriesTab() {
     });
   };
 
-  const handleVoiceTranscript = (transcript: string) => {
-    // Add the transcript with proper spacing
-    setEntryContent(prev => {
-      const trimmedPrev = prev.trim();
-      const trimmedTranscript = transcript.trim();
-      
-      if (!trimmedPrev) {
-        return trimmedTranscript;
-      }
-      
-      // Add a space between existing content and new transcript
-      return trimmedPrev + ' ' + trimmedTranscript;
-    });
-  };
-
-  const handleVoiceError = (error: string) => {
-    console.error('Voice error:', error);
-  };
-
-  const handleSavePress = () => {
-    if (!entryContent.trim()) return;
-
-    const getCurrentDateTime = () => {
-      const now = new Date();
-      const options: Intl.DateTimeFormatOptions = {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      };
-      return now.toLocaleDateString('en-US', options);
-    };
-
-    const preview = entryContent.trim().length > 150 
-      ? entryContent.trim().substring(0, 150) + '...'
-      : entryContent.trim();
-
-    const newEntry = {
-      title: getCurrentDateTime(),
-      content: entryContent.trim(),
-      preview,
-      date: getCurrentDateTime(),
-      mood: 'neutral',
-    };
-
-    addEntry(newEntry);
-    setEntryContent('');
-    setIsCreatingEntry(false);
-  };
-
   const renderEntryCard = (entry: typeof entries[0]) => (
     <TouchableOpacity 
       key={entry.id} 
@@ -154,43 +98,6 @@ export default function EntriesTab() {
       <ReflectHeader />
 
       <View style={styles.content}>
-        <View style={styles.entryCreationSection}>
-          <View style={styles.entryCreationHeader}>
-            <Text style={styles.entryCreationTitle}>
-              {isCreatingEntry ? 'New Entry' : 'Quick Reflection'}
-            </Text>
-            <EntryActions
-              onSavePress={handleSavePress}
-              isRecording={isRecording}
-              onRecordingChange={setIsRecording}
-              onVoiceTranscript={handleVoiceTranscript}
-              onVoiceError={handleVoiceError}
-            />
-          </View>
-          
-          <TouchableOpacity 
-            style={styles.entryInput}
-            onPress={() => setIsCreatingEntry(true)}
-          >
-            {isCreatingEntry ? (
-              <TextInput
-                style={styles.entryTextInput}
-                placeholder="What's on your mind?"
-                placeholderTextColor="#A5B8C8"
-                value={entryContent}
-                onChangeText={setEntryContent}
-                multiline
-                autoFocus
-                textAlignVertical="top"
-              />
-            ) : (
-              <Text style={styles.entryPlaceholder}>
-                What's on your mind?
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.searchSection}>
           <View style={styles.searchContainer}>
             <Search size={18} color="#A5B8C8" strokeWidth={1.5} />
@@ -215,7 +122,7 @@ export default function EntriesTab() {
                 {searchText ? 'No entries found' : 'No entries yet'}
               </Text>
               <Text style={styles.emptySubtext}>
-                {searchText ? 'Try a different search term' : 'Start writing your first entry above'}
+                {searchText ? 'Try a different search term' : 'Start your reflection journey by creating your first entry'}
               </Text>
             </View>
           ) : (
@@ -244,45 +151,8 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
   },
-  entryCreationSection: {
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA',
-    marginBottom: 16,
-  },
-  entryCreationHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  entryCreationTitle: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#2A2A2A',
-  },
-  entryInput: {
-    backgroundColor: '#FAFAFA',
-    borderWidth: 1,
-    borderColor: '#EAEAEA',
-    borderRadius: 12,
-    padding: 16,
-    minHeight: 80,
-  },
-  entryTextInput: {
-    fontSize: 16,
-    color: '#2A2A2A',
-    fontWeight: '300',
-    flex: 1,
-    textAlignVertical: 'top',
-  },
-  entryPlaceholder: {
-    fontSize: 16,
-    color: '#A5B8C8',
-    fontWeight: '300',
-  },
   searchSection: {
-    paddingVertical: 8,
+    paddingVertical: 16,
   },
   searchContainer: {
     flexDirection: 'row',
