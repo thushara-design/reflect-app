@@ -1,11 +1,13 @@
 {
-  "name": "bolt-expo-starter",
+  "name": "reflect-personal-journal",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
     "build:web": "expo export --platform web",
+    "build:ios": "eas build --platform ios",
+    "build:android": "eas build --platform android",
     "lint": "expo lint"
   },
   "dependencies": {
