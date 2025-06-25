@@ -111,17 +111,26 @@ export default function NewEntryPage() {
   };
 
   const handleAIAnalysis = async () => {
+    console.log('AI Analysis button pressed');
+    
     if (!content.trim()) {
       Alert.alert('No Content', 'Please write something before analyzing.');
       return;
     }
 
+    console.log('Starting AI analysis...');
     setIsAnalyzing(true);
+    
     try {
+      console.log('Calling aiService.analyzeEntry...');
       const analysis = await aiService.analyzeEntry(content);
+      console.log('AI Analysis completed:', analysis);
+      
       setAIAnalysis(analysis);
       setShowAIAnalysis(true);
+      console.log('Modal should now be visible');
     } catch (error) {
+      console.error('AI Analysis error:', error);
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
     } finally {
       setIsAnalyzing(false);
@@ -352,15 +361,20 @@ export default function NewEntryPage() {
         </View>
       </View>
 
+      {/* AI Analysis Modal */}
       <AIAnalysisModal
         visible={showAIAnalysis}
-        onClose={() => setShowAIAnalysis(false)}
+        onClose={() => {
+          console.log('Closing AI Analysis modal');
+          setShowAIAnalysis(false);
+        }}
         analysis={aiAnalysis}
         onSaveReframe={handleSaveReframe}
         onActivitySelect={handleActivitySelect}
         entryText={content}
       />
 
+      {/* Pattern Detection Modal */}
       <PatternDetectionModal
         visible={showPatternDetection}
         onClose={() => setShowPatternDetection(false)}

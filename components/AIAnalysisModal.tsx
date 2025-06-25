@@ -28,7 +28,34 @@ export default function AIAnalysisModal({
   const [isGeneratingReframe, setIsGeneratingReframe] = useState<Record<string, boolean>>({});
   const { colors } = useTheme();
 
-  if (!analysis) return null;
+  console.log('AIAnalysisModal render - visible:', visible, 'analysis:', !!analysis);
+
+  if (!analysis) {
+    console.log('No analysis data, not rendering modal content');
+    return (
+      <Modal
+        visible={visible}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={onClose}
+      >
+        <View style={[dynamicStyles.container, { backgroundColor: colors.background }]}>
+          <View style={[dynamicStyles.header, { borderBottomColor: colors.border }]}>
+            <View style={dynamicStyles.headerLeft}>
+              <Sparkles size={24} color={colors.primary} strokeWidth={1.5} />
+              <Text style={[dynamicStyles.headerTitle, { color: colors.text }]}>AI Analysis</Text>
+            </View>
+            <TouchableOpacity style={dynamicStyles.closeButton} onPress={onClose}>
+              <X size={24} color={colors.text} strokeWidth={1.5} />
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: colors.text }}>Loading analysis...</Text>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
 
   const handleActivityToggle = (activityId: string) => {
     const newSelected = new Set(selectedActivities);
@@ -82,9 +109,9 @@ export default function AIAnalysisModal({
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'high': return '#FF6B6B';
-      case 'medium': return '#FF9F43';
+      case 'medium': return '#FF9800';
       case 'low': return '#FFA726';
-      default: return '#FF9F43';
+      default: return '#FF9800';
     }
   };
 
