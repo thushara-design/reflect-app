@@ -60,9 +60,10 @@ import {
         Alert.alert('Please select at least one activity.');
         return;
       }
+      const normalizedEmotion = currentEmotion.toLowerCase();
       const updatedToolkit = [
-        ...toolkit.filter(item => item.emotion !== currentEmotion),
-        { emotion: currentEmotion, actions: [...selectedActions] },
+        ...toolkit.filter(item => item.emotion !== normalizedEmotion),
+        { emotion: normalizedEmotion, actions: [...selectedActions] },
       ];
       setToolkit(updatedToolkit);
       setSelectedActions([]);
@@ -79,6 +80,7 @@ import {
     };
   
     const handleSkip = () => {
+      const normalizedEmotion = currentEmotion.toLowerCase();
       setSelectedActions([]);
       setCustomAction('');
       setShowSuggestions(false);
