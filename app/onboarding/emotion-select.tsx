@@ -4,16 +4,7 @@ import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Check } from 'lucide-react-native';
-
-const COMMON_EMOTIONS = [
-  { name: 'Anxiety', emoji: '😰', color: '#FF9F43' },
-  { name: 'Sadness', emoji: '😢', color: '#74B9FF' },
-  { name: 'Anger', emoji: '😠', color: '#FF6B6B' },
-  { name: 'Guilt', emoji: '😔', color: '#A29BFE' },
-  { name: 'Stress', emoji: '😫', color: '#FD79A8' },
-  { name: 'Loneliness', emoji: '😞', color: '#FDCB6E' },
-  { name: 'Numbness', emoji: '😶', color: '#B2BEC3' },
-];
+import { COMMON_EMOTIONS } from './emotions';
 
 export default function EmotionSelectScreen() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -112,7 +103,7 @@ export default function EmotionSelectScreen() {
         <Text style={dynamicStyles.subtitle}>Select all that apply. You can add more later.</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.emotionsGrid}>
-            {COMMON_EMOTIONS.map((emotion) => {
+            {COMMON_EMOTIONS.map((emotion: { name: string; emoji: string; color: string }) => {
               const isSelected = selected.includes(emotion.name);
               return (
                 <TouchableOpacity

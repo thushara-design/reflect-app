@@ -21,6 +21,7 @@ interface OnboardingContextType {
   updateEmotionalToolkit: (toolkit: EmotionalToolkitItem[]) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   resetOnboarding: () => Promise<void>;
+  setUserProfile: React.Dispatch<React.SetStateAction<UserProfile | null>>;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -33,6 +34,23 @@ const defaultProfile: UserProfile = {
   hasCompletedOnboarding: false,
   useAI: true, // Default to true for better experience
 };
+
+// Utility to capitalize first letter
+function capitalizeFirst(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+function mergeToolkit(oldToolkit: EmotionalToolkitItem[], newToolkit: EmotionalToolkitItem[]): EmotionalToolkitItem[] {
+  const mergedMap = new Map<string, string[]>();
+
+  // First, add old data
+  oldToolkit.forEach(item => mergedMap.set(capitalizeFirst(item.emotion), item.actions));
+
+  // Then, override with new data
+  newToolkit.forEach(item => mergedMap.set(capitalizeFirst(item.emotion), item.actions));
+
+  return Array.from(mergedMap.entries()).map(([emotion, actions]) => ({ emotion, actions }));
+}
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -86,8 +104,20 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   const updateEmotionalToolkit = async (toolkit: EmotionalToolkitItem[]) => {
     if (!userProfile) return;
-    const updatedProfile = { ...userProfile, emotionalToolkit: toolkit };
-    await saveUserProfile(updatedProfile);
+    const updatedProfile: UserProfile = {
+      name: userProfile.name || '',
+      emotionalToolkit: mergeToolkit(userProfile.emotionalToolkit || [], toolkit),
+      hasCompletedOnboarding: userProfile.hasCompletedOnboarding ?? false,
+      useAI: userProfile.useAI ?? true,
+    };
+
+    console.log('DEBUG: Saving toolkit inside context function:', updatedProfile.emotionalToolkit);
+
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProfile));
+    console.log('DEBUG: Saved to AsyncStorage');
+
+    setUserProfile(updatedProfile); // Ensure in-memory state is updated after save
+    console.log('DEBUG: setUserProfile called after saving', updatedProfile);
   };
 
   const completeOnboarding = async () => {
@@ -100,6 +130,18 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     await saveUserProfile(defaultProfile);
   };
 
+  useEffect(() => {
+    AsyncStorage.getItem('@reflect_user_profile').then(json => {
+      if (json) {
+        const parsed = JSON.parse(json);
+        console.log('DEBUG: Fetched from AsyncStorage again:', parsed);
+        if (parsed) {
+          setUserProfile(parsed);
+        }
+      }
+    });
+  }, []);
+
   return (
     <OnboardingContext.Provider value={{
       userProfile,
@@ -109,6 +151,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       updateEmotionalToolkit,
       completeOnboarding,
       resetOnboarding,
+      setUserProfile,
     }}>
       {children}
     </OnboardingContext.Provider>

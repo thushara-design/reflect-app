@@ -1,46 +1,63 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput, Alert } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, CreditCard as Edit3 } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding, EmotionalToolkitItem } from '@/contexts/OnboardingContext';
+import { COMMON_EMOTIONS } from '../app/onboarding/emotions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ActivityManagementModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const emotions = [
-  { name: 'Anxiety', emoji: '😰', color: '#FF9F43' },
-  { name: 'Sadness', emoji: '😢', color: '#74B9FF' },
-  { name: 'Anger', emoji: '😠', color: '#FF6B6B' },
-  { name: 'Stress', emoji: '😫', color: '#FD79A8' },
-  { name: 'Frustration', emoji: '😤', color: '#A29BFE' },
-  { name: 'Loneliness', emoji: '😞', color: '#FDCB6E' },
-];
+// Utility to capitalize first letter
+function capitalizeFirst(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
 
 export default function ActivityManagementModal({ visible, onClose }: ActivityManagementModalProps) {
   const { colors } = useTheme();
-  const { userProfile, updateEmotionalToolkit } = useOnboarding();
+  const { userProfile, updateEmotionalToolkit, setUserProfile } = useOnboarding();
   
   const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [newActivity, setNewActivity] = useState('');
   const [editingActivity, setEditingActivity] = useState<{ emotion: string; index: number; text: string } | null>(null);
 
+  // DEBUG: Force context update from AsyncStorage on mount
+  useEffect(() => {
+    AsyncStorage.getItem('@reflect_user_profile').then(json => {
+      if (json) {
+        const parsed = JSON.parse(json);
+        console.log('DEBUG: Fetched from AsyncStorage again:', parsed);
+        if (parsed && parsed.emotionalToolkit) {
+          setUserProfile(prev => ({
+            name: prev?.name || '',
+            emotionalToolkit: parsed.emotionalToolkit,
+            hasCompletedOnboarding: prev?.hasCompletedOnboarding ?? false,
+            useAI: prev?.useAI ?? true,
+          }));
+        }
+      }
+    });
+  }, []);
+
+  console.log('DEBUG: Toolkit contents:', userProfile?.emotionalToolkit);
+
   const getActivitiesForEmotion = (emotionName: string) => {
     const toolkit = userProfile?.emotionalToolkit || [];
-    console.log('Looking for activities for emotion:', emotionName);
-    console.log('Available toolkit:', toolkit);
-    
-    // Normalize emotion name for comparison
-    const normalizedEmotion = emotionName.toLowerCase().trim();
-    
+    // Normalize and capitalize emotion name for comparison
+    const normalizedEmotion = capitalizeFirst(emotionName.toLowerCase().trim());
     const emotionData = toolkit.find(item => 
-      item.emotion.toLowerCase().trim() === normalizedEmotion
+      item.emotion === normalizedEmotion
     );
-    
-    console.log('Found emotion data:', emotionData);
-    return emotionData?.actions || [];
+    const actions = emotionData?.actions || [];
+    if (!emotionData) {
+      console.log(`DEBUG: No data found for emotion '${normalizedEmotion}'. Toolkit contents:`, toolkit.map(i => i.emotion));
+    }
+    console.log(`DEBUG: Loaded activities for emotion '${normalizedEmotion}':`, actions);
+    return actions;
   };
 
   const handleAddActivity = async () => {
@@ -48,14 +65,11 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
 
     const currentToolkit = userProfile?.emotionalToolkit || [];
     const updatedToolkit = [...currentToolkit];
-    
-    // Normalize emotion name
-    const normalizedEmotion = selectedEmotion.toLowerCase().trim();
-    
+    // Normalize and capitalize emotion name
+    const normalizedEmotion = capitalizeFirst(selectedEmotion.toLowerCase().trim());
     const existingIndex = updatedToolkit.findIndex(item => 
-      item.emotion.toLowerCase().trim() === normalizedEmotion
+      item.emotion === normalizedEmotion
     );
-
     if (existingIndex >= 0) {
       updatedToolkit[existingIndex].actions.push(newActivity.trim());
     } else {
@@ -64,8 +78,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
         actions: [newActivity.trim()]
       });
     }
-
-    console.log('Adding activity. Updated toolkit:', updatedToolkit);
+    console.log(`DEBUG: Added activity '${newActivity.trim()}' for emotion '${normalizedEmotion}'. Updated toolkit:`, updatedToolkit);
     await updateEmotionalToolkit(updatedToolkit);
     setNewActivity('');
     setShowAddActivity(false);
@@ -82,10 +95,9 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
           style: 'destructive',
           onPress: async () => {
             const currentToolkit = userProfile?.emotionalToolkit || [];
-            const normalizedEmotion = emotionName.toLowerCase().trim();
-            
+            const normalizedEmotion = capitalizeFirst(emotionName.toLowerCase().trim());
             const updatedToolkit = currentToolkit.map(item => {
-              if (item.emotion.toLowerCase().trim() === normalizedEmotion) {
+              if (item.emotion === normalizedEmotion) {
                 return {
                   ...item,
                   actions: item.actions.filter((_, index) => index !== activityIndex)
@@ -93,8 +105,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
               }
               return item;
             }).filter(item => item.actions.length > 0);
-
-            console.log('Deleting activity. Updated toolkit:', updatedToolkit);
+            console.log(`DEBUG: Deleted activity at index ${activityIndex} for emotion '${normalizedEmotion}'. Updated toolkit:`, updatedToolkit);
             await updateEmotionalToolkit(updatedToolkit);
           }
         }
@@ -104,20 +115,17 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
 
   const handleEditActivity = async () => {
     if (!editingActivity || !editingActivity.text.trim()) return;
-
     const currentToolkit = userProfile?.emotionalToolkit || [];
-    const normalizedEmotion = editingActivity.emotion.toLowerCase().trim();
-    
+    const normalizedEmotion = capitalizeFirst(editingActivity.emotion.toLowerCase().trim());
     const updatedToolkit = currentToolkit.map(item => {
-      if (item.emotion.toLowerCase().trim() === normalizedEmotion) {
+      if (item.emotion === normalizedEmotion) {
         const updatedActions = [...item.actions];
         updatedActions[editingActivity.index] = editingActivity.text.trim();
         return { ...item, actions: updatedActions };
       }
       return item;
     });
-
-    console.log('Editing activity. Updated toolkit:', updatedToolkit);
+    console.log(`DEBUG: Edited activity at index ${editingActivity.index} for emotion '${normalizedEmotion}' to '${editingActivity.text.trim()}'. Updated toolkit:`, updatedToolkit);
     await updateEmotionalToolkit(updatedToolkit);
     setEditingActivity(null);
   };
@@ -316,7 +324,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
 
         <ScrollView style={dynamicStyles.content} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.emotionsGrid}>
-            {emotions.map((emotion) => (
+            {COMMON_EMOTIONS.map((emotion) => (
               <TouchableOpacity
                 key={emotion.name}
                 style={[
@@ -326,7 +334,10 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
                     borderColor: emotion.color,
                   }
                 ]}
-                onPress={() => setSelectedEmotion(emotion.name)}
+                onPress={() => {
+                  setSelectedEmotion(emotion.name);
+                  console.log(`DEBUG: Selected emotion '${emotion.name}' in activity management modal.`);
+                }}
               >
                 <Text style={dynamicStyles.emotionEmoji}>{emotion.emoji}</Text>
                 <Text style={dynamicStyles.emotionName}>{emotion.name}</Text>

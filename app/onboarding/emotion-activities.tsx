@@ -9,11 +9,12 @@ import {
     Platform,
     Alert,
   } from 'react-native';
-  import { useState } from 'react';
+  import { useState, useEffect } from 'react';
   import { useLocalSearchParams, router } from 'expo-router';
   import { useTheme } from '@/contexts/ThemeContext';
   import { useOnboarding } from '@/contexts/OnboardingContext';
   import { MaterialIcons } from '@expo/vector-icons';
+  import AsyncStorage from '@react-native-async-storage/async-storage';
   
   const PREDEFINED_ACTIONS = [
     'Deep breathing',
@@ -30,37 +31,64 @@ import {
     'Watch something funny',
   ];
   
+  // Utility to capitalize first letter
+  function capitalizeFirst(str: string) {
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+  
   export default function EmotionActivitiesScreen() {
     const { emotions } = useLocalSearchParams<{ emotions: string }>();
     const emotionList = emotions ? JSON.parse(emotions) : [];
     const [currentIdx, setCurrentIdx] = useState(0);
-    const [toolkit, setToolkit] = useState<{ emotion: string; actions: string[] }[]>([]);
+    // Use a mapping to track all selections
+    const [allSelections, setAllSelections] = useState<{ [emotion: string]: string[] }>({});
     const [selectedActions, setSelectedActions] = useState<string[]>([]);
     const [customAction, setCustomAction] = useState('');
     const [showSuggestions, setShowSuggestions] = useState(true); // Show by default
     const { colors } = useTheme();
-    const { updateEmotionalToolkit, completeOnboarding, userProfile } = useOnboarding();
+    const { updateEmotionalToolkit, completeOnboarding, userProfile, setUserProfile } = useOnboarding();
   
     const currentEmotion = emotionList[currentIdx];
   
+    // Load previous selections for this emotion when changing emotion
+    useEffect(() => {
+      const normalizedEmotion = capitalizeFirst(currentEmotion.toLowerCase().trim());
+      setSelectedActions(allSelections[normalizedEmotion] || []);
+    }, [currentIdx]);
+  
     const handleActionToggle = (action: string) => {
-      setSelectedActions(prev =>
-        prev.includes(action)
+      setSelectedActions(prev => {
+        const next = prev.includes(action)
           ? prev.filter(a => a !== action)
-          : prev.length < 5 ? [...prev, action] : prev // Increased limit to 5
-      );
+          : prev.length < 5 ? [...prev, action] : prev;
+        console.log(`DEBUG: Toggled action '${action}' for emotion '${currentEmotion}'. New selectedActions:`, next);
+        return next;
+      });
     };
   
     const handleAddCustomAction = () => {
       const trimmed = customAction.trim();
       if (trimmed && !selectedActions.includes(trimmed) && selectedActions.length < 5) {
-        setSelectedActions(prev => [...prev, trimmed]);
+        setSelectedActions(prev => {
+          const next = [...prev, trimmed];
+          console.log(`DEBUG: Added custom action '${trimmed}' for emotion '${currentEmotion}'. New selectedActions:`, next);
+          return next;
+        });
         setCustomAction('');
       }
     };
   
     const handleRemoveAction = (action: string) => {
-      setSelectedActions(prev => prev.filter(a => a !== action));
+      setSelectedActions(prev => {
+        const next = prev.filter(a => a !== action);
+        console.log(`DEBUG: Removed action '${action}' for emotion '${currentEmotion}'. New selectedActions:`, next);
+        return next;
+      });
+    };
+  
+    const saveCurrentSelection = (selections: { [emotion: string]: string[] }) => {
+      const normalizedEmotion = capitalizeFirst(currentEmotion.toLowerCase().trim());
+      return { ...selections, [normalizedEmotion]: [...selectedActions] };
     };
   
     const handleNext = async () => {
@@ -68,15 +96,10 @@ import {
         Alert.alert('Please select at least one activity.');
         return;
       }
-      
-      // Normalize emotion name to lowercase for consistency
-      const normalizedEmotion = currentEmotion.toLowerCase().trim();
-      
-      const updatedToolkit = [
-        ...toolkit.filter(item => item.emotion !== normalizedEmotion),
-        { emotion: normalizedEmotion, actions: [...selectedActions] },
-      ];
-      setToolkit(updatedToolkit);
+      // Update allSelections with current
+      const newSelections = saveCurrentSelection(allSelections);
+      setAllSelections(newSelections);
+      console.log(`DEBUG: Clicked NEXT for emotion '${currentEmotion}'. All selections so far:`, newSelections);
       setSelectedActions([]);
       setCustomAction('');
       setShowSuggestions(true);
@@ -84,53 +107,51 @@ import {
       if (currentIdx < emotionList.length - 1) {
         setCurrentIdx(currentIdx + 1);
       } else {
-        // Merge with existing toolkit instead of overwriting
-        const existingToolkit = userProfile?.emotionalToolkit || [];
-        const mergedToolkit = [...existingToolkit];
-        
-        // Add or update emotions from onboarding
-        updatedToolkit.forEach(newItem => {
-          const existingIndex = mergedToolkit.findIndex(
-            existing => existing.emotion.toLowerCase().trim() === newItem.emotion.toLowerCase().trim()
-          );
-          
-          if (existingIndex >= 0) {
-            // Merge activities, avoiding duplicates
-            const existingActions = mergedToolkit[existingIndex].actions;
-            const combinedActions = [...existingActions];
-            
-            newItem.actions.forEach(action => {
-              if (!combinedActions.some(existing => 
-                existing.toLowerCase().trim() === action.toLowerCase().trim()
-              )) {
-                combinedActions.push(action);
-              }
-            });
-            
-            mergedToolkit[existingIndex] = {
-              ...mergedToolkit[existingIndex],
-              actions: combinedActions
-            };
-          } else {
-            // Add new emotion
-            mergedToolkit.push(newItem);
-          }
-        });
-        
-        console.log('Saving merged toolkit:', mergedToolkit);
-        await updateEmotionalToolkit(mergedToolkit);
-        await completeOnboarding();
+        // Build toolkit from allSelections
+        const finalToolkit = Object.entries(newSelections).map(([emotion, actions]) => ({
+          emotion,
+          actions,
+        }));
+        // Save the full, merged user profile
+        const updatedProfile = {
+          name: userProfile?.name || '',
+          emotionalToolkit: finalToolkit,
+          hasCompletedOnboarding: true,
+          useAI: userProfile?.useAI ?? true,
+        };
+        setUserProfile && setUserProfile(updatedProfile);
+        await AsyncStorage.setItem('@reflect_user_profile', JSON.stringify(updatedProfile));
+        console.log('DEBUG: Saved full profile in onboarding:', updatedProfile);
         router.replace('/(tabs)');
       }
     };
   
-    const handleSkip = () => {
+    const handleSkip = async () => {
+      // Save current selection (even if empty)
+      const newSelections = saveCurrentSelection(allSelections);
+      setAllSelections(newSelections);
+      console.log(`DEBUG: Clicked SKIP for emotion '${currentEmotion}'. All selections so far:`, newSelections);
       setSelectedActions([]);
       setCustomAction('');
       setShowSuggestions(true);
       if (currentIdx < emotionList.length - 1) {
         setCurrentIdx(prev => prev + 1);
       } else {
+        // Build toolkit from allSelections
+        const finalToolkit = Object.entries(newSelections).map(([emotion, actions]) => ({
+          emotion,
+          actions,
+        }));
+        // Save the full, merged user profile
+        const updatedProfile = {
+          name: userProfile?.name || '',
+          emotionalToolkit: finalToolkit,
+          hasCompletedOnboarding: true,
+          useAI: userProfile?.useAI ?? true,
+        };
+        setUserProfile && setUserProfile(updatedProfile);
+        await AsyncStorage.setItem('@reflect_user_profile', JSON.stringify(updatedProfile));
+        console.log('DEBUG: Saved full profile in onboarding:', updatedProfile);
         router.replace('/(tabs)');
       }
     };

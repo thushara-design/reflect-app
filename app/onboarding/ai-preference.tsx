@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, KeyboardAvoidingView, Platform } from 'react-native';
-import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Switch, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
+import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { ArrowLeft, ArrowRight, Brain, Sparkles, Activity } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 
 export default function AIPreferenceScreen() {
-  const [useAI, setUseAI] = useState(true);
   const { colors } = useTheme();
-  const { updateAIPreference } = useOnboarding();
+  const { updateAIPreference, userProfile, isLoading } = useOnboarding();
 
   const handleNext = async () => {
-    await updateAIPreference(useAI);
+    if (!userProfile) return;
+    await updateAIPreference(userProfile.useAI);
     router.push('/onboarding/emotion-select');
   };
 
@@ -163,6 +163,17 @@ export default function AIPreferenceScreen() {
     }
   ];
 
+  // Only render after userProfile/isLoading are ready
+  if (isLoading || !userProfile) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  const useAI = userProfile.useAI;
+
   return (
     <KeyboardAvoidingView 
       style={dynamicStyles.container} 
@@ -184,7 +195,7 @@ export default function AIPreferenceScreen() {
 
         <TouchableOpacity 
           style={[dynamicStyles.aiCard, useAI && dynamicStyles.aiCardActive]}
-          onPress={() => setUseAI(!useAI)}
+          onPress={() => updateAIPreference(!useAI)}
           activeOpacity={0.8}
         >
           <View style={dynamicStyles.aiHeader}>
@@ -196,22 +207,24 @@ export default function AIPreferenceScreen() {
             </View>
             <Switch
               value={useAI}
-              onValueChange={setUseAI}
+              onValueChange={() => updateAIPreference(!useAI)}
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor={colors.background}
             />
           </View>
 
-          <View style={dynamicStyles.featuresList}>
-            {aiFeatures.map((feature, index) => (
-              <View key={index} style={dynamicStyles.featureItem}>
-                <View style={dynamicStyles.featureIcon}>
-                  <feature.icon size={16} color={colors.primary} strokeWidth={1.5} />
+          {useAI && (
+            <View style={dynamicStyles.featuresList}>
+              {aiFeatures.map((feature, index) => (
+                <View key={index} style={dynamicStyles.featureItem}>
+                  <View style={dynamicStyles.featureIcon}>
+                    <feature.icon size={16} color={colors.primary} strokeWidth={1.5} />
+                  </View>
+                  <Text style={dynamicStyles.featureText}>{feature.text}</Text>
                 </View>
-                <Text style={dynamicStyles.featureText}>{feature.text}</Text>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          )}
         </TouchableOpacity>
 
         {!useAI && (

@@ -4,11 +4,14 @@ import { router } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import ReflectHeader from '@/components/ReflectHeader';
 import { useEntries } from '@/contexts/EntriesContext';
+import { useOnboarding } from '@/contexts/OnboardingContext';
 
 export default function EntriesTab() {
   const [searchText, setSearchText] = useState('');
   const [screenData, setScreenData] = useState(Dimensions.get('window'));
   const { entries } = useEntries();
+  const { userProfile, resetOnboarding, isLoading } = useOnboarding();
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     const onChange = (result: { window: any }) => {
@@ -137,6 +140,31 @@ export default function EntriesTab() {
             </View>
           )}
         </ScrollView>
+        {/* DEV ONLY: Reset Onboarding Button */}
+        {!isLoading && userProfile?.hasCompletedOnboarding && (
+          <TouchableOpacity
+            style={{
+              margin: 16,
+              padding: 14,
+              backgroundColor: '#FF6B6B',
+              borderRadius: 10,
+              alignItems: 'center',
+              opacity: resetting ? 0.5 : 1,
+            }}
+            onPress={async () => {
+              setResetting(true);
+              await resetOnboarding();
+              setResetting(false);
+              // Reload app to show onboarding
+              router.replace('/onboarding/welcome');
+            }}
+            disabled={resetting}
+          >
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+              Reset Onboarding (Dev)
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
