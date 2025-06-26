@@ -13,7 +13,7 @@ export default function NameScreen() {
   const handleNext = async () => {
     if (name.trim()) {
       await updateUserName(name.trim());
-      router.push('/onboarding/emotional-toolkit');
+      router.push('/onboarding/ai-preference');
     }
   };
 
@@ -107,7 +107,7 @@ export default function NameScreen() {
         <TouchableOpacity onPress={handleBack}>
           <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
         </TouchableOpacity>
-        <Text style={dynamicStyles.stepIndicator}>Step 1 of 2</Text>
+        <Text style={dynamicStyles.stepIndicator}>Step 1 of 3</Text>
         <View style={styles.placeholder} />
       </View>
 

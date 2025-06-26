@@ -11,7 +11,7 @@ import ActivityManagementModal from '@/components/ActivityManagementModal';
 
 export default function ProfileTab() {
   const { entries } = useEntries();
-  const { userProfile, updateUserName } = useOnboarding();
+  const { userProfile, updateUserName, updateAIPreference } = useOnboarding();
   const { colors } = useTheme();
   
   // Modal states
@@ -23,7 +23,7 @@ export default function ProfileTab() {
   // Form states
   const [editingName, setEditingName] = useState(userProfile?.name || '');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [reframeThoughtsEnabled, setReframeThoughtsEnabled] = useState(true);
+  const [useAI, setUseAI] = useState(userProfile?.useAI ?? true);
   
   // Calculate stats from actual entries
   const totalEntries = entries.length;
@@ -72,6 +72,11 @@ export default function ProfileTab() {
       await updateUserName(editingName.trim());
       setShowEditName(false);
     }
+  };
+
+  const handleAIToggle = async (value: boolean) => {
+    setUseAI(value);
+    await updateAIPreference(value);
   };
 
   const handleExportData = () => {
@@ -464,11 +469,11 @@ export default function ProfileTab() {
               <View style={dynamicStyles.menuIcon}>
                 <Brain size={18} color={colors.textSecondary} strokeWidth={1.5} />
               </View>
-              <Text style={dynamicStyles.menuTitle}>Reframe Thoughts</Text>
+              <Text style={dynamicStyles.menuTitle}>Use AI</Text>
             </View>
             <Switch
-              value={reframeThoughtsEnabled}
-              onValueChange={setReframeThoughtsEnabled}
+              value={useAI}
+              onValueChange={handleAIToggle}
               trackColor={{ false: colors.border, true: colors.primary }}
               thumbColor={colors.background}
             />

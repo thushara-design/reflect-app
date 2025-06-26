@@ -10,12 +10,14 @@ export interface UserProfile {
   name: string;
   emotionalToolkit: EmotionalToolkitItem[];
   hasCompletedOnboarding: boolean;
+  useAI: boolean; // New field for AI preference
 }
 
 interface OnboardingContextType {
   userProfile: UserProfile | null;
   isLoading: boolean;
   updateUserName: (name: string) => Promise<void>;
+  updateAIPreference: (useAI: boolean) => Promise<void>; // New method
   updateEmotionalToolkit: (toolkit: EmotionalToolkitItem[]) => Promise<void>;
   completeOnboarding: () => Promise<void>;
   resetOnboarding: () => Promise<void>;
@@ -29,6 +31,7 @@ const defaultProfile: UserProfile = {
   name: '',
   emotionalToolkit: [],
   hasCompletedOnboarding: false,
+  useAI: true, // Default to true for better experience
 };
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
@@ -43,7 +46,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     try {
       const stored = await AsyncStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setUserProfile(JSON.parse(stored));
+        const profile = JSON.parse(stored);
+        // Ensure useAI field exists for existing users
+        if (profile.useAI === undefined) {
+          profile.useAI = true;
+        }
+        setUserProfile(profile);
       } else {
         setUserProfile(defaultProfile);
       }
@@ -70,6 +78,12 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     await saveUserProfile(updatedProfile);
   };
 
+  const updateAIPreference = async (useAI: boolean) => {
+    if (!userProfile) return;
+    const updatedProfile = { ...userProfile, useAI };
+    await saveUserProfile(updatedProfile);
+  };
+
   const updateEmotionalToolkit = async (toolkit: EmotionalToolkitItem[]) => {
     if (!userProfile) return;
     const updatedProfile = { ...userProfile, emotionalToolkit: toolkit };
@@ -91,6 +105,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
       userProfile,
       isLoading,
       updateUserName,
+      updateAIPreference,
       updateEmotionalToolkit,
       completeOnboarding,
       resetOnboarding,

@@ -42,6 +42,13 @@ export default function EmotionSelectScreen() {
     skip: { color: colors.primary, fontWeight: '600', fontSize: 16, padding: 8 },
     title: { fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginBottom: 8 },
     subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 30, lineHeight: 24 },
+    stepIndicator: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '300',
+      textAlign: 'center',
+      marginBottom: 20,
+    },
     emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 30 },
     emotionCard: {
       width: '47%',
@@ -100,6 +107,7 @@ export default function EmotionSelectScreen() {
             <Text style={dynamicStyles.skip}>Skip</Text>
           </TouchableOpacity>
         </View>
+        <Text style={dynamicStyles.stepIndicator}>Step 3 of 3</Text>
         <Text style={dynamicStyles.title}>Which emotions do you struggle with most?</Text>
         <Text style={dynamicStyles.subtitle}>Select all that apply. You can add more later.</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>

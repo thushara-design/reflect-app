@@ -35,6 +35,7 @@ export default function NewEntryPage() {
   
   const isEditing = !!entryId;
   const showContextMenu = fromEntries === 'true';
+  const userHasAI = userProfile?.useAI ?? true; // Default to true for backward compatibility
 
   // Set initial content
   useEffect(() => {
@@ -75,12 +76,12 @@ export default function NewEntryPage() {
     }
   }, [content, title, isEditing]);
 
-  // Check for unhelpful patterns as user types
+  // Check for unhelpful patterns as user types (only if AI is enabled)
   useEffect(() => {
-    if (content.length > 50) {
+    if (userHasAI && content.length > 50) {
       checkForUnhelpfulPatterns(content);
     }
-  }, [content]);
+  }, [content, userHasAI]);
 
   const checkForUnhelpfulPatterns = (text: string) => {
     const lowerText = text.toLowerCase();
@@ -128,6 +129,12 @@ export default function NewEntryPage() {
       return;
     }
 
+    // Check if user has AI enabled
+    if (!userHasAI) {
+      Alert.alert('AI Disabled', 'AI analysis is disabled in your settings. You can enable it in your profile.');
+      return;
+    }
+
     // If we already have saved analysis for this content, show it
     if (savedAnalysis) {
       setAIAnalysis(savedAnalysis);
@@ -142,7 +149,7 @@ export default function NewEntryPage() {
       console.log('Calling aiService.analyzeEntry...');
       // Pass user's emotional toolkit to the AI service
       const userToolkit = userProfile?.emotionalToolkit || [];
-      const analysis = await aiService.analyzeEntry(content, userToolkit);
+      const analysis = await aiService.analyzeEntry(content, userToolkit, userHasAI);
       console.log('AI Analysis completed:', analysis);
       
       setAIAnalysis(analysis);
@@ -409,7 +416,7 @@ export default function NewEntryPage() {
           
           <EntryActions
             onSavePress={handleSave}
-            onAIAnalysis={handleAIAnalysis}
+            onAIAnalysis={userHasAI ? handleAIAnalysis : undefined} // Only show AI button if enabled
             showContextMenu={showContextMenu}
             onEditPress={handleEdit}
             onDeletePress={handleDelete}
@@ -452,15 +459,17 @@ export default function NewEntryPage() {
         </View>
       </View>
 
-      {/* Pattern Detection Modal */}
-      <PatternDetectionModal
-        visible={showPatternDetection}
-        onClose={() => setShowPatternDetection(false)}
-        patternType={detectedPattern?.type || ''}
-        explanation={detectedPattern?.explanation || ''}
-        challengingFacts={detectedPattern?.challengingFacts || []}
-        onSaveReframe={handlePatternReframe}
-      />
+      {/* Pattern Detection Modal - only show if AI is enabled */}
+      {userHasAI && (
+        <PatternDetectionModal
+          visible={showPatternDetection}
+          onClose={() => setShowPatternDetection(false)}
+          patternType={detectedPattern?.type || ''}
+          explanation={detectedPattern?.explanation || ''}
+          challengingFacts={detectedPattern?.challengingFacts || []}
+          onSaveReframe={handlePatternReframe}
+        />
+      )}
     </>
   );
 }

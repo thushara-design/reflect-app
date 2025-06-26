@@ -114,13 +114,22 @@ export class ActivityGenerator {
     entryText: string, 
     emotion: string, 
     aiInsights: string = '',
-    userToolkit: EmotionalToolkitItem[] = []
+    userToolkit: EmotionalToolkitItem[] = [],
+    useAI: boolean = true
   ): ActivitySuggestion[] {
     const lowerText = entryText.toLowerCase();
     const lowerAI = aiInsights.toLowerCase();
     
     // Start with user's saved activities for this emotion
     const userActivities = this.getUserActivitiesForEmotion(emotion, userToolkit);
+    
+    // If AI is disabled, only return user activities and basic emotion-based activities
+    if (!useAI) {
+      const basicActivities = [...(this.baseActivities[emotion] || this.baseActivities['anxious'])];
+      const allActivities = [...userActivities, ...basicActivities];
+      const uniqueActivities = this.removeDuplicateActivities(allActivities);
+      return uniqueActivities.slice(0, 4);
+    }
     
     // Get base AI activities for this emotion
     let aiActivities = [...(this.baseActivities[emotion] || this.baseActivities['anxious'])];

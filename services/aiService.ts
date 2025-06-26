@@ -45,12 +45,14 @@ class AIService {
     this.reframingService = new ReframingService(this.apiKey);
   }
 
-  async analyzeEntry(entryText: string, userToolkit: EmotionalToolkitItem[] = []): Promise<AIAnalysisResult> {
+  async analyzeEntry(entryText: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): Promise<AIAnalysisResult> {
     console.log('Starting AI analysis for entry:', entryText.substring(0, 100) + '...');
+    console.log('AI enabled:', useAI);
     
-    if (!this.apiKey) {
-      console.log('No API key found, using enhanced content analysis');
-      return this.getContentBasedAnalysis(entryText, userToolkit);
+    // If AI is disabled or no API key, use content-based analysis only
+    if (!useAI || !this.apiKey) {
+      console.log('Using content-based analysis (AI disabled or no API key)');
+      return this.getContentBasedAnalysis(entryText, userToolkit, useAI);
     }
 
     try {
@@ -92,14 +94,14 @@ class AIService {
         const generatedText = response.data.choices[0].message.content || '';
         console.log('Generated analysis (first 300 chars):', generatedText.substring(0, 300));
         
-        return this.parseAIAnalysis(entryText, generatedText, userToolkit);
+        return this.parseAIAnalysis(entryText, generatedText, userToolkit, useAI);
       } else {
         console.warn('Unexpected API response format, using content-based analysis');
-        return this.getContentBasedAnalysis(entryText, userToolkit);
+        return this.getContentBasedAnalysis(entryText, userToolkit, useAI);
       }
     } catch (error) {
       console.error('Error calling Fireworks API:', error);
-      return this.getContentBasedAnalysis(entryText, userToolkit);
+      return this.getContentBasedAnalysis(entryText, userToolkit, useAI);
     }
   }
 
@@ -147,7 +149,7 @@ CRITICAL:
 - For the reflection, specifically reference what the user wrote about (their situation, feelings, experiences) rather than giving generic emotional validation.`;
   }
 
-  private parseAIAnalysis(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
+  private parseAIAnalysis(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): AIAnalysisResult {
     try {
       // Clean the response - remove any text before the first { and after the last }
       let cleanedResponse = aiResponse.trim();
@@ -166,15 +168,18 @@ CRITICAL:
         // Parse emotion with validation
         const emotion = this.emotionDetector.parseEmotionFromAI(analysisData.emotion);
         
-        // Parse cognitive distortions with enhanced validation
-        const distortions = this.distortionDetector.parseDistortionsFromAI(analysisData.cognitive_distortions || [], originalText);
+        // Parse cognitive distortions with enhanced validation (only if AI is enabled)
+        const distortions = useAI 
+          ? this.distortionDetector.parseDistortionsFromAI(analysisData.cognitive_distortions || [], originalText)
+          : [];
         
         // Generate activities with user toolkit integration
         const activities = this.activityGenerator.generateContextualActivities(
           originalText, 
           emotion.emotion, 
           aiResponse,
-          userToolkit
+          userToolkit,
+          useAI
         );
         
         // Get reflection from AI or generate content-based one
@@ -197,25 +202,26 @@ CRITICAL:
       console.log('Raw AI response:', aiResponse);
       
       // Fallback to enhanced text-based parsing
-      return this.parseTextualAIResponse(originalText, aiResponse, userToolkit);
+      return this.parseTextualAIResponse(originalText, aiResponse, userToolkit, useAI);
     }
   }
 
-  private parseTextualAIResponse(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
+  private parseTextualAIResponse(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): AIAnalysisResult {
     console.log('Using enhanced textual parsing fallback');
     
     // Extract emotion from AI response text
     const emotion = this.emotionDetector.detectEmotion(originalText, aiResponse);
     
-    // Extract distortions mentioned in AI response with better detection
-    const distortions = this.distortionDetector.detectCognitiveDistortions(originalText);
+    // Extract distortions mentioned in AI response with better detection (only if AI enabled)
+    const distortions = useAI ? this.distortionDetector.detectCognitiveDistortions(originalText) : [];
     
     // Generate activities based on AI insights and emotion with user toolkit
     const activities = this.activityGenerator.generateContextualActivities(
       originalText, 
       emotion.emotion, 
       aiResponse,
-      userToolkit
+      userToolkit,
+      useAI
     );
     
     // Extract or generate reflection
@@ -251,16 +257,20 @@ CRITICAL:
     return null;
   }
 
-  private getContentBasedAnalysis(entryText: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
+  private getContentBasedAnalysis(entryText: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): AIAnalysisResult {
     console.log('Using enhanced content-based analysis');
     
     const emotion = this.emotionDetector.detectEmotion(entryText, '');
-    const distortions = this.distortionDetector.detectCognitiveDistortions(entryText);
+    
+    // Only detect distortions if AI is enabled
+    const distortions = useAI ? this.distortionDetector.detectCognitiveDistortions(entryText) : [];
+    
     const activities = this.activityGenerator.generateContextualActivities(
       entryText, 
       emotion.emotion, 
       '',
-      userToolkit
+      userToolkit,
+      useAI
     );
     const reflection = this.reflectionGenerator.generateContentBasedReflection(entryText, emotion.emotion);
 
