@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Trash2, Sparkles } from 'lucide-react-native';
+import { ArrowLeft } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import PatternDetectionModal from '@/components/PatternDetectionModal';
 import AIAnalysisCards from '@/components/AIAnalysisCards';
@@ -29,27 +29,20 @@ export default function NewEntryPage() {
   const [detectedPattern, setDetectedPattern] = useState<any>(null);
   const [showAnalysisCards, setShowAnalysisCards] = useState(false);
   const [savedAnalysis, setSavedAnalysis] = useState<AIAnalysisResult | null>(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const { addEntry, updateEntry, deleteEntry, entries } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
   
   const isEditing = !!entryId;
   const showContextMenu = fromEntries === 'true';
-  const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const initialContentRef = useRef('');
-  const initialTitleRef = useRef('');
 
-  // Set initial content and track changes
+  // Set initial content
   useEffect(() => {
     if (prompt) {
       setContent(`${prompt}\n\n`);
-      initialContentRef.current = `${prompt}\n\n`;
     } else if (initialContent) {
       setContent(initialContent);
       setTitle(initialTitle || '');
-      initialContentRef.current = initialContent;
-      initialTitleRef.current = initialTitle || '';
       // Load saved analysis if present
       if (entryId) {
         const entry = entries.find(e => e.id === parseInt(entryId));
@@ -60,33 +53,6 @@ export default function NewEntryPage() {
       }
     }
   }, [prompt, initialContent, initialTitle, entryId, entries]);
-
-  // Track unsaved changes
-  useEffect(() => {
-    const hasChanges = content !== initialContentRef.current || title !== initialTitleRef.current;
-    setHasUnsavedChanges(hasChanges);
-  }, [content, title]);
-
-  // Autosave functionality
-  useEffect(() => {
-    if (isEditing && hasUnsavedChanges && (content.trim() || title.trim())) {
-      // Clear existing timeout
-      if (autosaveTimeoutRef.current) {
-        clearTimeout(autosaveTimeoutRef.current);
-      }
-
-      // Set new timeout for autosave
-      autosaveTimeoutRef.current = setTimeout(() => {
-        handleSave(true); // true indicates autosave
-      }, 2000); // Autosave after 2 seconds of inactivity
-    }
-
-    return () => {
-      if (autosaveTimeoutRef.current) {
-        clearTimeout(autosaveTimeoutRef.current);
-      }
-    };
-  }, [content, title, isEditing, hasUnsavedChanges]);
 
   // Generate current date and time
   const getCurrentDateTime = () => {
@@ -209,11 +175,9 @@ export default function NewEntryPage() {
     setShowAnalysisCards(false);
   };
 
-  const handleSave = (isAutosave = false) => {
+  const handleSave = () => {
     if (!content.trim()) {
-      if (!isAutosave) {
-        Alert.alert('Empty Entry', 'Please write something before saving.');
-      }
+      Alert.alert('Empty Entry', 'Please write something before saving.');
       return;
     }
 
@@ -251,10 +215,6 @@ export default function NewEntryPage() {
 
     if (isEditing && entryId) {
       updateEntry(parseInt(entryId), entryData);
-      // Update initial refs after successful save
-      initialContentRef.current = content.trim();
-      initialTitleRef.current = finalTitle;
-      setHasUnsavedChanges(false);
     } else {
       const newEntry = {
         ...entryData,
@@ -263,9 +223,11 @@ export default function NewEntryPage() {
       addEntry(newEntry);
     }
     
-    if (!isAutosave) {
-      router.replace('/(tabs)');
-    }
+    router.replace('/(tabs)');
+  };
+
+  const handleEdit = () => {
+    console.log('Edit pressed');
   };
 
   const handleDelete = () => {
@@ -289,14 +251,13 @@ export default function NewEntryPage() {
   };
 
   const handleBack = () => {
-    if (hasUnsavedChanges) {
+    if (content.trim() || title.trim()) {
       Alert.alert(
-        'Unsaved Changes',
-        'You have unsaved changes. What would you like to do?',
+        'Discard Changes',
+        'Are you sure you want to discard your changes?',
         [
-          { text: 'Discard', style: 'destructive', onPress: () => router.back() },
-          { text: 'Save & Exit', onPress: () => { handleSave(); router.back(); } },
-          { text: 'Cancel', style: 'cancel' }
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Discard', style: 'destructive', onPress: () => router.back() }
         ]
       );
     } else {
@@ -328,29 +289,6 @@ export default function NewEntryPage() {
       flex: 1,
       textAlign: 'center',
       marginHorizontal: 16,
-    },
-    headerActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    deleteButton: {
-      padding: 8,
-      borderRadius: 8,
-    },
-    aiButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary,
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
-      gap: 6,
-    },
-    aiButtonText: {
-      color: colors.background,
-      fontSize: 14,
-      fontWeight: '500',
     },
     scrollContainer: {
       flex: 1,
@@ -409,12 +347,6 @@ export default function NewEntryPage() {
       color: colors.textSecondary,
       fontWeight: '300',
       textAlign: 'center',
-    },
-    autosaveText: {
-      fontSize: 12,
-      color: colors.primary,
-      fontStyle: 'italic',
-      marginTop: 4,
     },
     analyzingText: {
       fontSize: 12,
@@ -475,24 +407,17 @@ export default function NewEntryPage() {
             {isEditing ? 'Edit Entry' : 'New Entry'}
           </Text>
           
-          <View style={dynamicStyles.headerActions}>
-            {isEditing && (
-              <TouchableOpacity style={dynamicStyles.deleteButton} onPress={handleDelete}>
-                <Trash2 size={20} color={colors.accent} strokeWidth={1.5} />
-              </TouchableOpacity>
-            )}
-            
-            <TouchableOpacity 
-              style={dynamicStyles.aiButton}
-              onPress={handleAIAnalysis}
-              disabled={isAnalyzing}
-            >
-              <Sparkles size={16} color={colors.background} strokeWidth={1.5} />
-              <Text style={dynamicStyles.aiButtonText}>
-                {isAnalyzing ? 'Analyzing...' : 'Reflect'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <EntryActions
+            onSavePress={handleSave}
+            onAIAnalysis={handleAIAnalysis}
+            showContextMenu={showContextMenu}
+            onEditPress={handleEdit}
+            onDeletePress={handleDelete}
+            isRecording={isRecording}
+            onRecordingChange={setIsRecording}
+            onVoiceTranscript={handleVoiceTranscript}
+            onVoiceError={handleVoiceError}
+          />
         </View>
 
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -521,9 +446,6 @@ export default function NewEntryPage() {
 
         <View style={dynamicStyles.bottomInfo}>
           <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-          {isEditing && hasUnsavedChanges && (
-            <Text style={dynamicStyles.autosaveText}>Autosaving...</Text>
-          )}
           {isAnalyzing && (
             <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
           )}

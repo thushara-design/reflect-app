@@ -135,8 +135,6 @@ export default function ProfileTab() {
       fontSize: 24,
       fontWeight: '300',
       color: colors.text,
-      textAlign: 'center',
-      marginBottom: 8,
       letterSpacing: -0.5,
     },
     subtitle: {
