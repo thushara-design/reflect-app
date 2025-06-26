@@ -110,7 +110,6 @@ export default function NameScreen() {
         <Text style={dynamicStyles.stepIndicator}>Step 1 of 2</Text>
         <View style={styles.placeholder} />
       </View>
-
       <View style={dynamicStyles.content}>
         <Text style={dynamicStyles.title}>What should I call you?</Text>
         <Text style={dynamicStyles.subtitle}>

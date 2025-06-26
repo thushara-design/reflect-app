@@ -12,6 +12,7 @@ interface AIAnalysisCardsProps {
   onActivitySelect: (activityId: string) => void;
   entryText: string;
   userProfile: UserProfile | null;
+  detectedEmotion: string | null;
 }
 
 export default function AIAnalysisCards({
@@ -19,7 +20,8 @@ export default function AIAnalysisCards({
   onSaveReframe,
   onActivitySelect,
   entryText,
-  userProfile
+  userProfile,
+  detectedEmotion
 }: AIAnalysisCardsProps) {
   const { colors } = useTheme();
   const [selectedActivities, setSelectedActivities] = useState<Set<string>>(new Set());
@@ -27,18 +29,21 @@ export default function AIAnalysisCards({
   const [reframedThoughts, setReframedThoughts] = useState<Record<string, string>>({});
   const [isGeneratingReframe, setIsGeneratingReframe] = useState<Record<string, boolean>>({});
 
-  // Get user's saved activities for the detected emotion
+  // Get user's saved activities for the detected emotion only
   const getUserActivities = () => {
-    if (!userProfile?.emotionalToolkit) return [];
-    return userProfile.emotionalToolkit.flatMap((item, emotionIndex) =>
-      item.actions.map((action, actionIndex) => ({
-        id: `user-${emotionIndex}-${actionIndex}`,
-        title: action,
-        description: `Your personal coping strategy for ${item.emotion}`,
-        duration: '5-10 minutes',
-        category: 'personal'
-      }))
+    if (!userProfile?.emotionalToolkit || !detectedEmotion) return [];
+    const toolkitItem = userProfile.emotionalToolkit.find(
+      (item) => item.emotion.toLowerCase() === detectedEmotion.toLowerCase()
     );
+    return toolkitItem
+      ? toolkitItem.actions.map((action, idx) => ({
+          id: `user-${detectedEmotion}-${idx}`,
+          title: action,
+          description: `Your personal coping strategy for ${toolkitItem.emotion}`,
+          duration: '5-10 minutes',
+          category: 'personal'
+        }))
+      : [];
   };
 
   const allActivities = [...getUserActivities(), ...analysis.activities];

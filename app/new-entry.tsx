@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -383,6 +384,7 @@ export default function NewEntryPage() {
               onActivitySelect={handleActivitySelect}
               entryText={content}
               userProfile={userProfile}
+              detectedEmotion={aiAnalysis?.emotion?.emotion || null}
             />
           </View>
         </ScrollView>

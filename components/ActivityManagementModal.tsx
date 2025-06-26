@@ -9,6 +9,15 @@ interface ActivityManagementModalProps {
   onClose: () => void;
 }
 
+const emotions = [
+  { name: 'Anxiety', emoji: '😰', color: '#FF9F43' },
+  { name: 'Sadness', emoji: '😢', color: '#74B9FF' },
+  { name: 'Anger', emoji: '😠', color: '#FF6B6B' },
+  { name: 'Stress', emoji: '😫', color: '#FD79A8' },
+  { name: 'Frustration', emoji: '😤', color: '#A29BFE' },
+  { name: 'Loneliness', emoji: '😞', color: '#FDCB6E' },
+];
+
 export default function ActivityManagementModal({ visible, onClose }: ActivityManagementModalProps) {
   const { colors } = useTheme();
   const { userProfile, updateEmotionalToolkit } = useOnboarding();
@@ -17,15 +26,6 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
   const [showAddActivity, setShowAddActivity] = useState(false);
   const [newActivity, setNewActivity] = useState('');
   const [editingActivity, setEditingActivity] = useState<{ emotion: string; index: number; text: string } | null>(null);
-
-  const emotions = [
-    { name: 'Anxiety', emoji: '😰', color: '#FF9F43' },
-    { name: 'Sadness', emoji: '😢', color: '#74B9FF' },
-    { name: 'Anger', emoji: '😠', color: '#FF6B6B' },
-    { name: 'Stress', emoji: '😫', color: '#FD79A8' },
-    { name: 'Frustration', emoji: '😤', color: '#A29BFE' },
-    { name: 'Loneliness', emoji: '😞', color: '#FDCB6E' },
-  ];
 
   const getActivitiesForEmotion = (emotionName: string) => {
     const toolkit = userProfile?.emotionalToolkit || [];
