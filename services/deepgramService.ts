@@ -4,6 +4,10 @@ import { Buffer } from 'buffer';
 const DEEPGRAM_KEY = process.env.EXPO_PUBLIC_DEEPGRAM_KEY;
 const DEEPGRAM_URL = 'https://api.deepgram.com/v1/listen';
 
+if (!DEEPGRAM_KEY) {
+  throw new Error('Deepgram API key is not set in environment variables.');
+}
+
 // Utility to detect MIME type based on file extension
 function getAudioFormat(uri: string): { mimeType: string; extension: string } {
   const lowerUri = uri.toLowerCase();
@@ -16,12 +20,6 @@ function getAudioFormat(uri: string): { mimeType: string; extension: string } {
 
 export async function transcribeAudio(uri: string, mimeOverride?: string): Promise<string> {
   try {
-    // Check if Deepgram API key is available
-    if (!DEEPGRAM_KEY || DEEPGRAM_KEY === 'your_deepgram_api_key_here') {
-      console.warn('Deepgram API key is not configured. Transcription service is unavailable.');
-      throw new Error('Deepgram API key is not configured. Please add EXPO_PUBLIC_DEEPGRAM_KEY to your environment variables.');
-    }
-
     console.log('Checking audio file...');
     const fileInfo = await FileSystem.getInfoAsync(uri);
     if (!fileInfo.exists || !fileInfo.size || fileInfo.size < 1000) {
@@ -70,9 +68,4 @@ export async function transcribeAudio(uri: string, mimeOverride?: string): Promi
     console.error('Transcription error:', err.message);
     throw new Error(`Transcription failed: ${err.message}`);
   }
-}
-
-// Helper function to check if Deepgram is available
-export function isDeepgramAvailable(): boolean {
-  return !!(DEEPGRAM_KEY && DEEPGRAM_KEY !== 'your_deepgram_api_key_here');
 }
