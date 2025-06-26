@@ -123,6 +123,8 @@ export default function NewEntryPage() {
 
   const handleAIAnalysis = async () => {
     console.log('Analysis button pressed, AI enabled:', userHasAI);
+    console.log('User profile:', userProfile);
+    console.log('User toolkit:', userProfile?.emotionalToolkit);
     
     if (!content.trim()) {
       Alert.alert('No Content', 'Please write something before analyzing.');
@@ -143,6 +145,7 @@ export default function NewEntryPage() {
       console.log('Calling aiService.analyzeEntry...');
       // Pass user's emotional toolkit to the AI service
       const userToolkit = userProfile?.emotionalToolkit || [];
+      console.log('Passing toolkit to AI service:', userToolkit);
       const analysis = await aiService.analyzeEntry(content, userToolkit, userHasAI);
       console.log('Analysis completed:', analysis);
       

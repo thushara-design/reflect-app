@@ -46,8 +46,9 @@ class AIService {
   }
 
   async analyzeEntry(entryText: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): Promise<AIAnalysisResult> {
-    console.log('Starting AI analysis for entry:', entryText.substring(0, 100) + '...');
+    console.log('Starting analysis for entry:', entryText.substring(0, 100) + '...');
     console.log('AI enabled:', useAI);
+    console.log('User toolkit received:', userToolkit);
     
     // If AI is disabled or no API key, use content-based analysis only
     if (!useAI || !this.apiKey) {
@@ -259,6 +260,7 @@ CRITICAL:
 
   private getContentBasedAnalysis(entryText: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): AIAnalysisResult {
     console.log('Using enhanced content-based analysis');
+    console.log('User toolkit in content-based analysis:', userToolkit);
     
     const emotion = this.emotionDetector.detectEmotion(entryText, '');
     
@@ -273,6 +275,8 @@ CRITICAL:
       useAI
     );
     const reflection = this.reflectionGenerator.generateContentBasedReflection(entryText, emotion.emotion);
+
+    console.log('Content-based analysis complete. Activities:', activities);
 
     return {
       emotion,
