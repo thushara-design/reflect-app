@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
 
@@ -18,7 +19,20 @@ function getAudioFormat(uri: string): { mimeType: string; extension: string } {
   return { mimeType: 'audio/mp4', extension: 'm4a' }; // default
 }
 
-export async function transcribeAudio(uri: string, mimeOverride?: string): Promise<string> {
+async function getAudioDataForWeb(uri: string): Promise<Buffer> {
+  try {
+    const response = await fetch(uri);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch audio data: ${response.statusText}`);
+    }
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    throw new Error(`Failed to read audio data on web: ${error}`);
+  }
+}
+
+async function getAudioDataForNative(uri: string): Promise<Buffer> {
   try {
     console.log('Checking audio file...');
     const fileInfo = await FileSystem.getInfoAsync(uri);
@@ -26,15 +40,31 @@ export async function transcribeAudio(uri: string, mimeOverride?: string): Promi
       throw new Error('Invalid or corrupt audio file.');
     }
 
-    const audioFormat = getAudioFormat(uri);
-    const mimeType = mimeOverride || audioFormat.mimeType;
-
     console.log('Reading audio as base64...');
     const base64Data = await FileSystem.readAsStringAsync(uri, {
       encoding: FileSystem.EncodingType.Base64,
     });
 
-    const binaryData = Buffer.from(base64Data, 'base64');
+    return Buffer.from(base64Data, 'base64');
+  } catch (error) {
+    throw new Error(`Failed to read audio data on native: ${error}`);
+  }
+}
+
+export async function transcribeAudio(uri: string, mimeOverride?: string): Promise<string> {
+  try {
+    const audioFormat = getAudioFormat(uri);
+    const mimeType = mimeOverride || audioFormat.mimeType;
+
+    let binaryData: Buffer;
+
+    if (Platform.OS === 'web') {
+      console.log('Reading audio data for web...');
+      binaryData = await getAudioDataForWeb(uri);
+    } else {
+      console.log('Reading audio data for native...');
+      binaryData = await getAudioDataForNative(uri);
+    }
 
     const params = new URLSearchParams({
       punctuate: 'true',
