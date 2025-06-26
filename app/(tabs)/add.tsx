@@ -46,9 +46,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '300',
-    color: '#2A2A2A',
+    color: '#222',
     textAlign: 'center',
     letterSpacing: -0.5,
+    fontFamily: 'Nunito-Regular',
   },
   quickStartSection: {
     alignItems: 'center',
@@ -75,5 +76,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#FAFAFA',
     fontWeight: '400',
+    fontFamily: 'Nunito-Regular',
   },
 });

@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Trash2 } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import PatternDetectionModal from '@/components/PatternDetectionModal';
 import AIAnalysisCards from '@/components/AIAnalysisCards';
@@ -290,11 +290,12 @@ export default function NewEntryPage() {
     headerTitle: {
       fontSize: 18,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       letterSpacing: -0.3,
       flex: 1,
       textAlign: 'center',
       marginHorizontal: 16,
+      fontFamily: 'Nunito-Bold',
     },
     scrollContainer: {
       flex: 1,
@@ -306,20 +307,22 @@ export default function NewEntryPage() {
     titleInput: {
       fontSize: 24,
       fontWeight: '600',
-      color: colors.text,
+      color: '#181818',
       lineHeight: 32,
       minHeight: 40,
       marginTop: 16,
       marginBottom: 16,
+      fontFamily: 'Nunito-Bold',
     },
     contentInput: {
       fontSize: 16,
-      color: colors.text,
+      color: '#181818',
       lineHeight: 24,
       fontWeight: '300',
       minHeight: 200,
       textAlignVertical: 'top',
       marginBottom: 20,
+      fontFamily: 'Nunito-Regular',
     },
     userTextSection: {
       backgroundColor: colors.surface,
@@ -332,13 +335,15 @@ export default function NewEntryPage() {
     userTextTitle: {
       fontSize: 16,
       fontWeight: '500',
-      color: colors.text,
+      color: '#181818',
       marginBottom: 12,
+      fontFamily: 'Nunito-Bold',
     },
     userText: {
       fontSize: 14,
-      color: colors.text,
+      color: '#181818',
       lineHeight: 20,
+      fontFamily: 'Nunito-Regular',
     },
     bottomInfo: {
       paddingVertical: 16,
@@ -353,12 +358,14 @@ export default function NewEntryPage() {
       color: colors.textSecondary,
       fontWeight: '300',
       textAlign: 'center',
+      fontFamily: 'Nunito-Regular',
     },
     analyzingText: {
       fontSize: 12,
       color: colors.textSecondary,
       fontStyle: 'italic',
       marginTop: 4,
+      fontFamily: 'Nunito-Italic',
     },
   });
 
@@ -371,7 +378,7 @@ export default function NewEntryPage() {
           </TouchableOpacity>
           
           <Text style={dynamicStyles.headerTitle}>
-            {userHasAI ? 'AI Analysis' : 'Entry Analysis'}
+            {'Reflection'}
           </Text>
           
           <TouchableOpacity style={styles.backButton} onPress={handleSave}>
@@ -383,8 +390,8 @@ export default function NewEntryPage() {
           <View style={dynamicStyles.content}>
             {/* User's Text Display */}
             <View style={dynamicStyles.userTextSection}>
-              <Text style={dynamicStyles.userTextTitle}>Your Entry</Text>
-              <Text style={dynamicStyles.userText}>{content}</Text>
+              <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 8 }}>{'Your Entry'}</Text>
+              <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}>{content}</Text>
             </View>
 
             {/* Analysis Cards */}
@@ -432,7 +439,7 @@ export default function NewEntryPage() {
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.content}>
             <TextInput
-              style={dynamicStyles.titleInput}
+              style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 8 }}
               placeholder="Title here"
               placeholderTextColor={colors.textSecondary}
               value={title}
@@ -441,7 +448,7 @@ export default function NewEntryPage() {
             />
 
             <TextInput
-              style={dynamicStyles.contentInput}
+              style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}
               placeholder="Start writing..."
               placeholderTextColor={colors.textSecondary}
               value={content}
@@ -454,6 +461,11 @@ export default function NewEntryPage() {
         </ScrollView>
 
         <View style={dynamicStyles.bottomInfo}>
+          {isEditing && (
+            <TouchableOpacity onPress={handleDelete} style={{ position: 'absolute', left: 24, bottom: 16 }}>
+              <Trash2 size={22} color={colors.textSecondary} strokeWidth={1.5} />
+            </TouchableOpacity>
+          )}
           <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
           {isAnalyzing && (
             <Text style={dynamicStyles.analyzingText}>

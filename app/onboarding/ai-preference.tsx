@@ -36,6 +36,7 @@ export default function AIPreferenceScreen() {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     content: {
       flex: 1,
@@ -45,10 +46,11 @@ export default function AIPreferenceScreen() {
     title: {
       fontSize: 32,
       fontWeight: '300',
-      color: colors.text,
+      color: '#181818',
       textAlign: 'center',
       marginBottom: 16,
       letterSpacing: -0.5,
+      fontFamily: 'Nunito-Bold',
     },
     subtitle: {
       fontSize: 16,
@@ -56,6 +58,7 @@ export default function AIPreferenceScreen() {
       textAlign: 'center',
       marginBottom: 60,
       lineHeight: 24,
+      fontFamily: 'Nunito-Regular',
     },
     aiCard: {
       backgroundColor: colors.surface,
@@ -91,7 +94,8 @@ export default function AIPreferenceScreen() {
     aiTitle: {
       fontSize: 20,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
+      fontFamily: 'Nunito-Bold',
     },
     featuresList: {
       gap: 16,
@@ -112,8 +116,9 @@ export default function AIPreferenceScreen() {
     featureText: {
       flex: 1,
       fontSize: 14,
-      color: colors.text,
+      color: '#181818',
       lineHeight: 20,
+      fontFamily: 'Nunito-Regular',
     },
     fallbackInfo: {
       backgroundColor: colors.surface,
@@ -124,13 +129,15 @@ export default function AIPreferenceScreen() {
     fallbackTitle: {
       fontSize: 16,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       marginBottom: 8,
+      fontFamily: 'Nunito-Bold',
     },
     fallbackText: {
       fontSize: 14,
       color: colors.textSecondary,
       lineHeight: 20,
+      fontFamily: 'Nunito-Regular',
     },
     nextButton: {
       backgroundColor: colors.primary,
@@ -145,6 +152,7 @@ export default function AIPreferenceScreen() {
       fontSize: 16,
       color: colors.background,
       fontWeight: '400',
+      fontFamily: 'Nunito-Bold',
     },
   });
 

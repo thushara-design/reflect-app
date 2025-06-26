@@ -159,8 +159,8 @@ import {
     const styles = StyleSheet.create({
       container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 20 },
       header: { marginTop: 40, marginBottom: 20 },
-      title: { fontSize: 22, fontWeight: '500', color: colors.text, textAlign: 'center' },
-      subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 20 },
+      title: { fontSize: 22, fontWeight: '500', color: '#222', textAlign: 'center', fontFamily: 'Nunito-Regular' },
+      subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 20, fontFamily: 'Nunito-Regular' },
       inputContainer: {
         flexDirection: 'row',
         marginBottom: 12,
@@ -172,7 +172,8 @@ import {
         borderWidth: 1,
         borderRadius: 8,
         padding: 10,
-        color: colors.text,
+        color: '#222',
+        fontFamily: 'Nunito-Regular',
       },
       addButton: {
         backgroundColor: colors.primary,
@@ -184,6 +185,7 @@ import {
       addButtonText: {
         color: colors.background,
         fontWeight: '500',
+        fontFamily: 'Nunito-Bold',
       },
       suggestionToggle: { 
         alignSelf: 'flex-end', 
@@ -195,6 +197,7 @@ import {
       suggestionToggleText: {
         color: colors.primary,
         fontSize: 14,
+        fontFamily: 'Nunito-Regular',
       },
       chipContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
       chip: {
@@ -211,7 +214,7 @@ import {
         backgroundColor: colors.primary + '20',
         borderColor: colors.primary,
       },
-      chipText: { fontSize: 14, color: colors.text, marginRight: 6 },
+      chipText: { fontSize: 14, color: '#222', marginRight: 6, fontFamily: 'Nunito-Regular' },
       selectedChip: {
         backgroundColor: colors.primary + '30',
         borderColor: colors.primary,
@@ -219,6 +222,7 @@ import {
       selectedChipText: {
         color: colors.primary,
         fontWeight: '500',
+        fontFamily: 'Nunito-Bold',
       },
       footer: {
         padding: 16,
@@ -236,17 +240,18 @@ import {
       buttonDisabled: {
         backgroundColor: colors.border,
       },
-      buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+      buttonText: { color: '#fff', fontSize: 16, fontWeight: '600', fontFamily: 'Nunito-Bold' },
       skip: {
         alignItems: 'center',
         paddingVertical: 10,
       },
-      skipText: { color: colors.textSecondary, fontSize: 14 },
+      skipText: { color: colors.textSecondary, fontSize: 14, fontFamily: 'Nunito-Regular' },
       progressText: {
         textAlign: 'center',
         color: colors.textSecondary,
         fontSize: 12,
         marginBottom: 10,
+        fontFamily: 'Nunito-Regular',
       },
     });
   

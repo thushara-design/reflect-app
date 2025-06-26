@@ -5,16 +5,15 @@ import { Menu, LogOut, Phone } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 
 interface ReflectHeaderProps {
-  onMenuPress?: () => void;
+  title: string;
 }
 
-export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
+export default function ReflectHeader({ title }: ReflectHeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
   const { colors } = useTheme();
 
   const handleMenuPress = () => {
     setShowMenu(true);
-    onMenuPress?.();
   };
 
   const handleSignOut = () => {
@@ -31,7 +30,6 @@ export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
     header: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'space-between',
       paddingHorizontal: 24,
       paddingTop: 50,
       paddingBottom: 16,
@@ -40,10 +38,10 @@ export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
       borderBottomColor: colors.border,
     },
     logo: {
-      fontSize: 28,
-      fontWeight: '300',
+      fontSize: 18,
+      fontWeight: '400',
       color: colors.text,
-      letterSpacing: -0.8,
+      letterSpacing: -0.3,
     },
     menuContainer: {
       backgroundColor: colors.surface,
@@ -71,13 +69,7 @@ export default function ReflectHeader({ onMenuPress }: ReflectHeaderProps) {
   return (
     <>
       <View style={dynamicStyles.header}>
-        <View style={styles.logoContainer}>
-          <Text style={dynamicStyles.logo}>Reflect</Text>
-        </View>
-        
-        <TouchableOpacity style={styles.menuButton} onPress={handleMenuPress}>
-          <Menu size={24} color={colors.text} strokeWidth={1.5} />
-        </TouchableOpacity>
+        <Text style={dynamicStyles.logo}>{title}</Text>
       </View>
 
       <Modal

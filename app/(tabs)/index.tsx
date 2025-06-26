@@ -90,7 +90,7 @@ export default function EntriesTab() {
       <View style={styles.entryHeader}>
         <Text style={styles.entryDate}>{entry.date}</Text>
       </View>
-      <Text style={styles.entryPreview}>
+      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}>
         {entry.preview}
       </Text>
     </TouchableOpacity>
@@ -98,7 +98,7 @@ export default function EntriesTab() {
 
   return (
     <View style={styles.container}>
-      <ReflectHeader />
+      <ReflectHeader title="Entries" />
 
       <View style={styles.content}>
         <View style={styles.searchSection}>
@@ -196,8 +196,9 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#2A2A2A',
+    color: '#181818',
     fontWeight: '300',
+    fontFamily: 'Nunito-Regular',
   },
   entriesContainer: {
     flex: 1,
@@ -240,9 +241,10 @@ const styles = StyleSheet.create({
   },
   entryPreview: {
     fontSize: 13,
-    color: '#2A2A2A',
+    color: '#181818',
     lineHeight: 18,
     fontWeight: '300',
+    fontFamily: 'Nunito-Regular',
   },
   emptyState: {
     flex: 1,
@@ -252,14 +254,16 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: '#A5B8C8',
+    color: '#181818',
     fontWeight: '300',
     marginBottom: 8,
+    fontFamily: 'Nunito-Regular',
   },
   emptySubtext: {
     fontSize: 14,
     color: '#EAEAEA',
     fontWeight: '300',
     textAlign: 'center',
+    fontFamily: 'Nunito-Regular',
   },
 });

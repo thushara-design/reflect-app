@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Square, SquareCheck as CheckSquare, Lightbulb, Brain, Activity, Sparkles } from 'lucide-react-native';
@@ -108,16 +109,8 @@ export default function AIAnalysisCards({
       gap: 20,
     },
     card: {
-      backgroundColor: colors.surface,
       borderRadius: 16,
       padding: 20,
-      borderWidth: 1,
-      borderColor: colors.border,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.05,
-      shadowRadius: 8,
-      elevation: 2,
     },
     cardHeader: {
       flexDirection: 'row',
@@ -134,15 +127,17 @@ export default function AIAnalysisCards({
     },
     cardTitle: {
       fontSize: 18,
-      fontWeight: '600',
-      color: colors.text,
+      fontWeight: '700',
+      color: '#181818',
       flex: 1,
+      fontFamily: 'Nunito-Bold',
     },
-    emotionSection: {
+    emotionRow: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 16,
-      marginBottom: 16,
+      marginBottom: 8,
+      flexWrap: 'wrap',
     },
     emotionEmoji: {
       fontSize: 32,
@@ -151,30 +146,34 @@ export default function AIAnalysisCards({
       flex: 1,
     },
     emotionText: {
-      fontSize: 16,
-      fontWeight: '500',
-      color: colors.text,
+      fontSize: 15,
+      fontWeight: '600',
+      color: '#181818',
       marginBottom: 4,
+      fontFamily: 'Nunito-SemiBold',
     },
     confidenceText: {
       fontSize: 12,
       color: colors.textSecondary,
       marginBottom: 8,
+      fontFamily: 'Nunito-Regular',
     },
     reflectionText: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-      fontStyle: 'italic',
+      fontSize: 15,
+      color: '#181818',
+      lineHeight: 22,
+      fontStyle: 'normal',
+      fontFamily: 'Nunito-SemiBold',
     },
     activitiesSection: {
       marginBottom: 16,
     },
     sectionSubtitle: {
       fontSize: 14,
-      fontWeight: '500',
-      color: colors.text,
+      fontWeight: '400',
+      color: '#181818',
       marginBottom: 12,
+      fontFamily: 'Nunito-Regular',
     },
     activityItem: {
       flexDirection: 'row',
@@ -189,14 +188,16 @@ export default function AIAnalysisCards({
     },
     activityTitle: {
       fontSize: 15,
-      color: colors.text,
-      fontWeight: '500',
+      color: '#181818',
+      fontWeight: '600',
       marginBottom: 4,
+      fontFamily: 'Nunito-SemiBold',
     },
     activityDescription: {
-      fontSize: 13,
-      color: colors.textSecondary,
-      lineHeight: 18,
+      fontSize: 15,
+      color: '#181818',
+      lineHeight: 22,
+      fontFamily: 'Nunito-SemiBold',
     },
     activityMeta: {
       fontSize: 11,
@@ -323,7 +324,8 @@ export default function AIAnalysisCards({
     saveButtonText: {
       fontSize: 14,
       color: colors.background,
-      fontWeight: '500',
+      fontWeight: '400',
+      fontFamily: 'Nunito-Regular',
     },
     ignoreButton: {
       flex: 1,
@@ -338,6 +340,7 @@ export default function AIAnalysisCards({
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '400',
+      fontFamily: 'Nunito-Regular',
     },
     emptyState: {
       alignItems: 'center',
@@ -361,33 +364,24 @@ export default function AIAnalysisCards({
   return (
     <View style={dynamicStyles.container}>
       {/* Card 1: Emotion Analysis */}
-      <View style={dynamicStyles.card}>
-        <View style={dynamicStyles.cardHeader}>
-          <View style={[dynamicStyles.cardIcon, { backgroundColor: colors.primary + '15' }]}>
-            <Brain size={20} color={colors.primary} strokeWidth={1.5} />
-          </View>
-          <Text style={dynamicStyles.cardTitle}>Emotion Analysis</Text>
-        </View>
-
-        <View style={dynamicStyles.emotionSection}>
+      <View style={[dynamicStyles.card, { backgroundColor: '#FFF3EC' }]}> 
+        <View style={dynamicStyles.emotionRow}>
           <Text style={dynamicStyles.emotionEmoji}>{analysis.emotion.emoji}</Text>
-          <View style={dynamicStyles.emotionContent}>
-            <Text style={dynamicStyles.emotionText}>
-              You sound {analysis.emotion.emotion}, based on what you wrote.
-            </Text>
-            <Text style={dynamicStyles.confidenceText}>
-              {Math.round(analysis.emotion.confidence * 100)}% confidence
-              {!useAI && ' (basic detection)'}
-            </Text>
-            <Text style={dynamicStyles.reflectionText}>
-              {analysis.reflection}
-            </Text>
-          </View>
+          <Text style={{ fontFamily: 'Nunito-Bold', color: '#181818', fontSize: 18, fontWeight: '700', flexShrink: 1, flexWrap: 'wrap' }}>
+            You sound {analysis.emotion.emotion}, based on what you wrote.
+          </Text>
         </View>
+        <Text style={dynamicStyles.confidenceText}>
+          {Math.round(analysis.emotion.confidence * 100)}% confidence
+          {!useAI && ' (basic detection)'}
+        </Text>
+        <Text style={dynamicStyles.reflectionText}>
+          {analysis.reflection}
+        </Text>
       </View>
 
       {/* Card 2: Suggested Activities */}
-      <View style={dynamicStyles.card}>
+      <View style={[dynamicStyles.card, { backgroundColor: '#F1F9FF' }]}>
         <View style={dynamicStyles.cardHeader}>
           <View style={[dynamicStyles.cardIcon, { backgroundColor: colors.accent + '40' }]}>
             <Activity size={20} color={colors.text} strokeWidth={1.5} />
@@ -411,9 +405,9 @@ export default function AIAnalysisCards({
                     onPress={() => handleActivityToggle(activity.id)}
                   >
                     {selectedActivities.has(activity.id) ? (
-                      <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
+                      <CheckSquare size={20} color={'#181818'} strokeWidth={1.5} />
                     ) : (
-                      <Square size={20} color={colors.border} strokeWidth={1.5} />
+                      <Square size={20} color={'#181818'} strokeWidth={1.5} />
                     )}
                     <View style={dynamicStyles.activityContent}>
                       <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
@@ -443,9 +437,9 @@ export default function AIAnalysisCards({
                     onPress={() => handleActivityToggle(activity.id)}
                   >
                     {selectedActivities.has(activity.id) ? (
-                      <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
+                      <CheckSquare size={20} color={'#181818'} strokeWidth={1.5} />
                     ) : (
-                      <Square size={20} color={colors.border} strokeWidth={1.5} />
+                      <Square size={20} color={'#181818'} strokeWidth={1.5} />
                     )}
                     <View style={dynamicStyles.activityContent}>
                       <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>

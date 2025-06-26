@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Modal, Text } from 'react-native';
 import { useState } from 'react';
 import { Check, MoveHorizontal as MoreHorizontal, Sparkles } from 'lucide-react-native';
@@ -72,40 +73,7 @@ export default function EntryActions({
         >
           <Check size={20} color="#FAFAFA" strokeWidth={1.5} />
         </TouchableOpacity>
-        
-        {showContextMenu && (
-          <TouchableOpacity style={styles.actionButton} onPress={handleMorePress}>
-            <MoreHorizontal size={20} color="#A5B8C8" strokeWidth={1.5} />
-          </TouchableOpacity>
-        )}
       </View>
-
-      {showContextMenu && (
-        <Modal
-          visible={showMenu}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setShowMenu(false)}
-        >
-          <TouchableOpacity 
-            style={styles.modalOverlay} 
-            activeOpacity={1} 
-            onPress={() => setShowMenu(false)}
-          >
-            <View style={styles.contextMenuContainer}>
-              <TouchableOpacity style={styles.contextMenuItem} onPress={handleEdit}>
-                <Text style={styles.contextMenuText}>Edit</Text>
-              </TouchableOpacity>
-              
-              <View style={styles.contextMenuDivider} />
-              
-              <TouchableOpacity style={styles.contextMenuItem} onPress={handleDelete}>
-                <Text style={[styles.contextMenuText, styles.deleteText]}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
-        </Modal>
-      )}
     </>
   );
 }

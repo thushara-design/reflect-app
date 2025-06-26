@@ -58,11 +58,12 @@ export default function ReflectionResultsPage() {
     headerTitle: {
       fontSize: 18,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       letterSpacing: -0.3,
       flex: 1,
       textAlign: 'center',
       marginHorizontal: 16,
+      fontFamily: 'Nunito-Bold',
     },
     emotionCard: {
       backgroundColor: colors.surface,
@@ -80,9 +81,10 @@ export default function ReflectionResultsPage() {
     emotionText: {
       fontSize: 24,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       textTransform: 'capitalize',
       marginBottom: 8,
+      fontFamily: 'Nunito-Bold',
     },
     confidenceText: {
       fontSize: 14,
@@ -100,22 +102,25 @@ export default function ReflectionResultsPage() {
     reflectionTitle: {
       fontSize: 16,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       marginBottom: 12,
       flexDirection: 'row',
       alignItems: 'center',
+      fontFamily: 'Nunito-Bold',
     },
     reflectionText: {
       fontSize: 15,
       color: colors.textSecondary,
       lineHeight: 22,
+      fontFamily: 'Nunito-Regular',
     },
     sectionTitle: {
       fontSize: 18,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       marginHorizontal: 24,
       marginBottom: 16,
+      fontFamily: 'Nunito-Bold',
     },
     activityCard: {
       backgroundColor: colors.surface,
@@ -140,7 +145,8 @@ export default function ReflectionResultsPage() {
       flex: 1,
       fontSize: 16,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
+      fontFamily: 'Nunito-Bold',
     },
     activityDuration: {
       fontSize: 12,
@@ -151,6 +157,7 @@ export default function ReflectionResultsPage() {
       color: colors.textSecondary,
       lineHeight: 20,
       marginLeft: 32,
+      fontFamily: 'Nunito-Regular',
     },
   });
 

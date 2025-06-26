@@ -25,9 +25,10 @@ export default function WelcomeScreen() {
     logo: {
       fontSize: 48,
       fontWeight: '300',
-      color: colors.text,
+      color: '#181818',
       letterSpacing: -1.5,
       marginBottom: 16,
+      fontFamily: 'Nunito-Bold',
     },
     subtitle: {
       fontSize: 18,
@@ -35,6 +36,7 @@ export default function WelcomeScreen() {
       textAlign: 'center',
       marginBottom: 40,
       lineHeight: 26,
+      fontFamily: 'Nunito-Regular',
     },
     illustration: {
       width: 200,
@@ -63,6 +65,7 @@ export default function WelcomeScreen() {
       fontSize: 18,
       color: colors.background,
       fontWeight: '400',
+      fontFamily: 'Nunito-Bold',
     },
   });
 

@@ -30,15 +30,16 @@ export default function EmotionSelectScreen() {
     safe: { flex: 1, backgroundColor: colors.background },
     container: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
     header: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 },
-    skip: { color: colors.primary, fontWeight: '600', fontSize: 16, padding: 8 },
-    title: { fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginBottom: 8 },
-    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 30, lineHeight: 24 },
+    skip: { color: colors.primary, fontWeight: '600', fontSize: 16, padding: 8, fontFamily: 'Nunito-Bold' },
+    title: { fontSize: 28, fontWeight: '300', color: '#181818', textAlign: 'center', marginBottom: 8, fontFamily: 'Nunito-Bold' },
+    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 30, lineHeight: 24, fontFamily: 'Nunito-Regular' },
     stepIndicator: {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
       textAlign: 'center',
       marginBottom: 20,
+      fontFamily: 'Nunito-Regular',
     },
     emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 30 },
     emotionCard: {
@@ -74,7 +75,7 @@ export default function EmotionSelectScreen() {
       zIndex: 2,
     },
     emotionEmoji: { fontSize: 38, marginBottom: 10 },
-    emotionName: { fontSize: 16, color: colors.text, fontWeight: '500', textAlign: 'center' },
+    emotionName: { fontSize: 16, color: '#181818', fontWeight: '500', textAlign: 'center', fontFamily: 'Nunito-Bold' },
     nextButtonContainer: {
       paddingBottom: 24,
       paddingHorizontal: 24,
@@ -87,7 +88,7 @@ export default function EmotionSelectScreen() {
       alignItems: 'center',
       marginTop: 8,
     },
-    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 },
+    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18, fontFamily: 'Nunito-Bold' },
   });
 
   return (

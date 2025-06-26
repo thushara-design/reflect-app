@@ -19,13 +19,13 @@ interface ThemeContextType {
 }
 
 const lightColors: ThemeColors = {
-  background: '#FAFAFA',
-  surface: '#FAFAFA',
-  text: '#2A2A2A',
-  textSecondary: '#A5B8C8',
-  border: '#EAEAEA',
-  primary: '#A5B8C8',
-  accent: '#EFCFD6',
+  background: '#FDFDFD',        // Softer than pure white, reduces glare
+  surface: '#FFFFFF',           // True white for cards, modals, elevated surfaces
+  text: '#2A2A2A',              // Comfortable dark gray for body text
+  textSecondary: '#181818',     // Muted blue-gray for secondary info
+  border: '#E5E5E5',            // Light neutral gray for soft separation
+  primary: '#A5B8C8',           // Desaturated slate blue, soft and neutral
+  accent: '#EFCFD6',            // Cool misty blue for gentle accents
   error: '#FF6B6B',
 };
 

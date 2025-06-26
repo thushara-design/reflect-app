@@ -16,7 +16,7 @@ export default function TabLayout() {
           shadowOpacity: 0,
         },
         tabBarActiveTintColor: '#A5B8C8',
-        tabBarInactiveTintColor: '#EAEAEA',
+        tabBarInactiveTintColor: '#181818',
         tabBarShowLabel: false,
       }}>
       <Tabs.Screen

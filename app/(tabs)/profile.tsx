@@ -119,7 +119,8 @@ export default function ProfileTab() {
     avatarText: {
       fontSize: 32,
       fontWeight: '300',
-      color: colors.background,
+      color: '#181818',
+      fontFamily: 'Nunito-Regular',
     },
     editNameButton: {
       position: 'absolute',
@@ -139,14 +140,16 @@ export default function ProfileTab() {
     welcomeText: {
       fontSize: 24,
       fontWeight: '300',
-      color: colors.text,
+      color: '#181818',
       letterSpacing: -0.5,
+      fontFamily: 'Nunito-Regular',
     },
     subtitle: {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
       marginTop: 4,
+      fontFamily: 'Nunito-Regular',
     },
     statsSection: {
       marginBottom: 30,
@@ -154,8 +157,9 @@ export default function ProfileTab() {
     sectionTitle: {
       fontSize: 16,
       fontWeight: '400',
-      color: colors.text,
+      color: '#181818',
       marginBottom: 16,
+      fontFamily: 'Nunito-Bold',
     },
     statsGrid: {
       flexDirection: 'row',
@@ -174,14 +178,16 @@ export default function ProfileTab() {
     statValue: {
       fontSize: 20,
       fontWeight: '300',
-      color: colors.text,
+      color: '#181818',
       marginBottom: 4,
+      fontFamily: 'Nunito-Regular',
     },
     statLabel: {
       fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'center',
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     statIndicator: {
       position: 'absolute',
@@ -211,12 +217,14 @@ export default function ProfileTab() {
       fontSize: 12,
       color: colors.textSecondary,
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     activityText: {
       fontSize: 14,
-      color: colors.text,
+      color: '#181818',
       lineHeight: 20,
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     featuresSection: {
       marginBottom: 30,
@@ -246,15 +254,17 @@ export default function ProfileTab() {
     },
     featureTitle: {
       fontSize: 16,
-      color: colors.text,
+      color: '#181818',
       fontWeight: '400',
       marginBottom: 2,
+      fontFamily: 'Nunito-Bold',
     },
     featureDescription: {
       fontSize: 13,
       color: colors.textSecondary,
       fontWeight: '300',
       lineHeight: 18,
+      fontFamily: 'Nunito-Regular',
     },
     menuSection: {
       marginBottom: 30,
@@ -284,8 +294,9 @@ export default function ProfileTab() {
     },
     menuTitle: {
       fontSize: 16,
-      color: colors.text,
+      color: '#181818',
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     footer: {
       alignItems: 'center',
@@ -296,11 +307,13 @@ export default function ProfileTab() {
       color: colors.textSecondary,
       fontWeight: '300',
       marginBottom: 4,
+      fontFamily: 'Nunito-Regular',
     },
     footerSubtext: {
       fontSize: 11,
       color: colors.border,
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
     // Modal styles
     modalOverlay: {
@@ -322,6 +335,7 @@ export default function ProfileTab() {
       color: colors.text,
       marginBottom: 16,
       textAlign: 'center',
+      fontFamily: 'Nunito-Bold',
     },
     textInput: {
       backgroundColor: colors.background,
@@ -333,6 +347,7 @@ export default function ProfileTab() {
       fontSize: 16,
       color: colors.text,
       marginBottom: 20,
+      fontFamily: 'Nunito-Regular',
     },
     modalButtons: {
       flexDirection: 'row',
@@ -353,14 +368,16 @@ export default function ProfileTab() {
       borderColor: colors.border,
     },
     primaryButtonText: {
-      color: colors.background,
+      color: '#181818',
       fontSize: 16,
       fontWeight: '400',
+      fontFamily: 'Nunito-Bold',
     },
     secondaryButtonText: {
       color: colors.text,
       fontSize: 16,
       fontWeight: '300',
+      fontFamily: 'Nunito-Regular',
     },
   });
 
@@ -395,12 +412,12 @@ export default function ProfileTab() {
 
         {/* Stats */}
         <View style={dynamicStyles.statsSection}>
-          <Text style={dynamicStyles.sectionTitle}>Your Progress</Text>
+          <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 16 }}>Your Progress</Text>
           <View style={dynamicStyles.statsGrid}>
             {stats.map((stat, index) => (
               <View key={index} style={dynamicStyles.statCard}>
-                <Text style={dynamicStyles.statValue}>{stat.value}</Text>
-                <Text style={dynamicStyles.statLabel}>{stat.label}</Text>
+                <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.value}</Text>
+                <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.label}</Text>
                 <View style={[dynamicStyles.statIndicator, { backgroundColor: stat.color }]} />
               </View>
             ))}

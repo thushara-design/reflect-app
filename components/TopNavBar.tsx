@@ -43,12 +43,7 @@ export default function TopNavBar({ title, showDarkMode = false, showSignOut = f
 
   return (
     <View style={dynamicStyles.topNav}>
-      <TouchableOpacity style={styles.navButton}>
-        <Menu size={20} color={colors.text} strokeWidth={1.5} />
-      </TouchableOpacity>
-      
       <Text style={dynamicStyles.navTitle}>{title}</Text>
-      
       <View style={styles.navActions}>
         {showSignOut && (
           <TouchableOpacity style={dynamicStyles.signOutButton} onPress={handleSignOut}>
