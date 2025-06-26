@@ -334,10 +334,6 @@ export default function NewEntryPage() {
       alignItems: 'center',
       gap: 12,
     },
-    deleteButton: {
-      padding: 8,
-      borderRadius: 8,
-    },
     aiButton: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -396,19 +392,33 @@ export default function NewEntryPage() {
       color: colors.text,
       lineHeight: 20,
     },
-    bottomInfo: {
+    bottomContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       paddingVertical: 16,
       paddingHorizontal: 24,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      alignItems: 'center',
       backgroundColor: colors.background,
+    },
+    bottomLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 16,
+    },
+    deleteButton: {
+      padding: 8,
+      borderRadius: 8,
+    },
+    bottomRight: {
+      alignItems: 'flex-end',
     },
     timestamp: {
       fontSize: 12,
       color: colors.textSecondary,
       fontWeight: '300',
-      textAlign: 'center',
+      textAlign: 'right',
     },
     autosaveText: {
       fontSize: 12,
@@ -476,12 +486,6 @@ export default function NewEntryPage() {
           </Text>
           
           <View style={dynamicStyles.headerActions}>
-            {isEditing && (
-              <TouchableOpacity style={dynamicStyles.deleteButton} onPress={handleDelete}>
-                <Trash2 size={20} color={colors.accent} strokeWidth={1.5} />
-              </TouchableOpacity>
-            )}
-            
             <TouchableOpacity 
               style={dynamicStyles.aiButton}
               onPress={handleAIAnalysis}
@@ -519,14 +523,32 @@ export default function NewEntryPage() {
           </View>
         </ScrollView>
 
-        <View style={dynamicStyles.bottomInfo}>
-          <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-          {isEditing && hasUnsavedChanges && (
-            <Text style={dynamicStyles.autosaveText}>Autosaving...</Text>
-          )}
-          {isAnalyzing && (
-            <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
-          )}
+        <View style={dynamicStyles.bottomContainer}>
+          <View style={dynamicStyles.bottomLeft}>
+            {isEditing && (
+              <TouchableOpacity style={dynamicStyles.deleteButton} onPress={handleDelete}>
+                <Trash2 size={20} color={colors.accent} strokeWidth={1.5} />
+              </TouchableOpacity>
+            )}
+            
+            <EntryActions
+              onSavePress={handleSave}
+              isRecording={isRecording}
+              onRecordingChange={setIsRecording}
+              onVoiceTranscript={handleVoiceTranscript}
+              onVoiceError={handleVoiceError}
+            />
+          </View>
+
+          <View style={dynamicStyles.bottomRight}>
+            <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
+            {isEditing && hasUnsavedChanges && (
+              <Text style={dynamicStyles.autosaveText}>Autosaving...</Text>
+            )}
+            {isAnalyzing && (
+              <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
+            )}
+          </View>
         </View>
       </View>
 
