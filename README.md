@@ -64,11 +64,39 @@ A beautiful, AI-powered journaling app built with React Native and Expo that hel
 Create a `.env` file in the root directory:
 
 ```env
+# Required: Supabase configuration
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
 # Optional: Add Fireworks AI API key for enhanced AI analysis
 EXPO_PUBLIC_FIREWORKS_API_KEY=your_api_key_here
 
-# The app works perfectly without this - it uses smart fallback analysis
+# Optional: Add Deepgram API key for voice transcription
+EXPO_PUBLIC_DEEPGRAM_KEY=your_deepgram_api_key_here
+
+# Optional: Add Hugging Face API key for additional AI features
+EXPO_PUBLIC_HUGGING_FACE_API_KEY=your_hugging_face_api_key_here
+
+# The app works perfectly without optional keys - it uses smart fallback analysis
 ```
+
+### API Keys Setup
+
+#### Deepgram (Voice Transcription)
+1. Sign up at [Deepgram](https://deepgram.com/)
+2. Get your API key from the dashboard
+3. Add it to your `.env` file as `EXPO_PUBLIC_DEEPGRAM_KEY`
+4. **Note**: Voice transcription will be disabled if this key is not provided
+
+#### Fireworks AI (Enhanced Analysis)
+1. Sign up at [Fireworks AI](https://fireworks.ai/)
+2. Get your API key
+3. Add it to your `.env` file as `EXPO_PUBLIC_FIREWORKS_API_KEY`
+
+#### Hugging Face (Additional AI Features)
+1. Sign up at [Hugging Face](https://huggingface.co/)
+2. Get your API key
+3. Add it to your `.env` file as `EXPO_PUBLIC_HUGGING_FACE_API_KEY`
 
 ## 📊 Data Storage
 
@@ -117,7 +145,8 @@ contexts/              # App state management
 services/              # Business logic
 ├── ai/               # AI analysis modules
 ├── aiService.ts      # Main AI service
-└── speechService.ts  # Voice recognition
+├── speechService.ts  # Voice recognition
+└── deepgramService.ts # Voice transcription
 ```
 
 ## 🎨 Customization
@@ -129,6 +158,10 @@ The app supports both light and dark themes. Customize colors in `contexts/Theme
 - Works offline with smart pattern detection
 - Optional: Add Fireworks AI API key for enhanced analysis
 - Fallback: Uses local algorithms for emotion and pattern detection
+
+### Voice Features
+- Optional: Add Deepgram API key for voice transcription
+- Fallback: Uses device's built-in speech recognition when available
 
 ### Activities
 Customize coping activities in the onboarding flow or profile settings.
@@ -170,6 +203,7 @@ MIT License - Feel free to use this code for your own personal journaling app.
 - Built with [Expo](https://expo.dev/) and [React Native](https://reactnative.dev/)
 - Icons by [Lucide](https://lucide.dev/)
 - AI analysis powered by [Fireworks AI](https://fireworks.ai/) (optional)
+- Voice transcription by [Deepgram](https://deepgram.com/) (optional)
 
 ---
 
