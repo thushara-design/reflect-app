@@ -304,6 +304,9 @@ export class ActivityGenerator {
     console.log('Looking for user activities for emotion:', emotion);
     console.log('Available toolkit emotions:', userToolkit.map(item => item.emotion));
     
+    // Normalize the input emotion for comparison
+    const normalizedEmotion = emotion.toLowerCase().trim();
+    
     // Create comprehensive emotion mapping for better matching
     const emotionMappings: Record<string, string[]> = {
       'anxiety': ['anxious', 'nervous', 'worried', 'panic', 'fear'],
@@ -328,16 +331,16 @@ export class ActivityGenerator {
       'peaceful': ['calm', 'serene', 'tranquil', 'relaxed']
     };
     
-    // Try exact match first
+    // Try exact match first (normalized)
     let toolkitItem = userToolkit.find(
-      item => item.emotion.toLowerCase().trim() === emotion.toLowerCase().trim()
+      item => item.emotion.toLowerCase().trim() === normalizedEmotion
     );
     
     console.log('Exact match found:', !!toolkitItem);
     
     // If no exact match, try variations
     if (!toolkitItem) {
-      const variations = emotionMappings[emotion.toLowerCase()] || [];
+      const variations = emotionMappings[normalizedEmotion] || [];
       console.log('Trying variations:', variations);
       
       for (const variation of variations) {
@@ -355,7 +358,7 @@ export class ActivityGenerator {
         for (const item of userToolkit) {
           const itemEmotion = item.emotion.toLowerCase().trim();
           const possibleMatches = emotionMappings[itemEmotion] || [];
-          if (possibleMatches.includes(emotion.toLowerCase().trim())) {
+          if (possibleMatches.includes(normalizedEmotion)) {
             toolkitItem = item;
             console.log(`Found reverse match: ${emotion} matches toolkit item ${item.emotion}`);
             break;
@@ -382,8 +385,10 @@ export class ActivityGenerator {
   }
 
   private getBaseActivitiesForEmotion(emotion: string): ActivitySuggestion[] {
+    const normalizedEmotion = emotion.toLowerCase().trim();
+    
     // Try exact match first
-    let activities = this.baseActivities[emotion.toLowerCase()];
+    let activities = this.baseActivities[normalizedEmotion];
     
     // If no exact match, try common variations
     if (!activities) {
@@ -399,7 +404,7 @@ export class ActivityGenerator {
         'happiness': 'happy'
       };
       
-      const mappedEmotion = emotionMappings[emotion.toLowerCase()];
+      const mappedEmotion = emotionMappings[normalizedEmotion];
       if (mappedEmotion) {
         activities = this.baseActivities[mappedEmotion];
       }

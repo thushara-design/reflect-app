@@ -29,7 +29,17 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
 
   const getActivitiesForEmotion = (emotionName: string) => {
     const toolkit = userProfile?.emotionalToolkit || [];
-    const emotionData = toolkit.find(item => item.emotion.toLowerCase() === emotionName.toLowerCase());
+    console.log('Looking for activities for emotion:', emotionName);
+    console.log('Available toolkit:', toolkit);
+    
+    // Normalize emotion name for comparison
+    const normalizedEmotion = emotionName.toLowerCase().trim();
+    
+    const emotionData = toolkit.find(item => 
+      item.emotion.toLowerCase().trim() === normalizedEmotion
+    );
+    
+    console.log('Found emotion data:', emotionData);
     return emotionData?.actions || [];
   };
 
@@ -39,19 +49,23 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
     const currentToolkit = userProfile?.emotionalToolkit || [];
     const updatedToolkit = [...currentToolkit];
     
+    // Normalize emotion name
+    const normalizedEmotion = selectedEmotion.toLowerCase().trim();
+    
     const existingIndex = updatedToolkit.findIndex(item => 
-      item.emotion.toLowerCase() === selectedEmotion.toLowerCase()
+      item.emotion.toLowerCase().trim() === normalizedEmotion
     );
 
     if (existingIndex >= 0) {
       updatedToolkit[existingIndex].actions.push(newActivity.trim());
     } else {
       updatedToolkit.push({
-        emotion: selectedEmotion,
+        emotion: normalizedEmotion,
         actions: [newActivity.trim()]
       });
     }
 
+    console.log('Adding activity. Updated toolkit:', updatedToolkit);
     await updateEmotionalToolkit(updatedToolkit);
     setNewActivity('');
     setShowAddActivity(false);
@@ -68,8 +82,10 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
           style: 'destructive',
           onPress: async () => {
             const currentToolkit = userProfile?.emotionalToolkit || [];
+            const normalizedEmotion = emotionName.toLowerCase().trim();
+            
             const updatedToolkit = currentToolkit.map(item => {
-              if (item.emotion.toLowerCase() === emotionName.toLowerCase()) {
+              if (item.emotion.toLowerCase().trim() === normalizedEmotion) {
                 return {
                   ...item,
                   actions: item.actions.filter((_, index) => index !== activityIndex)
@@ -78,6 +94,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
               return item;
             }).filter(item => item.actions.length > 0);
 
+            console.log('Deleting activity. Updated toolkit:', updatedToolkit);
             await updateEmotionalToolkit(updatedToolkit);
           }
         }
@@ -89,8 +106,10 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
     if (!editingActivity || !editingActivity.text.trim()) return;
 
     const currentToolkit = userProfile?.emotionalToolkit || [];
+    const normalizedEmotion = editingActivity.emotion.toLowerCase().trim();
+    
     const updatedToolkit = currentToolkit.map(item => {
-      if (item.emotion.toLowerCase() === editingActivity.emotion.toLowerCase()) {
+      if (item.emotion.toLowerCase().trim() === normalizedEmotion) {
         const updatedActions = [...item.actions];
         updatedActions[editingActivity.index] = editingActivity.text.trim();
         return { ...item, actions: updatedActions };
@@ -98,6 +117,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
       return item;
     });
 
+    console.log('Editing activity. Updated toolkit:', updatedToolkit);
     await updateEmotionalToolkit(updatedToolkit);
     setEditingActivity(null);
   };
