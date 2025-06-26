@@ -56,6 +56,7 @@ export default function EntryActions({
           />
         )}
         
+        {/* Always show the sparkle button for analysis */}
         {onAIAnalysis && (
           <TouchableOpacity 
             style={styles.actionButton}

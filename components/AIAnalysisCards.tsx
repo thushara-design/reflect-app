@@ -13,6 +13,7 @@ interface AIAnalysisCardsProps {
   entryText: string;
   userProfile: UserProfile | null;
   detectedEmotion: string;
+  useAI: boolean;
 }
 
 export default function AIAnalysisCards({
@@ -21,7 +22,8 @@ export default function AIAnalysisCards({
   onActivitySelect,
   entryText,
   userProfile,
-  detectedEmotion
+  detectedEmotion,
+  useAI
 }: AIAnalysisCardsProps) {
   const { colors } = useTheme();
   const [selectedActivities, setSelectedActivities] = useState<Set<string>>(new Set());
@@ -375,6 +377,7 @@ export default function AIAnalysisCards({
             </Text>
             <Text style={dynamicStyles.confidenceText}>
               {Math.round(analysis.emotion.confidence * 100)}% confidence
+              {!useAI && ' (basic detection)'}
             </Text>
             <Text style={dynamicStyles.reflectionText}>
               {analysis.reflection}
@@ -424,10 +427,12 @@ export default function AIAnalysisCards({
               </View>
             )}
 
-            {/* AI Suggested Activities */}
+            {/* AI Suggested Activities or Predefined Activities */}
             {aiActivities.length > 0 && (
               <View style={dynamicStyles.activitiesSection}>
-                <Text style={dynamicStyles.sectionSubtitle}>AI Suggestions</Text>
+                <Text style={dynamicStyles.sectionSubtitle}>
+                  {useAI ? 'AI Suggestions' : 'Suggested Activities'}
+                </Text>
                 {aiActivities.map((activity, index) => (
                   <TouchableOpacity
                     key={activity.id}
@@ -446,7 +451,7 @@ export default function AIAnalysisCards({
                       <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
                       <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
                       <Text style={dynamicStyles.activityMeta}>
-                        {activity.duration} • AI Suggested
+                        {activity.duration} • {useAI ? 'AI Suggested' : 'Suggested'}
                       </Text>
                     </View>
                   </TouchableOpacity>
@@ -464,17 +469,17 @@ export default function AIAnalysisCards({
         )}
       </View>
 
-      {/* Card 3: Positive Reframe */}
-      <View style={dynamicStyles.card}>
-        <View style={dynamicStyles.cardHeader}>
-          <View style={[dynamicStyles.cardIcon, { backgroundColor: colors.primary + '15' }]}>
-            <Sparkles size={20} color={colors.primary} strokeWidth={1.5} />
+      {/* Card 3: Positive Reframe - Only show if AI is enabled and distortions exist */}
+      {useAI && analysis.distortions.length > 0 && (
+        <View style={dynamicStyles.card}>
+          <View style={dynamicStyles.cardHeader}>
+            <View style={[dynamicStyles.cardIcon, { backgroundColor: colors.primary + '15' }]}>
+              <Sparkles size={20} color={colors.primary} strokeWidth={1.5} />
+            </View>
+            <Text style={dynamicStyles.cardTitle}>Positive Reframe</Text>
           </View>
-          <Text style={dynamicStyles.cardTitle}>Positive Reframe</Text>
-        </View>
 
-        {analysis.distortions.length > 0 ? (
-          analysis.distortions.map((distortion, index) => {
+          {analysis.distortions.map((distortion, index) => {
             const isExpanded = expandedDistortions.has(distortion.type);
             const severityColor = getSeverityColor(distortion.severity);
             
@@ -576,16 +581,9 @@ export default function AIAnalysisCards({
                 )}
               </View>
             );
-          })
-        ) : (
-          <View style={dynamicStyles.emptyState}>
-            <Text style={dynamicStyles.emptyText}>No unhelpful patterns detected</Text>
-            <Text style={dynamicStyles.emptySubtext}>
-              Your thinking shows good balance and perspective in this entry.
-            </Text>
-          </View>
-        )}
-      </View>
+          })}
+        </View>
+      )}
     </View>
   );
 }

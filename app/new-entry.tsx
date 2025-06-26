@@ -122,16 +122,10 @@ export default function NewEntryPage() {
   };
 
   const handleAIAnalysis = async () => {
-    console.log('AI Analysis button pressed');
+    console.log('Analysis button pressed, AI enabled:', userHasAI);
     
     if (!content.trim()) {
       Alert.alert('No Content', 'Please write something before analyzing.');
-      return;
-    }
-
-    // Check if user has AI enabled
-    if (!userHasAI) {
-      Alert.alert('AI Disabled', 'AI analysis is disabled in your settings. You can enable it in your profile.');
       return;
     }
 
@@ -142,7 +136,7 @@ export default function NewEntryPage() {
       return;
     }
 
-    console.log('Starting AI analysis...');
+    console.log('Starting analysis...');
     setIsAnalyzing(true);
     
     try {
@@ -150,14 +144,14 @@ export default function NewEntryPage() {
       // Pass user's emotional toolkit to the AI service
       const userToolkit = userProfile?.emotionalToolkit || [];
       const analysis = await aiService.analyzeEntry(content, userToolkit, userHasAI);
-      console.log('AI Analysis completed:', analysis);
+      console.log('Analysis completed:', analysis);
       
       setAIAnalysis(analysis);
       setSavedAnalysis(analysis); // Save for future clicks
       setShowAnalysisCards(true);
       console.log('Analysis cards should now be visible');
     } catch (error) {
-      console.error('AI Analysis error:', error);
+      console.error('Analysis error:', error);
       Alert.alert('Analysis Error', 'Failed to analyze entry. Please try again.');
     } finally {
       setIsAnalyzing(false);
@@ -371,7 +365,9 @@ export default function NewEntryPage() {
             <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
           </TouchableOpacity>
           
-          <Text style={dynamicStyles.headerTitle}>AI Analysis</Text>
+          <Text style={dynamicStyles.headerTitle}>
+            {userHasAI ? 'AI Analysis' : 'Entry Analysis'}
+          </Text>
           
           <TouchableOpacity style={styles.backButton} onPress={handleSave}>
             <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '500' }}>Save</Text>
@@ -386,7 +382,7 @@ export default function NewEntryPage() {
               <Text style={dynamicStyles.userText}>{content}</Text>
             </View>
 
-            {/* AI Analysis Cards */}
+            {/* Analysis Cards */}
             <AIAnalysisCards
               analysis={aiAnalysis}
               onSaveReframe={handleSaveReframe}
@@ -394,6 +390,7 @@ export default function NewEntryPage() {
               entryText={content}
               userProfile={userProfile}
               detectedEmotion={aiAnalysis.emotion.emotion}
+              useAI={userHasAI}
             />
           </View>
         </ScrollView>
@@ -416,7 +413,7 @@ export default function NewEntryPage() {
           
           <EntryActions
             onSavePress={handleSave}
-            onAIAnalysis={userHasAI ? handleAIAnalysis : undefined} // Only show AI button if enabled
+            onAIAnalysis={handleAIAnalysis} // Always show the sparkle button
             showContextMenu={showContextMenu}
             onEditPress={handleEdit}
             onDeletePress={handleDelete}
@@ -454,7 +451,9 @@ export default function NewEntryPage() {
         <View style={dynamicStyles.bottomInfo}>
           <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
           {isAnalyzing && (
-            <Text style={dynamicStyles.analyzingText}>Analyzing with AI...</Text>
+            <Text style={dynamicStyles.analyzingText}>
+              {userHasAI ? 'Analyzing with AI...' : 'Analyzing entry...'}
+            </Text>
           )}
         </View>
       </View>
