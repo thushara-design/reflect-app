@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimens
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Search } from 'lucide-react-native';
-import ReflectHeader from '@/components/ReflectHeader';
+import TopNavBar from '@/components/TopNavBar';
 import { useEntries } from '@/contexts/EntriesContext';
 
 export default function EntriesTab() {
@@ -95,7 +95,7 @@ export default function EntriesTab() {
 
   return (
     <View style={styles.container}>
-      <ReflectHeader />
+      <TopNavBar title="Entries" />
 
       <View style={styles.content}>
         <View style={styles.searchSection}>
