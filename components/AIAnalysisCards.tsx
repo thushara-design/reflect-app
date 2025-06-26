@@ -12,7 +12,7 @@ interface AIAnalysisCardsProps {
   onActivitySelect: (activityId: string) => void;
   entryText: string;
   userProfile: UserProfile | null;
-  detectedEmotion: string | null;
+  detectedEmotion: string;
 }
 
 export default function AIAnalysisCards({
@@ -28,25 +28,6 @@ export default function AIAnalysisCards({
   const [expandedDistortions, setExpandedDistortions] = useState<Set<string>>(new Set());
   const [reframedThoughts, setReframedThoughts] = useState<Record<string, string>>({});
   const [isGeneratingReframe, setIsGeneratingReframe] = useState<Record<string, boolean>>({});
-
-  // Get user's saved activities for the detected emotion
-  const getUserActivities = () => {
-    if (!userProfile?.emotionalToolkit || !detectedEmotion) return [];
-    const toolkitItem = userProfile.emotionalToolkit.find(
-      (item) => item.emotion.toLowerCase() === detectedEmotion.toLowerCase()
-    );
-    return toolkitItem
-      ? toolkitItem.actions.map((action, idx) => ({
-          id: `user-${detectedEmotion}-${idx}`,
-          title: action,
-          description: `Your personal coping strategy for ${toolkitItem.emotion}`,
-          duration: '5-10 minutes',
-          category: 'personal'
-        }))
-      : [];
-  };
-
-  const allActivities = [...getUserActivities(), ...analysis.activities];
 
   const handleActivityToggle = (activityId: string) => {
     const newSelected = new Set(selectedActivities);
@@ -116,6 +97,10 @@ export default function AIAnalysisCards({
     }
   };
 
+  // Separate user activities from AI activities
+  const userActivities = analysis.activities.filter(activity => activity.category === 'personal');
+  const aiActivities = analysis.activities.filter(activity => activity.category !== 'personal');
+
   const dynamicStyles = StyleSheet.create({
     container: {
       gap: 20,
@@ -180,6 +165,15 @@ export default function AIAnalysisCards({
       lineHeight: 20,
       fontStyle: 'italic',
     },
+    activitiesSection: {
+      marginBottom: 16,
+    },
+    sectionSubtitle: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.text,
+      marginBottom: 12,
+    },
     activityItem: {
       flexDirection: 'row',
       alignItems: 'flex-start',
@@ -207,6 +201,9 @@ export default function AIAnalysisCards({
       color: colors.textSecondary,
       marginTop: 4,
       fontWeight: '500',
+    },
+    personalActivityMeta: {
+      color: colors.primary,
     },
     distortionCard: {
       backgroundColor: colors.background,
@@ -395,30 +392,68 @@ export default function AIAnalysisCards({
           <Text style={dynamicStyles.cardTitle}>Suggested Activities</Text>
         </View>
 
-        {allActivities.length > 0 ? (
-          allActivities.map((activity, index) => (
-            <TouchableOpacity
-              key={activity.id}
-              style={[
-                dynamicStyles.activityItem,
-                index === allActivities.length - 1 && { borderBottomWidth: 0 }
-              ]}
-              onPress={() => handleActivityToggle(activity.id)}
-            >
-              {selectedActivities.has(activity.id) ? (
-                <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
-              ) : (
-                <Square size={20} color={colors.border} strokeWidth={1.5} />
-              )}
-              <View style={dynamicStyles.activityContent}>
-                <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
-                <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
-                <Text style={dynamicStyles.activityMeta}>
-                  {activity.duration} • {activity.category === 'personal' ? 'Your Strategy' : 'AI Suggested'}
-                </Text>
+        {analysis.activities.length > 0 ? (
+          <>
+            {/* User's Personal Activities */}
+            {userActivities.length > 0 && (
+              <View style={dynamicStyles.activitiesSection}>
+                <Text style={dynamicStyles.sectionSubtitle}>Your Personal Strategies</Text>
+                {userActivities.map((activity, index) => (
+                  <TouchableOpacity
+                    key={activity.id}
+                    style={[
+                      dynamicStyles.activityItem,
+                      index === userActivities.length - 1 && { borderBottomWidth: 0 }
+                    ]}
+                    onPress={() => handleActivityToggle(activity.id)}
+                  >
+                    {selectedActivities.has(activity.id) ? (
+                      <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
+                    ) : (
+                      <Square size={20} color={colors.border} strokeWidth={1.5} />
+                    )}
+                    <View style={dynamicStyles.activityContent}>
+                      <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
+                      <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
+                      <Text style={[dynamicStyles.activityMeta, dynamicStyles.personalActivityMeta]}>
+                        {activity.duration} • Your Strategy
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
-            </TouchableOpacity>
-          ))
+            )}
+
+            {/* AI Suggested Activities */}
+            {aiActivities.length > 0 && (
+              <View style={dynamicStyles.activitiesSection}>
+                <Text style={dynamicStyles.sectionSubtitle}>AI Suggestions</Text>
+                {aiActivities.map((activity, index) => (
+                  <TouchableOpacity
+                    key={activity.id}
+                    style={[
+                      dynamicStyles.activityItem,
+                      index === aiActivities.length - 1 && { borderBottomWidth: 0 }
+                    ]}
+                    onPress={() => handleActivityToggle(activity.id)}
+                  >
+                    {selectedActivities.has(activity.id) ? (
+                      <CheckSquare size={20} color={colors.primary} strokeWidth={1.5} />
+                    ) : (
+                      <Square size={20} color={colors.border} strokeWidth={1.5} />
+                    )}
+                    <View style={dynamicStyles.activityContent}>
+                      <Text style={dynamicStyles.activityTitle}>{activity.title}</Text>
+                      <Text style={dynamicStyles.activityDescription}>{activity.description}</Text>
+                      <Text style={dynamicStyles.activityMeta}>
+                        {activity.duration} • AI Suggested
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+          </>
         ) : (
           <View style={dynamicStyles.emptyState}>
             <Text style={dynamicStyles.emptyText}>No activities suggested</Text>

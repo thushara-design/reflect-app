@@ -140,7 +140,9 @@ export default function NewEntryPage() {
     
     try {
       console.log('Calling aiService.analyzeEntry...');
-      const analysis = await aiService.analyzeEntry(content);
+      // Pass user's emotional toolkit to the AI service
+      const userToolkit = userProfile?.emotionalToolkit || [];
+      const analysis = await aiService.analyzeEntry(content, userToolkit);
       console.log('AI Analysis completed:', analysis);
       
       setAIAnalysis(analysis);
@@ -383,7 +385,9 @@ export default function NewEntryPage() {
               onSaveReframe={handleSaveReframe}
               onActivitySelect={handleActivitySelect}
               entryText={content}
-              userProfile={userProfile} detectedEmotion={null}            />
+              userProfile={userProfile}
+              detectedEmotion={aiAnalysis.emotion.emotion}
+            />
           </View>
         </ScrollView>
       </View>

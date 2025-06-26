@@ -4,6 +4,7 @@ import { DistortionDetector } from './ai/distortionDetector';
 import { ActivityGenerator } from './ai/activityGenerator';
 import { ReflectionGenerator } from './ai/reflectionGenerator';
 import { ReframingService } from './ai/reframingService';
+import { EmotionalToolkitItem } from '@/contexts/OnboardingContext';
 import { 
   EmotionResult, 
   CognitiveDistortion, 
@@ -44,12 +45,12 @@ class AIService {
     this.reframingService = new ReframingService(this.apiKey);
   }
 
-  async analyzeEntry(entryText: string): Promise<AIAnalysisResult> {
+  async analyzeEntry(entryText: string, userToolkit: EmotionalToolkitItem[] = []): Promise<AIAnalysisResult> {
     console.log('Starting AI analysis for entry:', entryText.substring(0, 100) + '...');
     
     if (!this.apiKey) {
       console.log('No API key found, using enhanced content analysis');
-      return this.getContentBasedAnalysis(entryText);
+      return this.getContentBasedAnalysis(entryText, userToolkit);
     }
 
     try {
@@ -91,14 +92,14 @@ class AIService {
         const generatedText = response.data.choices[0].message.content || '';
         console.log('Generated analysis (first 300 chars):', generatedText.substring(0, 300));
         
-        return this.parseAIAnalysis(entryText, generatedText);
+        return this.parseAIAnalysis(entryText, generatedText, userToolkit);
       } else {
         console.warn('Unexpected API response format, using content-based analysis');
-        return this.getContentBasedAnalysis(entryText);
+        return this.getContentBasedAnalysis(entryText, userToolkit);
       }
     } catch (error) {
       console.error('Error calling Fireworks API:', error);
-      return this.getContentBasedAnalysis(entryText);
+      return this.getContentBasedAnalysis(entryText, userToolkit);
     }
   }
 
@@ -146,7 +147,7 @@ CRITICAL:
 - For the reflection, specifically reference what the user wrote about (their situation, feelings, experiences) rather than giving generic emotional validation.`;
   }
 
-  private parseAIAnalysis(originalText: string, aiResponse: string): AIAnalysisResult {
+  private parseAIAnalysis(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
     try {
       // Clean the response - remove any text before the first { and after the last }
       let cleanedResponse = aiResponse.trim();
@@ -168,8 +169,13 @@ CRITICAL:
         // Parse cognitive distortions with enhanced validation
         const distortions = this.distortionDetector.parseDistortionsFromAI(analysisData.cognitive_distortions || [], originalText);
         
-        // Parse activities with validation
-        const activities = this.activityGenerator.parseActivitiesFromAI(analysisData.suggested_activities || []);
+        // Generate activities with user toolkit integration
+        const activities = this.activityGenerator.generateContextualActivities(
+          originalText, 
+          emotion.emotion, 
+          aiResponse,
+          userToolkit
+        );
         
         // Get reflection from AI or generate content-based one
         const reflection = analysisData.reflection || this.reflectionGenerator.generateContentBasedReflection(originalText, emotion.emotion);
@@ -191,11 +197,11 @@ CRITICAL:
       console.log('Raw AI response:', aiResponse);
       
       // Fallback to enhanced text-based parsing
-      return this.parseTextualAIResponse(originalText, aiResponse);
+      return this.parseTextualAIResponse(originalText, aiResponse, userToolkit);
     }
   }
 
-  private parseTextualAIResponse(originalText: string, aiResponse: string): AIAnalysisResult {
+  private parseTextualAIResponse(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
     console.log('Using enhanced textual parsing fallback');
     
     // Extract emotion from AI response text
@@ -204,8 +210,13 @@ CRITICAL:
     // Extract distortions mentioned in AI response with better detection
     const distortions = this.distortionDetector.detectCognitiveDistortions(originalText);
     
-    // Generate activities based on AI insights and emotion
-    const activities = this.activityGenerator.generateContextualActivities(originalText, emotion.emotion, aiResponse);
+    // Generate activities based on AI insights and emotion with user toolkit
+    const activities = this.activityGenerator.generateContextualActivities(
+      originalText, 
+      emotion.emotion, 
+      aiResponse,
+      userToolkit
+    );
     
     // Extract or generate reflection
     const reflection = this.extractReflectionFromAIText(aiResponse) || 
@@ -240,12 +251,17 @@ CRITICAL:
     return null;
   }
 
-  private getContentBasedAnalysis(entryText: string): AIAnalysisResult {
+  private getContentBasedAnalysis(entryText: string, userToolkit: EmotionalToolkitItem[] = []): AIAnalysisResult {
     console.log('Using enhanced content-based analysis');
     
     const emotion = this.emotionDetector.detectEmotion(entryText, '');
     const distortions = this.distortionDetector.detectCognitiveDistortions(entryText);
-    const activities = this.activityGenerator.generateContextualActivities(entryText, emotion.emotion);
+    const activities = this.activityGenerator.generateContextualActivities(
+      entryText, 
+      emotion.emotion, 
+      '',
+      userToolkit
+    );
     const reflection = this.reflectionGenerator.generateContentBasedReflection(entryText, emotion.emotion);
 
     return {

@@ -1,4 +1,5 @@
 import { ActivitySuggestion } from './types';
+import { EmotionalToolkitItem } from '@/contexts/OnboardingContext';
 
 export class ActivityGenerator {
   private baseActivities: Record<string, ActivitySuggestion[]> = {
@@ -109,15 +110,24 @@ export class ActivityGenerator {
     ]
   };
 
-  generateContextualActivities(entryText: string, emotion: string, aiInsights: string = ''): ActivitySuggestion[] {
+  generateContextualActivities(
+    entryText: string, 
+    emotion: string, 
+    aiInsights: string = '',
+    userToolkit: EmotionalToolkitItem[] = []
+  ): ActivitySuggestion[] {
     const lowerText = entryText.toLowerCase();
     const lowerAI = aiInsights.toLowerCase();
     
-    let activities = [...(this.baseActivities[emotion] || this.baseActivities['anxious'])];
+    // Start with user's saved activities for this emotion
+    const userActivities = this.getUserActivitiesForEmotion(emotion, userToolkit);
+    
+    // Get base AI activities for this emotion
+    let aiActivities = [...(this.baseActivities[emotion] || this.baseActivities['anxious'])];
     
     // Add contextual activities based on content and AI insights
     if (lowerText.includes('work') || lowerText.includes('job') || lowerAI.includes('work')) {
-      activities.push({
+      aiActivities.push({
         id: 'work-boundary',
         title: 'Work Boundary Setting',
         description: 'Take 5 minutes to step away from work thoughts and do something just for you.',
@@ -127,7 +137,7 @@ export class ActivityGenerator {
     }
     
     if (lowerText.includes('relationship') || lowerText.includes('friend') || lowerAI.includes('social')) {
-      activities.push({
+      aiActivities.push({
         id: 'connection-reach',
         title: 'Reach Out',
         description: 'Consider connecting with someone who makes you feel supported and understood.',
@@ -137,7 +147,7 @@ export class ActivityGenerator {
     }
 
     if (lowerText.includes('sleep') || lowerText.includes('tired') || lowerAI.includes('rest')) {
-      activities.push({
+      aiActivities.push({
         id: 'rest-ritual',
         title: 'Rest Preparation',
         description: 'Create a calming environment and prepare your mind and body for quality rest.',
@@ -146,7 +156,44 @@ export class ActivityGenerator {
       });
     }
 
-    return activities.slice(0, 4); // Return top 4 most relevant activities
+    // Combine user activities (prioritized) with AI activities
+    const allActivities = [...userActivities, ...aiActivities];
+    
+    // Remove duplicates and limit to 6 total activities
+    const uniqueActivities = this.removeDuplicateActivities(allActivities);
+    return uniqueActivities.slice(0, 6);
+  }
+
+  private getUserActivitiesForEmotion(emotion: string, userToolkit: EmotionalToolkitItem[]): ActivitySuggestion[] {
+    // Find the toolkit item for this emotion (case-insensitive)
+    const toolkitItem = userToolkit.find(
+      item => item.emotion.toLowerCase() === emotion.toLowerCase()
+    );
+
+    if (!toolkitItem || !toolkitItem.actions.length) {
+      return [];
+    }
+
+    // Convert user's saved actions to ActivitySuggestion format
+    return toolkitItem.actions.map((action, index) => ({
+      id: `user-${emotion}-${index}`,
+      title: action,
+      description: `Your personal coping strategy for ${toolkitItem.emotion}`,
+      duration: '5-10 minutes',
+      category: 'personal'
+    }));
+  }
+
+  private removeDuplicateActivities(activities: ActivitySuggestion[]): ActivitySuggestion[] {
+    const seen = new Set<string>();
+    return activities.filter(activity => {
+      const key = activity.title.toLowerCase();
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+      return true;
+    });
   }
 
   parseActivitiesFromAI(activitiesData: any[]): ActivitySuggestion[] {
