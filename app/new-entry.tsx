@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -10,6 +9,7 @@ import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { aiService, AIAnalysisResult } from '@/services/aiService';
+import React from 'react';
 
 export default function NewEntryPage() {
   const { prompt, entryId, title: initialTitle, content: initialContent, fromEntries } = useLocalSearchParams<{ 
@@ -383,9 +383,7 @@ export default function NewEntryPage() {
               onSaveReframe={handleSaveReframe}
               onActivitySelect={handleActivitySelect}
               entryText={content}
-              userProfile={userProfile}
-              detectedEmotion={aiAnalysis?.emotion?.emotion || null}
-            />
+              userProfile={userProfile} detectedEmotion={null}            />
           </View>
         </ScrollView>
       </View>

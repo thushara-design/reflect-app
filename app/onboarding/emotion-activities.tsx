@@ -89,26 +89,11 @@ import {
       }
     };
   
-    const progress = (emotionList.length > 0) ? (currentIdx + 1) / emotionList.length : 0;
     const styles = StyleSheet.create({
-      header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 24,
-        paddingTop: 50,
-        paddingBottom: 16,
-      },
-      stepIndicator: {
-        fontSize: 14,
-        color: colors.textSecondary,
-        fontWeight: '300',
-      },
-      progressBarContainer: { height: 8, backgroundColor: colors.background, borderRadius: 4, marginHorizontal: 24, marginBottom: 24, marginTop: 8, overflow: 'hidden' },
-      progressBar: { height: 8, backgroundColor: colors.primary, width: `${progress * 100}%`, borderRadius: 4 },
       container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 20 },
-      title: { fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginBottom: 8 },
-      subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 20, lineHeight: 24 },
+      header: { marginTop: 40, marginBottom: 20 },
+      title: { fontSize: 22, fontWeight: '500', color: colors.text, textAlign: 'center' },
+      subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 20 },
       customInput: {
         borderColor: colors.border,
         borderWidth: 1,
@@ -142,100 +127,83 @@ import {
       },
       button: {
         backgroundColor: colors.primary,
-        paddingVertical: 16,
-        borderRadius: 16,
+        padding: 14,
+        borderRadius: 8,
         alignItems: 'center',
-        marginTop: 8,
+        marginBottom: 8,
       },
-      buttonText: { color: '#fff', fontSize: 16, fontWeight: '400' },
+      buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
       skip: {
         alignItems: 'center',
         paddingVertical: 10,
-        marginBottom: 8,
       },
-      skipText: { color: colors.textSecondary, fontSize: 14, fontWeight: '400' },
+      skipText: { color: colors.textSecondary, fontSize: 14 },
     });
   
     return (
-        <View style={{ flex: 1, backgroundColor: colors.background }}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-            {/* everything inside stays the same */}
-            <View style={styles.header}>
-              <View style={{ width: 24 }} />
-              <Text style={styles.stepIndicator}>Step 2 of 2</Text>
-              <View style={{ width: 24 }} />
-            </View>
-            <View style={styles.progressBarContainer}>
-              <View style={[styles.progressBar, { width: `${progress * 100}%` }]} />
-            </View>
-            <View style={styles.container}>
-              <Text style={styles.title}>Coping with {currentEmotion}</Text>
-              <Text style={styles.subtitle}>
-                Pick up to 3 actions that help you manage this emotion
-              </Text>
-      
-              <TextInput
-                style={styles.customInput}
-                value={customAction}
-                onChangeText={setCustomAction}
-                placeholder="Add your own..."
-                placeholderTextColor={colors.textSecondary}
-                onSubmitEditing={handleAddCustomAction}
-                returnKeyType="done"
-              />
-      
-              <TouchableOpacity
-                style={styles.suggestionToggle}
-                onPress={() => setShowSuggestions((s) => !s)}
-              >
-                <MaterialIcons name="lightbulb-outline" size={24} color={colors.primary} />
-              </TouchableOpacity>
-      
-              {showSuggestions && (
-                <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
-                  <View style={styles.chipContainer}>
-                    {PREDEFINED_ACTIONS.map((action) => (
-                      <TouchableOpacity
-                        key={action}
-                        style={[
-                          styles.chip,
-                          selectedActions.includes(action) && styles.chipSelected,
-                        ]}
-                        onPress={() => handleActionToggle(action)}
-                      >
-                        <Text style={styles.chipText}>{action}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </ScrollView>
-              )}
-      
-              {selectedActions.length > 0 && (
-                <View style={styles.chipContainer}>
-                  {selectedActions.map((action) => (
-                    <View key={action} style={[styles.chip, styles.chipSelected]}>
-                      <Text style={styles.chipText}>{action}</Text>
-                      <TouchableOpacity onPress={() => handleRemoveAction(action)}>
-                        <MaterialIcons name="close" size={16} color={colors.primary} />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Coping with {currentEmotion}</Text>
+            <Text style={styles.subtitle}>Pick up to 3 actions that help you manage this emotion</Text>
+  
+            <TextInput
+              style={styles.customInput}
+              value={customAction}
+              onChangeText={setCustomAction}
+              placeholder="Add your own..."
+              placeholderTextColor={colors.textSecondary}
+              onSubmitEditing={handleAddCustomAction}
+              returnKeyType="done"
+            />
+  
+            <TouchableOpacity style={styles.suggestionToggle} onPress={() => setShowSuggestions(s => !s)}>
+              <MaterialIcons name="lightbulb-outline" size={24} color={colors.primary} />
+            </TouchableOpacity>
+          </View>
+  
+          {showSuggestions && (
+            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 80 }}>
+              <View style={styles.chipContainer}>
+                {PREDEFINED_ACTIONS.map(action => (
+                  <TouchableOpacity
+                    key={action}
+                    style={[
+                      styles.chip,
+                      selectedActions.includes(action) && styles.chipSelected,
+                    ]}
+                    onPress={() => handleActionToggle(action)}
+                  >
+                    <Text style={styles.chipText}>{action}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </ScrollView>
+          )}
+  
+          {selectedActions.length > 0 && (
+            <View style={styles.chipContainer}>
+              {selectedActions.map(action => (
+                <View key={action} style={[styles.chip, styles.chipSelected]}>
+                  <Text style={styles.chipText}>{action}</Text>
+                  <TouchableOpacity onPress={() => handleRemoveAction(action)}>
+                    <MaterialIcons name="close" size={16} color={colors.primary} />
+                  </TouchableOpacity>
                 </View>
-              )}
+              ))}
             </View>
-      
-            <View style={styles.footer}>
-              <TouchableOpacity style={styles.skip} onPress={handleSkip}>
-                <Text style={styles.skipText}>Skip this emotion</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={handleNext}>
-                <Text style={styles.buttonText}>
-                  {currentIdx < emotionList.length - 1 ? 'Next' : 'Finish'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
+          )}
         </View>
-      );      
+  
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.button} onPress={handleNext}>
+            <Text style={styles.buttonText}>{currentIdx < emotionList.length - 1 ? 'Next' : 'Finish'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.skip} onPress={handleSkip}>
+            <Text style={styles.skipText}>Skip this emotion</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    );
   }
   

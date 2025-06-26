@@ -35,41 +35,31 @@ export default function EmotionSelectScreen() {
     router.replace('/(tabs)');
   };
 
-  const progress = selected.length / COMMON_EMOTIONS.length;
   const dynamicStyles = StyleSheet.create({
     safe: { flex: 1, backgroundColor: colors.background },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 24,
-      paddingTop: 50,
-      paddingBottom: 16,
-    },
-    stepIndicator: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      fontWeight: '300',
-    },
-    container: { flex: 1, paddingHorizontal: 16, paddingTop: 0 },
-    skip: { color: colors.primary, fontWeight: '400', fontSize: 16, padding: 8, textAlign: 'center' },
-    title: { fontSize: 24, fontWeight: '300', color: colors.text, textAlign: 'center', marginBottom: 6 },
-    subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginBottom: 18, lineHeight: 22 },
-    emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 16 },
+    container: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
+    header: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 },
+    skip: { color: colors.primary, fontWeight: '600', fontSize: 16, padding: 8 },
+    title: { fontSize: 28, fontWeight: '300', color: colors.text, textAlign: 'center', marginBottom: 8 },
+    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 30, lineHeight: 24 },
+    emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 30 },
     emotionCard: {
-      width: '30%',
-      aspectRatio: 0.85,
+      width: '47%',
+      aspectRatio: 1,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 16,
+      borderRadius: 20,
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 10,
+      marginBottom: 18,
       marginTop: 2,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.08,
+      shadowRadius: 6,
+      elevation: 2,
       position: 'relative',
-      minHeight: 80,
-      maxHeight: 110,
     },
     emotionCardSelected: {
       borderWidth: 2,
@@ -78,38 +68,38 @@ export default function EmotionSelectScreen() {
     },
     checkOverlay: {
       position: 'absolute',
-      top: 6,
-      right: 6,
+      top: 10,
+      right: 10,
       backgroundColor: colors.primary,
-      borderRadius: 10,
+      borderRadius: 12,
       padding: 2,
       zIndex: 2,
     },
-    emotionEmoji: { fontSize: 28, marginBottom: 4 },
-    emotionName: { fontSize: 13, color: colors.text, fontWeight: '400', textAlign: 'center' },
+    emotionEmoji: { fontSize: 38, marginBottom: 10 },
+    emotionName: { fontSize: 16, color: colors.text, fontWeight: '500', textAlign: 'center' },
     nextButtonContainer: {
-      paddingBottom: 16,
-      paddingHorizontal: 16,
+      paddingBottom: 24,
+      paddingHorizontal: 24,
       backgroundColor: colors.background,
     },
     nextButton: {
       backgroundColor: selected.length > 0 ? colors.primary : colors.border,
-      borderRadius: 16,
-      paddingVertical: 14,
+      borderRadius: 12,
+      padding: 18,
       alignItems: 'center',
       marginTop: 8,
     },
-    nextButtonText: { color: '#fff', fontWeight: '400', fontSize: 16 },
+    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 },
   });
 
   return (
     <SafeAreaView style={dynamicStyles.safe}>
-      <View style={dynamicStyles.header}>
-        <View style={{ width: 24 }} />
-        <Text style={dynamicStyles.stepIndicator}>Step 2 of 2</Text>
-        <View style={{ width: 24 }} />
-      </View>
       <View style={dynamicStyles.container}>
+        <View style={dynamicStyles.header}>
+          <TouchableOpacity onPress={handleSkip}>
+            <Text style={dynamicStyles.skip}>Skip</Text>
+          </TouchableOpacity>
+        </View>
         <Text style={dynamicStyles.title}>Which emotions do you struggle with most?</Text>
         <Text style={dynamicStyles.subtitle}>Select all that apply. You can add more later.</Text>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
@@ -128,7 +118,7 @@ export default function EmotionSelectScreen() {
                 >
                   {isSelected && (
                     <View style={dynamicStyles.checkOverlay}>
-                      <Check size={14} color="#fff" strokeWidth={2} />
+                      <Check size={18} color="#fff" strokeWidth={3} />
                     </View>
                   )}
                   <Text style={dynamicStyles.emotionEmoji}>{emotion.emoji}</Text>
@@ -140,9 +130,6 @@ export default function EmotionSelectScreen() {
         </ScrollView>
       </View>
       <View style={dynamicStyles.nextButtonContainer}>
-        <TouchableOpacity onPress={handleSkip}>
-          <Text style={dynamicStyles.skip}>Skip</Text>
-        </TouchableOpacity>
         <TouchableOpacity
           style={dynamicStyles.nextButton}
           onPress={handleNext}

@@ -29,7 +29,7 @@ export default function AIAnalysisCards({
   const [reframedThoughts, setReframedThoughts] = useState<Record<string, string>>({});
   const [isGeneratingReframe, setIsGeneratingReframe] = useState<Record<string, boolean>>({});
 
-  // Get user's saved activities for the detected emotion only
+  // Get user's saved activities for the detected emotion
   const getUserActivities = () => {
     if (!userProfile?.emotionalToolkit || !detectedEmotion) return [];
     const toolkitItem = userProfile.emotionalToolkit.find(

@@ -88,7 +88,7 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
 
   return (
     <OnboardingContext.Provider value={{
-      userProfile,
+      userProfile: userProfile ? { ...userProfile, hasCompletedOnboarding: false } : null,
       isLoading,
       updateUserName,
       updateEmotionalToolkit,
@@ -107,3 +107,10 @@ export function useOnboarding() {
   }
   return context;
 }
+
+const { userProfile } = useOnboarding();
+const [selectedEmotion, setSelectedEmotion] = useState<string | null>(null);
+
+const suggestedActivities = selectedEmotion
+  ? userProfile?.emotionalToolkit.find(item => item.emotion.toLowerCase() === selectedEmotion.toLowerCase())?.actions || []
+  : [];
