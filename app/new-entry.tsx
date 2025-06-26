@@ -122,7 +122,8 @@ export default function NewEntryPage() {
   };
 
   const handleAIAnalysis = async () => {
-    console.log('Analysis button pressed, AI enabled:', userHasAI);
+    console.log('=== Analysis Button Pressed ===');
+    console.log('AI enabled:', userHasAI);
     console.log('User profile:', userProfile);
     console.log('User toolkit:', userProfile?.emotionalToolkit);
     
@@ -133,12 +134,13 @@ export default function NewEntryPage() {
 
     // If we already have saved analysis for this content, show it
     if (savedAnalysis) {
+      console.log('Using saved analysis');
       setAIAnalysis(savedAnalysis);
       setShowAnalysisCards(true);
       return;
     }
 
-    console.log('Starting analysis...');
+    console.log('Starting new analysis...');
     setIsAnalyzing(true);
     
     try {

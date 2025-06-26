@@ -261,110 +261,110 @@ export class ActivityGenerator {
     userToolkit: EmotionalToolkitItem[] = [],
     useAI: boolean = true
   ): ActivitySuggestion[] {
-    console.log('Generating activities for emotion:', emotion);
-    console.log('User toolkit:', userToolkit);
+    console.log('=== Activity Generation Debug ===');
+    console.log('Emotion detected:', emotion);
+    console.log('User toolkit received:', userToolkit);
+    console.log('AI enabled:', useAI);
     
     const lowerText = entryText.toLowerCase();
     const lowerAI = aiInsights.toLowerCase();
     
-    // ALWAYS start with user's saved activities for this emotion (highest priority)
+    // STEP 1: Get user's saved activities for this emotion (highest priority)
     const userActivities = this.getUserActivitiesForEmotion(emotion, userToolkit);
-    console.log('Found user activities:', userActivities);
+    console.log('User activities found:', userActivities.length);
     
-    // Get base activities for this emotion (try exact match first, then fallback)
+    // STEP 2: Get base/predefined activities for this emotion
     let baseActivities = this.getBaseActivitiesForEmotion(emotion);
+    console.log('Base activities found:', baseActivities.length);
     
-    // If AI is disabled, return user activities + basic emotion-based activities
-    if (!useAI) {
-      const allActivities = [...userActivities, ...baseActivities];
-      const uniqueActivities = this.removeDuplicateActivities(allActivities);
-      console.log('AI disabled - returning activities:', uniqueActivities);
-      return uniqueActivities.slice(0, 6);
-    }
+    // STEP 3: Add contextual activities based on entry content
+    const contextualActivities = this.getContextualActivities(lowerText, lowerAI);
+    console.log('Contextual activities found:', contextualActivities.length);
     
-    // Add contextual activities based on content and AI insights
-    if (lowerText.includes('work') || lowerText.includes('job') || lowerAI.includes('work')) {
-      baseActivities.push({
-        id: 'work-boundary',
-        title: 'Work Boundary Setting',
-        description: 'Take 5 minutes to step away from work thoughts and do something just for you.',
-        duration: '5 minutes',
-        category: 'boundaries'
-      });
-    }
+    // STEP 4: Combine all activities with proper prioritization
+    // User activities first (personal), then contextual, then base activities
+    const allActivities = [
+      ...userActivities,
+      ...contextualActivities,
+      ...baseActivities
+    ];
     
-    if (lowerText.includes('relationship') || lowerText.includes('friend') || lowerAI.includes('social')) {
-      baseActivities.push({
-        id: 'connection-reach',
-        title: 'Reach Out',
-        description: 'Consider connecting with someone who makes you feel supported and understood.',
-        duration: '10-20 minutes',
-        category: 'connection'
-      });
-    }
-
-    if (lowerText.includes('sleep') || lowerText.includes('tired') || lowerAI.includes('rest')) {
-      baseActivities.push({
-        id: 'rest-ritual',
-        title: 'Rest Preparation',
-        description: 'Create a calming environment and prepare your mind and body for quality rest.',
-        duration: '15 minutes',
-        category: 'rest'
-      });
-    }
-
-    // Combine user activities (prioritized) with base/contextual activities
-    const allActivities = [...userActivities, ...baseActivities];
-    
-    // Remove duplicates and limit to 6 total activities
+    // STEP 5: Remove duplicates and limit total
     const uniqueActivities = this.removeDuplicateActivities(allActivities);
-    console.log('Final activities:', uniqueActivities);
-    return uniqueActivities.slice(0, 6);
+    const finalActivities = uniqueActivities.slice(0, 6);
+    
+    console.log('Final activities count:', finalActivities.length);
+    console.log('Final activities:', finalActivities.map(a => `${a.title} (${a.category})`));
+    console.log('=== End Activity Generation Debug ===');
+    
+    return finalActivities;
   }
 
   private getUserActivitiesForEmotion(emotion: string, userToolkit: EmotionalToolkitItem[]): ActivitySuggestion[] {
     console.log('Looking for user activities for emotion:', emotion);
-    console.log('Available toolkit items:', userToolkit.map(item => item.emotion));
+    console.log('Available toolkit emotions:', userToolkit.map(item => item.emotion));
+    
+    // Create comprehensive emotion mapping for better matching
+    const emotionMappings: Record<string, string[]> = {
+      'anxiety': ['anxious', 'nervous', 'worried', 'panic', 'fear'],
+      'anxious': ['anxiety', 'nervous', 'worried', 'panic', 'fear'],
+      'sadness': ['sad', 'down', 'depressed', 'blue', 'melancholy'],
+      'sad': ['sadness', 'down', 'depressed', 'blue', 'melancholy'],
+      'anger': ['angry', 'mad', 'furious', 'rage', 'irritated'],
+      'angry': ['anger', 'mad', 'furious', 'rage', 'irritated'],
+      'stress': ['stressed', 'overwhelmed', 'pressure', 'tension'],
+      'stressed': ['stress', 'overwhelmed', 'pressure', 'tension'],
+      'frustration': ['frustrated', 'annoyed', 'irritated'],
+      'frustrated': ['frustration', 'annoyed', 'irritated'],
+      'guilt': ['guilty', 'shame', 'regret'],
+      'guilty': ['guilt', 'shame', 'regret'],
+      'loneliness': ['lonely', 'isolated', 'alone'],
+      'lonely': ['loneliness', 'isolated', 'alone'],
+      'numbness': ['numb', 'empty', 'disconnected', 'void'],
+      'numb': ['numbness', 'empty', 'disconnected', 'void'],
+      'happy': ['happiness', 'joy', 'excited', 'elated'],
+      'happiness': ['happy', 'joy', 'excited', 'elated'],
+      'calm': ['peaceful', 'serene', 'tranquil', 'relaxed'],
+      'peaceful': ['calm', 'serene', 'tranquil', 'relaxed']
+    };
     
     // Try exact match first
     let toolkitItem = userToolkit.find(
-      item => item.emotion.toLowerCase() === emotion.toLowerCase()
+      item => item.emotion.toLowerCase().trim() === emotion.toLowerCase().trim()
     );
     
-    // If no exact match, try partial matches for common emotion variations
+    console.log('Exact match found:', !!toolkitItem);
+    
+    // If no exact match, try variations
     if (!toolkitItem) {
-      const emotionMappings: Record<string, string[]> = {
-        'anxiety': ['anxious', 'nervous', 'worried'],
-        'anxious': ['anxiety', 'nervous', 'worried'],
-        'sadness': ['sad', 'down', 'depressed'],
-        'sad': ['sadness', 'down', 'depressed'],
-        'anger': ['angry', 'mad', 'furious'],
-        'angry': ['anger', 'mad', 'furious'],
-        'stress': ['stressed', 'overwhelmed', 'pressure'],
-        'stressed': ['stress', 'overwhelmed', 'pressure'],
-        'frustration': ['frustrated', 'annoyed'],
-        'frustrated': ['frustration', 'annoyed'],
-        'guilt': ['guilty', 'shame'],
-        'guilty': ['guilt', 'shame'],
-        'loneliness': ['lonely', 'isolated'],
-        'lonely': ['loneliness', 'isolated'],
-        'numbness': ['numb', 'empty', 'disconnected'],
-        'numb': ['numbness', 'empty', 'disconnected']
-      };
-      
       const variations = emotionMappings[emotion.toLowerCase()] || [];
+      console.log('Trying variations:', variations);
+      
       for (const variation of variations) {
         toolkitItem = userToolkit.find(
-          item => item.emotion.toLowerCase() === variation
+          item => item.emotion.toLowerCase().trim() === variation.toLowerCase().trim()
         );
         if (toolkitItem) {
-          console.log(`Found toolkit item for ${emotion} using variation: ${variation}`);
+          console.log(`Found match using variation: ${variation} -> ${toolkitItem.emotion}`);
           break;
+        }
+      }
+      
+      // Also try reverse mapping (check if any toolkit emotion maps to our detected emotion)
+      if (!toolkitItem) {
+        for (const item of userToolkit) {
+          const itemEmotion = item.emotion.toLowerCase().trim();
+          const possibleMatches = emotionMappings[itemEmotion] || [];
+          if (possibleMatches.includes(emotion.toLowerCase().trim())) {
+            toolkitItem = item;
+            console.log(`Found reverse match: ${emotion} matches toolkit item ${item.emotion}`);
+            break;
+          }
         }
       }
     }
 
-    if (!toolkitItem || !toolkitItem.actions.length) {
+    if (!toolkitItem || !toolkitItem.actions || toolkitItem.actions.length === 0) {
       console.log('No user activities found for emotion:', emotion);
       return [];
     }
@@ -373,9 +373,9 @@ export class ActivityGenerator {
 
     // Convert user's saved actions to ActivitySuggestion format
     return toolkitItem.actions.map((action, index) => ({
-      id: `user-${emotion}-${index}`,
-      title: action,
-      description: `Your personal coping strategy for ${toolkitItem.emotion}`,
+      id: `user-${toolkitItem!.emotion}-${index}`,
+      title: action.trim(),
+      description: `Your personal coping strategy for ${toolkitItem!.emotion}`,
       duration: '5-10 minutes',
       category: 'personal'
     }));
@@ -395,7 +395,8 @@ export class ActivityGenerator {
         'frustration': 'frustrated',
         'guilt': 'guilt',
         'loneliness': 'lonely',
-        'numbness': 'numbness'
+        'numbness': 'numbness',
+        'happiness': 'happy'
       };
       
       const mappedEmotion = emotionMappings[emotion.toLowerCase()];
@@ -406,6 +407,53 @@ export class ActivityGenerator {
     
     // Fallback to anxious activities if nothing found
     return activities ? [...activities] : [...this.baseActivities['anxious']];
+  }
+
+  private getContextualActivities(lowerText: string, lowerAI: string): ActivitySuggestion[] {
+    const contextualActivities: ActivitySuggestion[] = [];
+    
+    // Add contextual activities based on content and AI insights
+    if (lowerText.includes('work') || lowerText.includes('job') || lowerAI.includes('work')) {
+      contextualActivities.push({
+        id: 'work-boundary',
+        title: 'Work Boundary Setting',
+        description: 'Take 5 minutes to step away from work thoughts and do something just for you.',
+        duration: '5 minutes',
+        category: 'boundaries'
+      });
+    }
+    
+    if (lowerText.includes('relationship') || lowerText.includes('friend') || lowerAI.includes('social')) {
+      contextualActivities.push({
+        id: 'connection-reach',
+        title: 'Reach Out',
+        description: 'Consider connecting with someone who makes you feel supported and understood.',
+        duration: '10-20 minutes',
+        category: 'connection'
+      });
+    }
+
+    if (lowerText.includes('sleep') || lowerText.includes('tired') || lowerAI.includes('rest')) {
+      contextualActivities.push({
+        id: 'rest-ritual',
+        title: 'Rest Preparation',
+        description: 'Create a calming environment and prepare your mind and body for quality rest.',
+        duration: '15 minutes',
+        category: 'rest'
+      });
+    }
+
+    if (lowerText.includes('meeting') || lowerText.includes('presentation') || lowerText.includes('speaking')) {
+      contextualActivities.push({
+        id: 'confidence-building',
+        title: 'Confidence Building',
+        description: 'Practice positive self-talk and remind yourself of past successes in similar situations.',
+        duration: '10 minutes',
+        category: 'confidence'
+      });
+    }
+
+    return contextualActivities;
   }
 
   private removeDuplicateActivities(activities: ActivitySuggestion[]): ActivitySuggestion[] {
