@@ -6,7 +6,6 @@ import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import EmotionChart from '@/components/EmotionChart';
-import HealingStrengthChart from '@/components/HealingStrengthChart';
 import CrisisHelpModal from '@/components/CrisisHelpModal';
 import ActivityManagementModal from '@/components/ActivityManagementModal';
 
@@ -403,41 +402,10 @@ export default function ProfileTab() {
           </View>
         </View>
 
-        {/* Recent Activity */}
-        <View style={dynamicStyles.activitySection}>
-          <Text style={dynamicStyles.sectionTitle}>Recent Activity</Text>
-          <View style={dynamicStyles.activityCard}>
-            <View style={dynamicStyles.activityHeader}>
-              <Calendar size={16} color={colors.textSecondary} strokeWidth={1.5} />
-              <Text style={dynamicStyles.activityDate}>
-                {latestEntry ? `Last entry: ${latestEntry.date}` : 'No entries yet'}
-              </Text>
-            </View>
-            <Text style={dynamicStyles.activityText}>
-              {latestEntry 
-                ? "You've been consistent with your journaling this week. Keep up the great work!"
-                : "Start your reflection journey by creating your first entry."
-              }
-            </Text>
-          </View>
-        </View>
-
         {/* Main Features */}
         <View style={dynamicStyles.featuresSection}>
           <Text style={dynamicStyles.sectionTitle}>Features</Text>
           
-          <TouchableOpacity style={dynamicStyles.featureItem} onPress={() => setShowInsights(true)}>
-            <View style={dynamicStyles.featureLeft}>
-              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.primary + '15' }]}>
-                <BarChart3 size={20} color={colors.primary} strokeWidth={1.5} />
-              </View>
-              <View style={dynamicStyles.featureContent}>
-                <Text style={dynamicStyles.featureTitle}>Healing Analytics</Text>
-                <Text style={dynamicStyles.featureDescription}>Track your emotional patterns and healing strength over time</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
           <TouchableOpacity style={dynamicStyles.featureItem} onPress={() => setShowCrisisHelp(true)}>
             <View style={dynamicStyles.featureLeft}>
               <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.accent }]}>
@@ -547,27 +515,6 @@ export default function ProfileTab() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </Modal>
-
-      {/* Healing Analytics Modal */}
-      <Modal
-        visible={showInsights}
-        animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowInsights(false)}
-      >
-        <View style={dynamicStyles.container}>
-          <View style={styles.modalHeader}>
-            <Text style={[dynamicStyles.modalTitle, { fontSize: 24, marginBottom: 0 }]}>Healing Analytics</Text>
-            <TouchableOpacity onPress={() => setShowInsights(false)}>
-              <X size={24} color={colors.text} strokeWidth={1.5} />
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={dynamicStyles.content}>
-            <EmotionChart entries={entries} />
-            <HealingStrengthChart entries={entries} />
-          </ScrollView>
         </View>
       </Modal>
 

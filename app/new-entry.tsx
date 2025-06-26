@@ -28,7 +28,7 @@ export default function NewEntryPage() {
   const [detectedPattern, setDetectedPattern] = useState<any>(null);
   const [showAnalysisCards, setShowAnalysisCards] = useState(false);
   const [savedAnalysis, setSavedAnalysis] = useState<AIAnalysisResult | null>(null);
-  const { addEntry, updateEntry, deleteEntry } = useEntries();
+  const { addEntry, updateEntry, deleteEntry, entries } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
   
@@ -42,8 +42,16 @@ export default function NewEntryPage() {
     } else if (initialContent) {
       setContent(initialContent);
       setTitle(initialTitle || '');
+      // Load saved analysis if present
+      if (entryId) {
+        const entry = entries.find(e => e.id === parseInt(entryId));
+        if (entry?.aiAnalysis) {
+          setSavedAnalysis(entry.aiAnalysis);
+          setAIAnalysis(entry.aiAnalysis);
+        }
+      }
     }
-  }, [prompt, initialContent, initialTitle]);
+  }, [prompt, initialContent, initialTitle, entryId, entries]);
 
   // Generate current date and time
   const getCurrentDateTime = () => {

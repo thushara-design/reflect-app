@@ -30,18 +30,15 @@ export default function AIAnalysisCards({
   // Get user's saved activities for the detected emotion
   const getUserActivities = () => {
     if (!userProfile?.emotionalToolkit) return [];
-    
-    const emotionToolkit = userProfile.emotionalToolkit.find(
-      item => item.emotion.toLowerCase() === analysis.emotion.emotion.toLowerCase()
+    return userProfile.emotionalToolkit.flatMap((item, emotionIndex) =>
+      item.actions.map((action, actionIndex) => ({
+        id: `user-${emotionIndex}-${actionIndex}`,
+        title: action,
+        description: `Your personal coping strategy for ${item.emotion}`,
+        duration: '5-10 minutes',
+        category: 'personal'
+      }))
     );
-    
-    return emotionToolkit?.actions.map((action, index) => ({
-      id: `user-${index}`,
-      title: action,
-      description: `Your personal coping strategy for ${analysis.emotion.emotion}`,
-      duration: '5-10 minutes',
-      category: 'personal'
-    })) || [];
   };
 
   const allActivities = [...getUserActivities(), ...analysis.activities];
