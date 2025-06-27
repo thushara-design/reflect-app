@@ -43,6 +43,15 @@
         {
           "microphonePermission": "Allow Reflect to access your microphone to record voice notes for your journal entries."
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableProguardInReleaseBuilds": true,
+            "extraProguardRules": "-keep class com.myapp.** {*;}"
+          }
+        }
       ]
     ],
     "experiments": {

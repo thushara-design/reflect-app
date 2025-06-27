@@ -278,7 +278,9 @@ import {
               {currentIdx + 1} of {emotionList.length}
             </Text>
             <Text style={styles.title}>Coping with {currentEmotion}</Text>
-            <Text style={styles.subtitle}>Add activities that help you manage this emotion</Text>
+            <Text style={styles.subtitle}>
+              Add activities that help you manage this emotion. When this emotion is detected, we'll gently suggest these activities to support you.
+            </Text>
   
             <View style={styles.inputContainer}>
               <TextInput
@@ -326,10 +328,15 @@ import {
               </View>
             )}
   
+            {/* Add white space between selected and suggested activities */}
+            {selectedActions.length > 0 && showSuggestions && (
+              <View style={{ height: 24 }} />
+            )}
+  
             {/* Suggested Activities */}
             {showSuggestions && (
               <View style={styles.chipContainer}>
-                {PREDEFINED_ACTIONS.map(action => (
+                {PREDEFINED_ACTIONS.filter(action => !selectedActions.includes(action)).map(action => (
                   <TouchableOpacity
                     key={action}
                     style={[
@@ -341,6 +348,10 @@ import {
                     <Text style={styles.chipText}>{action}</Text>
                   </TouchableOpacity>
                 ))}
+                {/* If all suggestions are selected, show a message */}
+                {PREDEFINED_ACTIONS.filter(action => !selectedActions.includes(action)).length === 0 && (
+                  <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>All suggestions selected</Text>
+                )}
               </View>
             )}
           </ScrollView>
