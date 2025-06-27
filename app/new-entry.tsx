@@ -237,23 +237,36 @@ export default function NewEntryPage() {
   };
 
   const handleDelete = () => {
-    if (entryId) {
-      Alert.alert(
-        'Delete Entry',
-        'Are you sure you want to delete this entry? This action cannot be undone.',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { 
-            text: 'Delete', 
-            style: 'destructive', 
-            onPress: () => {
+    if (!entryId) {
+      Alert.alert('Error', 'Cannot delete entry: Entry ID not found.');
+      return;
+    }
+
+    Alert.alert(
+      'Delete Entry',
+      'Are you sure you want to delete this entry? This action cannot be undone.',
+      [
+        { 
+          text: 'Cancel', 
+          style: 'cancel' 
+        },
+        { 
+          text: 'Delete', 
+          style: 'destructive', 
+          onPress: () => {
+            try {
+              console.log('Deleting entry with ID:', entryId);
               deleteEntry(parseInt(entryId));
+              console.log('Entry deleted successfully');
               router.replace('/(tabs)');
+            } catch (error) {
+              console.error('Error deleting entry:', error);
+              Alert.alert('Error', 'Failed to delete entry. Please try again.');
             }
           }
-        ]
-      );
-    }
+        }
+      ]
+    );
   };
 
   const handleBack = () => {
@@ -349,6 +362,15 @@ export default function NewEntryPage() {
       borderTopColor: colors.border,
       alignItems: 'center',
       backgroundColor: colors.background,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      position: 'relative',
+    },
+    deleteButton: {
+      position: 'absolute',
+      left: 24,
+      padding: 8,
+      borderRadius: 8,
     },
     timestamp: {
       fontSize: 12,
@@ -456,16 +478,21 @@ export default function NewEntryPage() {
 
         <View style={dynamicStyles.bottomInfo}>
           {isEditing && (
-            <TouchableOpacity onPress={handleDelete} style={{ position: 'absolute', left: 24, bottom: 16 }}>
+            <TouchableOpacity 
+              style={dynamicStyles.deleteButton} 
+              onPress={handleDelete}
+            >
               <Trash2 size={22} color={colors.textSecondary} strokeWidth={1.5} />
             </TouchableOpacity>
           )}
-          <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-          {isAnalyzing && (
-            <Text style={dynamicStyles.analyzingText}>
-              {userHasAI ? 'Analyzing with AI...' : 'Analyzing entry...'}
-            </Text>
-          )}
+          <View style={{ flex: 1, alignItems: 'center' }}>
+            <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
+            {isAnalyzing && (
+              <Text style={dynamicStyles.analyzingText}>
+                {userHasAI ? 'Analyzing with AI...' : 'Analyzing entry...'}
+              </Text>
+            )}
+          </View>
         </View>
       </View>
 
