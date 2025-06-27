@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Check } from 'lucide-react-native';
 import { COMMON_EMOTIONS } from './emotions';
+import SvgUri from 'react-native-svg-uri-reborn';
 
 export default function EmotionSelectScreen() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -31,13 +32,13 @@ export default function EmotionSelectScreen() {
     container: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
     header: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 },
     skip: { color: colors.primary, fontWeight: '600', fontSize: 16, padding: 8, fontFamily: 'Nunito-Bold' },
-    title: { fontSize: 28, fontWeight: '300', color: '#181818', textAlign: 'center', marginBottom: 8, fontFamily: 'Nunito-Bold' },
-    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'center', marginBottom: 30, lineHeight: 24, fontFamily: 'Nunito-Regular' },
+    title: { fontSize: 28, fontWeight: '300', color: '#181818', textAlign: 'left', marginBottom: 8, fontFamily: 'Nunito-Bold' },
+    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'left', marginBottom: 30, lineHeight: 24, fontFamily: 'Nunito-Regular' },
     stepIndicator: {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
-      textAlign: 'center',
+      textAlign: 'left',
       marginBottom: 20,
       fontFamily: 'Nunito-Regular',
     },
@@ -45,7 +46,7 @@ export default function EmotionSelectScreen() {
     emotionCard: {
       width: '47%',
       aspectRatio: 1,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.background,
       borderWidth: 1,
       borderColor: colors.border,
       borderRadius: 20,
@@ -53,11 +54,6 @@ export default function EmotionSelectScreen() {
       justifyContent: 'center',
       marginBottom: 18,
       marginTop: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.08,
-      shadowRadius: 6,
-      elevation: 2,
       position: 'relative',
     },
     emotionCardSelected: {
@@ -75,7 +71,7 @@ export default function EmotionSelectScreen() {
       zIndex: 2,
     },
     emotionEmoji: { fontSize: 38, marginBottom: 10 },
-    emotionName: { fontSize: 16, color: '#181818', fontWeight: '500', textAlign: 'center', fontFamily: 'Nunito-Bold' },
+    emotionName: { fontSize: 16, color: '#181818', fontWeight: '500', textAlign: 'left', fontFamily: 'Nunito-Bold' },
     nextButtonContainer: {
       paddingBottom: 24,
       paddingHorizontal: 24,
@@ -121,7 +117,7 @@ export default function EmotionSelectScreen() {
                       <Check size={18} color="#fff" strokeWidth={3} />
                     </View>
                   )}
-                  <Text style={dynamicStyles.emotionEmoji}>{emotion.emoji}</Text>
+                  <SvgUri width="38" height="38" source={{ uri: emotion.emoji }} />
                   <Text style={dynamicStyles.emotionName}>{emotion.name}</Text>
                 </TouchableOpacity>
               );

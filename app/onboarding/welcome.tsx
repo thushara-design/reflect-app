@@ -29,11 +29,12 @@ export default function WelcomeScreen() {
       letterSpacing: -1.5,
       marginBottom: 16,
       fontFamily: 'Nunito-Bold',
+      textAlign: 'left',
     },
     subtitle: {
       fontSize: 18,
       color: colors.textSecondary,
-      textAlign: 'center',
+      textAlign: 'left',
       marginBottom: 40,
       lineHeight: 26,
       fontFamily: 'Nunito-Regular',

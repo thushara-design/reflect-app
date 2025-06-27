@@ -37,6 +37,7 @@ export default function AIPreferenceScreen() {
       color: colors.textSecondary,
       fontWeight: '300',
       fontFamily: 'Nunito-Regular',
+      textAlign: 'left',
     },
     content: {
       flex: 1,
@@ -47,7 +48,7 @@ export default function AIPreferenceScreen() {
       fontSize: 32,
       fontWeight: '300',
       color: '#181818',
-      textAlign: 'center',
+      textAlign: 'left',
       marginBottom: 16,
       letterSpacing: -0.5,
       fontFamily: 'Nunito-Bold',
@@ -55,7 +56,7 @@ export default function AIPreferenceScreen() {
     subtitle: {
       fontSize: 16,
       color: colors.textSecondary,
-      textAlign: 'center',
+      textAlign: 'left',
       marginBottom: 60,
       lineHeight: 24,
       fontFamily: 'Nunito-Regular',

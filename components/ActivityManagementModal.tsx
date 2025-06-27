@@ -5,6 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding, EmotionalToolkitItem } from '@/contexts/OnboardingContext';
 import { COMMON_EMOTIONS } from '../app/onboarding/emotions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SvgUri from 'react-native-svg-uri-reborn';
 
 interface ActivityManagementModalProps {
   visible: boolean;
@@ -339,7 +340,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
                   console.log(`DEBUG: Selected emotion '${emotion.name}' in activity management modal.`);
                 }}
               >
-                <Text style={dynamicStyles.emotionEmoji}>{emotion.emoji}</Text>
+                <SvgUri width="24" height="24" source={{ uri: emotion.emoji }} />
                 <Text style={dynamicStyles.emotionName}>{emotion.name}</Text>
               </TouchableOpacity>
             ))}

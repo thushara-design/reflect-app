@@ -159,8 +159,22 @@ import {
     const styles = StyleSheet.create({
       container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 20 },
       header: { marginTop: 40, marginBottom: 20 },
-      title: { fontSize: 22, fontWeight: '500', color: '#222', textAlign: 'center', fontFamily: 'Nunito-Regular' },
-      subtitle: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', marginTop: 6, marginBottom: 20, fontFamily: 'Nunito-Regular' },
+      title: {
+        fontSize: 28,
+        fontWeight: '300',
+        color: '#181818',
+        textAlign: 'left',
+        marginBottom: 8,
+        fontFamily: 'Nunito-Bold',
+      },
+      subtitle: {
+        fontSize: 16,
+        color: colors.textSecondary,
+        textAlign: 'left',
+        marginBottom: 30,
+        lineHeight: 24,
+        fontFamily: 'Nunito-Regular',
+      },
       inputContainer: {
         flexDirection: 'row',
         marginBottom: 12,
@@ -251,6 +265,14 @@ import {
         color: colors.textSecondary,
         fontSize: 12,
         marginBottom: 10,
+        fontFamily: 'Nunito-Regular',
+      },
+      stepIndicator: {
+        fontSize: 14,
+        color: colors.textSecondary,
+        fontWeight: '300',
+        textAlign: 'left',
+        marginBottom: 20,
         fontFamily: 'Nunito-Regular',
       },
     });
