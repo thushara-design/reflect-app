@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { PenTool, PlusCircleIcon, PlusIcon } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
-import SvgUri from 'react-native-svg-uri-reborn';
+import OpenMojiIcon from '@/components/OpenMojiIcon';
 
 export default function AddTab() {
   const { colors } = useTheme();
@@ -78,7 +78,11 @@ export default function AddTab() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.emojiCircle}>
-            <SvgUri width="48" height="48" source={{ uri: 'https://openmoji.org/data/black/svg/1F642.svg' }} />
+            <OpenMojiIcon 
+              uri="https://openmoji.org/data/black/svg/1F642.svg"
+              width={48}
+              height={48}
+            />
           </View>
           <Text style={styles.title}>How are you feeling today?</Text>
         </View>

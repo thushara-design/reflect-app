@@ -7,7 +7,7 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import CrisisHelpModal from '@/components/CrisisHelpModal';
 import ActivityManagementModal from '@/components/ActivityManagementModal';
-import SvgUri from 'react-native-svg-uri-reborn';
+import OpenMojiIcon from '@/components/OpenMojiIcon';
 
 export default function ProfileTab() {
   const { entries } = useEntries();
@@ -373,7 +373,11 @@ export default function ProfileTab() {
         <View style={dynamicStyles.header}>
           <View style={dynamicStyles.avatarContainer}>
             <View style={[dynamicStyles.avatar, { backgroundColor: colors.accent }]}> 
-              <SvgUri width="48" height="48" source={{ uri: 'https://openmoji.org/data/black/svg/1F344.svg' }} />
+              <OpenMojiIcon 
+                uri="https://openmoji.org/data/black/svg/1F344.svg"
+                width={48}
+                height={48}
+              />
             </View>
           </View>
           <View style={dynamicStyles.welcomeContainer}>

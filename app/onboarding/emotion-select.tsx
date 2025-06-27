@@ -5,7 +5,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { Check } from 'lucide-react-native';
 import { COMMON_EMOTIONS } from './emotions';
-import SvgUri from 'react-native-svg-uri-reborn';
+import OpenMojiIcon from '@/components/OpenMojiIcon';
 
 export default function EmotionSelectScreen() {
   const [selected, setSelected] = useState<string[]>([]);
@@ -122,7 +122,11 @@ export default function EmotionSelectScreen() {
                       <Check size={18} color="#fff" strokeWidth={3} />
                     </View>
                   )}
-                  <SvgUri width="38" height="38" source={{ uri: emotion.emoji }} />
+                  <OpenMojiIcon 
+                    uri={emotion.emoji}
+                    width={38}
+                    height={38}
+                  />
                   <Text style={dynamicStyles.emotionName}>{emotion.name}</Text>
                 </TouchableOpacity>
               );
