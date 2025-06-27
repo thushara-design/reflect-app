@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ScrollView, SafeAreaView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Trash2 } from 'lucide-react-native';
@@ -10,6 +10,7 @@ import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { aiService, AIAnalysisResult } from '@/services/aiService';
 import React from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function NewEntryPage() {
   const { prompt, entryId, title: initialTitle, content: initialContent, fromEntries } = useLocalSearchParams<{ 
@@ -32,6 +33,7 @@ export default function NewEntryPage() {
   const { addEntry, updateEntry, deleteEntry, entries } = useEntries();
   const { userProfile } = useOnboarding();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   
   const isEditing = !!entryId;
   const showContextMenu = fromEntries === 'true';
@@ -360,15 +362,13 @@ export default function NewEntryPage() {
       paddingHorizontal: 24,
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      alignItems: 'center',
       backgroundColor: colors.background,
       flexDirection: 'row',
-      justifyContent: 'center',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       position: 'relative',
     },
     deleteButton: {
-      position: 'absolute',
-      left: 24,
       padding: 8,
       borderRadius: 8,
     },
@@ -476,24 +476,28 @@ export default function NewEntryPage() {
           />
         </View>
 
-        <View style={dynamicStyles.bottomInfo}>
-          {isEditing && (
-            <TouchableOpacity 
-              style={dynamicStyles.deleteButton} 
-              onPress={handleDelete}
-            >
-              <Trash2 size={22} color={colors.textSecondary} strokeWidth={1.5} />
-            </TouchableOpacity>
-          )}
-          <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
-            {isAnalyzing && (
-              <Text style={dynamicStyles.analyzingText}>
-                {userHasAI ? 'Analyzing with AI...' : 'Analyzing entry...'}
-              </Text>
+        <SafeAreaView style={{backgroundColor: colors.background}}>
+          <View style={[dynamicStyles.bottomInfo, { paddingBottom: insets.bottom || 16 }]}> 
+            {isEditing ? (
+              <TouchableOpacity 
+                style={dynamicStyles.deleteButton} 
+                onPress={handleDelete}
+              >
+                <Trash2 size={22} color={colors.textSecondary} strokeWidth={1.5} />
+              </TouchableOpacity>
+            ) : (
+              <View style={{ width: 38 }} />
             )}
+            <View style={{ alignItems: 'flex-end', flex: 1 }}>
+              <Text style={dynamicStyles.timestamp}>{getCurrentDateTime()}</Text>
+              {isAnalyzing && (
+                <Text style={dynamicStyles.analyzingText}>
+                  {userHasAI ? 'Analyzing with AI...' : 'Analyzing entry...'}
+                </Text>
+              )}
+            </View>
           </View>
-        </View>
+        </SafeAreaView>
       </View>
 
       {/* Pattern Detection Modal - only show if AI is enabled */}

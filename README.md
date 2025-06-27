@@ -5,11 +5,8 @@ A beautiful, AI-powered journaling app built with React Native and Expo that hel
 ## 🌟 Features
 
 - **Smart Journaling**: Write entries with voice-to-text support
-- **AI Analysis**: Detect emotions and cognitive patterns in your writing
-- **Healing Analytics**: Track your mental health progress over time
-- **Crisis Support**: Quick access to mental health resources
-- **Personalized Activities**: Custom coping strategies for different emotions
-- **Dark/Light Theme**: Comfortable viewing in any lighting
+- **Emotion analysis**: Detect emotions and cognitive patterns in your writing with or without AI
+- **Personalized Activities**: Custom coping strategies for different emotions triggered each time when the emotion is detected
 - **Offline Support**: Your data stays private and accessible offline
 
 ## 📱 Getting Started on Your Phone

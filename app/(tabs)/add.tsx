@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import { PenTool, Plus as PlusIcon } from 'lucide-react-native';
@@ -71,7 +71,7 @@ export default function AddTab() {
   });
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TopNavBar title="New Entry" />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -95,6 +95,6 @@ export default function AddTab() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }

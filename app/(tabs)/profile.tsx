@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Linking, SafeAreaView } from 'react-native';
 import { useState } from 'react';
 import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, CreditCard as Edit3, X, Plus, Trash2, Download, Brain, Zap, PenTool } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
@@ -63,7 +63,7 @@ export default function ProfileTab() {
 
   const stats = [
     { label: 'Total Entries', value: totalEntries.toString(), color: colors.primary },
-    { label: 'Current Streak', value: `${calculateStreak()} days`, color: colors.accent },
+    { label: 'Streak', value: `${calculateStreak()} days`, color: colors.accent },
     { label: 'This Month', value: thisMonth.toString(), color: colors.primary },
   ];
 
@@ -353,7 +353,7 @@ export default function ProfileTab() {
       borderColor: colors.border,
     },
     primaryButtonText: {
-      color: '#181818',
+      color: colors.text,
       fontSize: 16,
       fontWeight: '400',
     },
@@ -365,7 +365,7 @@ export default function ProfileTab() {
   });
 
   return (
-    <View style={dynamicStyles.container}>
+    <SafeAreaView style={dynamicStyles.container}>
       <TopNavBar title="Profile" showDarkMode={true} showSignOut={true} />
 
       <ScrollView style={dynamicStyles.content} showsVerticalScrollIndicator={false}>
@@ -397,12 +397,11 @@ export default function ProfileTab() {
 
         {/* Stats */}
         <View style={dynamicStyles.statsSection}>
-          <Text style={{ fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 16 }}>Your Progress</Text>
           <View style={dynamicStyles.statsGrid}>
             {stats.map((stat, index) => (
-              <View key={index} style={dynamicStyles.statCard}>
-                <Text style={{ fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.value}</Text>
-                <Text style={{ fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.label}</Text>
+              <View key={index} style={[dynamicStyles.statCard, { alignItems: 'flex-start', justifyContent: 'center', paddingVertical: 10, paddingHorizontal: 8 }]}> 
+                <Text style={{ fontSize: 18, color: '#181818', fontWeight: '500', marginBottom: 2 }}>{stat.value}</Text>
+                <Text style={{ fontSize: 13, color: colors.textSecondary, fontWeight: '300' }}>{stat.label}</Text>
               </View>
             ))}
           </View>
@@ -512,7 +511,7 @@ export default function ProfileTab() {
         visible={showActivityManagement}
         onClose={() => setShowActivityManagement(false)}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 

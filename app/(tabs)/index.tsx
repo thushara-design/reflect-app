@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Dimensions, SafeAreaView } from 'react-native';
 import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Search } from 'lucide-react-native';
@@ -101,7 +101,7 @@ export default function EntriesTab() {
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ReflectHeader title="Entries" />
 
       <View style={styles.content}>
@@ -145,7 +145,7 @@ export default function EntriesTab() {
           )}
         </ScrollView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

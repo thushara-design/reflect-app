@@ -54,6 +54,7 @@ import {
     useEffect(() => {
       const normalizedEmotion = capitalizeFirst(currentEmotion.toLowerCase().trim());
       setSelectedActions(allSelections[normalizedEmotion] || []);
+      setShowSuggestions(false); // Hide suggestions for each new emotion
     }, [currentIdx]);
   
     const handleActionToggle = (action: string) => {
@@ -102,7 +103,7 @@ import {
       console.log(`DEBUG: Clicked NEXT for emotion '${currentEmotion}'. All selections so far:`, newSelections);
       setSelectedActions([]);
       setCustomAction('');
-      setShowSuggestions(true);
+      setShowSuggestions(false);
   
       if (currentIdx < emotionList.length - 1) {
         setCurrentIdx(currentIdx + 1);
@@ -133,7 +134,7 @@ import {
       console.log(`DEBUG: Clicked SKIP for emotion '${currentEmotion}'. All selections so far:`, newSelections);
       setSelectedActions([]);
       setCustomAction('');
-      setShowSuggestions(true);
+      setShowSuggestions(false); // Hide suggestions for each new emotion
       if (currentIdx < emotionList.length - 1) {
         setCurrentIdx(prev => prev + 1);
       } else {
