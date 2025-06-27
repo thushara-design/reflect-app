@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { ChevronDown, ChevronUp, Square, SquareCheck as CheckSquare, Lightbulb, Brain, Activity, Sparkles } from 'lucide-react-native';
@@ -10,7 +10,7 @@ import { UserProfile } from '@/contexts/OnboardingContext';
 interface AIAnalysisCardsProps {
   analysis: AIAnalysisResult;
   onSaveReframe: (originalThought: string, reframedThought: string) => void;
-  onActivitySelect: (activityId: string) => void;
+  onActivitySelect: (activity: any) => void;
   entryText: string;
   userProfile: UserProfile | null;
   detectedEmotion: string;
@@ -32,15 +32,15 @@ export default function AIAnalysisCards({
   const [reframedThoughts, setReframedThoughts] = useState<Record<string, string>>({});
   const [isGeneratingReframe, setIsGeneratingReframe] = useState<Record<string, boolean>>({});
 
-  const handleActivityToggle = (activityId: string) => {
+  const handleActivityToggle = (activity: any) => {
     const newSelected = new Set(selectedActivities);
-    if (newSelected.has(activityId)) {
-      newSelected.delete(activityId);
+    if (newSelected.has(activity.id)) {
+      newSelected.delete(activity.id);
     } else {
-      newSelected.add(activityId);
+      newSelected.add(activity.id);
     }
     setSelectedActivities(newSelected);
-    onActivitySelect(activityId);
+    onActivitySelect(activity);
   };
 
   const handleDistortionToggle = (distortionType: string) => {
@@ -104,12 +104,42 @@ export default function AIAnalysisCards({
   const userActivities = analysis.activities.filter(activity => activity.category === 'personal');
   const aiActivities = analysis.activities.filter(activity => activity.category !== 'personal');
 
-  // Limit total activities to 3, prioritizing user activities
-  let displayedUserActivities = userActivities.slice(0, 3);
+  let displayedUserActivities: typeof userActivities = [];
   let displayedAIActivities: typeof aiActivities = [];
-  if (displayedUserActivities.length < 3) {
-    displayedAIActivities = aiActivities.slice(0, 3 - displayedUserActivities.length);
+
+  if (userActivities.length > 0) {
+    // If user has saved activities
+    displayedUserActivities = userActivities;
+    if (useAI) {
+      // In AI mode, allow one extra AI/predefined activity
+      displayedAIActivities = aiActivities.slice(0, 1);
+    } else {
+      // In basic mode, show only user activities
+      displayedAIActivities = [];
+    }
+  } else {
+    // No user activities, fallback to current logic (up to 3 total, prioritizing user, then AI)
+    displayedUserActivities = userActivities.slice(0, 3);
+    if (displayedUserActivities.length < 3) {
+      displayedAIActivities = aiActivities.slice(0, 3 - displayedUserActivities.length);
+    } else {
+      displayedAIActivities = [];
+    }
   }
+
+  // Sync checked activities with entryText
+  useEffect(() => {
+    const checked = new Set<string>();
+    const allActivities = [...displayedUserActivities, ...displayedAIActivities];
+    allActivities.forEach(activity => {
+      const completedLine = `Completed activity - ${activity.title}`;
+      if (entryText.includes(completedLine)) {
+        checked.add(activity.id);
+      }
+    });
+    setSelectedActivities(checked);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [entryText, analysis.activities]);
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -365,7 +395,11 @@ export default function AIAnalysisCards({
         <View style={dynamicStyles.emotionRow}>
           <Text style={dynamicStyles.emotionEmoji}>{analysis.emotion.emoji}</Text>
           <Text style={{ fontSize: 18, color: '#181818', fontWeight: '700', flexShrink: 1, flexWrap: 'wrap' }}>
-            You sound {analysis.emotion.emotion}, based on what you wrote.
+            {analysis.emotion.emotion === 'distress'
+              ? 'You sound distressed, based on what you wrote.'
+              : analysis.emotion.emotion === 'neutral'
+                ? "Layered/Subtle"
+                : `You sound ${analysis.emotion.emotion}, based on what you wrote.`}
           </Text>
         </View>
         <Text style={dynamicStyles.confidenceText}>
@@ -399,7 +433,7 @@ export default function AIAnalysisCards({
                       dynamicStyles.activityItem,
                       index === displayedUserActivities.length - 1 && displayedAIActivities.length === 0 && { borderBottomWidth: 0 }
                     ]}
-                    onPress={() => handleActivityToggle(activity.id)}
+                    onPress={() => handleActivityToggle(activity)}
                   >
                     {selectedActivities.has(activity.id) ? (
                       <CheckSquare size={20} color={'#181818'} strokeWidth={1.5} />
@@ -431,7 +465,7 @@ export default function AIAnalysisCards({
                       dynamicStyles.activityItem,
                       index === displayedAIActivities.length - 1 && { borderBottomWidth: 0 }
                     ]}
-                    onPress={() => handleActivityToggle(activity.id)}
+                    onPress={() => handleActivityToggle(activity)}
                   >
                     {selectedActivities.has(activity.id) ? (
                       <CheckSquare size={20} color={'#181818'} strokeWidth={1.5} />

@@ -40,7 +40,25 @@ export class EmotionDetector {
   };
 
   detectEmotion(text: string, aiResponse: string = ''): EmotionResult {
+    // Critical distress lexicon (robust, covers apostrophe and non-apostrophe, and word boundaries)
+    const criticalKeywords = [
+      "wish i could die", "want to die", "kill myself", "i'm worthless", "im worthless", "no one cares",
+      "hate myself", "i hate myself", "i'm not good enough", "i'm not good enough", "im not good enough", "i'm such a loser", "i'm such a loser", "im such a loser", "nobody loves me",
+      "end it all", "can't go on", "cant go on", "everything is pointless", "i don't matter", "i dont matter", "i want to disappear"
+    ];
     const fullText = (text + ' ' + aiResponse).toLowerCase();
+    const critical_distress_flag = criticalKeywords.some(kw => {
+      // Use regex for word boundaries to avoid partial matches
+      const pattern = new RegExp(`\\b${kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+      return pattern.test(fullText);
+    });
+    if (critical_distress_flag) {
+      return {
+        emotion: 'distress',
+        emoji: '💔',
+        confidence: 1
+      };
+    }
     
     let maxScore = 0;
     let detectedEmotion = 'neutral';

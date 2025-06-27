@@ -175,8 +175,12 @@ export default function NewEntryPage() {
     setContent(prev => prev + reframedSection);
   };
 
-  const handleActivitySelect = (activityId: string) => {
-    console.log('Activity selected:', activityId);
+  const handleActivitySelect = (activity: any) => {
+    // Only add if not already present in content
+    const completedLine = `Completed activity - ${activity.title}`;
+    if (!content.includes(completedLine)) {
+      setContent(prev => prev.trim() + (prev.trim() ? '\n' : '') + completedLine + '\n');
+    }
   };
 
   const handleCloseAnalysisCards = () => {
@@ -209,7 +213,7 @@ export default function NewEntryPage() {
     };
 
     let finalTitle = title.trim() || getCurrentDateTime();
-    if (aiAnalysis?.emotion.emoji) {
+    if (aiAnalysis?.emotion.emoji && !finalTitle.startsWith(aiAnalysis.emotion.emoji)) {
       finalTitle = `${aiAnalysis.emotion.emoji} ${finalTitle}`;
     }
 

@@ -251,6 +251,29 @@ export class ActivityGenerator {
         duration: '10 minutes',
         category: 'mindfulness'
       }
+    ],
+    distress: [
+      {
+        id: 'ground-breathing',
+        title: 'Box Breathing',
+        description: 'Breathe in for 4, hold for 4, out for 4, hold for 4. This can help calm your nervous system when feeling distressed.',
+        duration: '3-5 minutes',
+        category: 'breathing'
+      },
+      {
+        id: '54321-senses',
+        title: 'Name 5 Things You See',
+        description: 'Name 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. This brings you back to the present moment.',
+        duration: '5 minutes',
+        category: 'grounding'
+      },
+      {
+        id: 'crisis-support-link',
+        title: 'Talk to Someone',
+        description: 'Reach out to a trusted person or helpline. You don\'t have to go through this alone.',
+        duration: '10+ minutes',
+        category: 'connection'
+      }
     ]
   };
 
@@ -307,28 +330,76 @@ export class ActivityGenerator {
     // Normalize the input emotion for comparison
     const normalizedEmotion = emotion.toLowerCase().trim();
     
-    // Create comprehensive emotion mapping for better matching
+    // Create comprehensive emotion mapping for better matching - same emotions, more natural diary language
     const emotionMappings: Record<string, string[]> = {
-      'anxiety': ['anxious', 'nervous', 'worried', 'panic', 'fear'],
-      'anxious': ['anxiety', 'nervous', 'worried', 'panic', 'fear'],
-      'sadness': ['sad', 'down', 'depressed', 'blue', 'melancholy'],
-      'sad': ['sadness', 'down', 'depressed', 'blue', 'melancholy'],
-      'anger': ['angry', 'mad', 'furious', 'rage', 'irritated'],
-      'angry': ['anger', 'mad', 'furious', 'rage', 'irritated'],
-      'stress': ['stressed', 'overwhelmed', 'pressure', 'tension'],
-      'stressed': ['stress', 'overwhelmed', 'pressure', 'tension'],
-      'frustration': ['frustrated', 'annoyed', 'irritated'],
-      'frustrated': ['frustration', 'annoyed', 'irritated'],
-      'guilt': ['guilty', 'shame', 'regret'],
-      'guilty': ['guilt', 'shame', 'regret'],
-      'loneliness': ['lonely', 'isolated', 'alone'],
-      'lonely': ['loneliness', 'isolated', 'alone'],
-      'numbness': ['numb', 'empty', 'disconnected', 'void'],
-      'numb': ['numbness', 'empty', 'disconnected', 'void'],
-      'happy': ['happiness', 'joy', 'excited', 'elated'],
-      'happiness': ['happy', 'joy', 'excited', 'elated'],
-      'calm': ['peaceful', 'serene', 'tranquil', 'relaxed'],
-      'peaceful': ['calm', 'serene', 'tranquil', 'relaxed']
+      // Anxiety cluster - keeping original emotions, adding natural diary expressions
+      'anxiety': ['anxious', 'nervous', 'worried', 'panic', 'fear', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+      'anxious': ['anxiety', 'nervous', 'worried', 'panic', 'fear', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+      'nervous': ['anxiety', 'anxious', 'worried', 'panic', 'fear', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+      'worried': ['anxiety', 'anxious', 'nervous', 'panic', 'fear', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+      'panic': ['anxiety', 'anxious', 'nervous', 'worried', 'fear', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+      'fear': ['anxiety', 'anxious', 'nervous', 'worried', 'panic', 'can\'t sit still', 'racing thoughts', 'what if', 'churning stomach', 'sweaty palms', 'heart racing', 'overthinking', 'spiraling', 'restless', 'jittery', 'on edge', 'butterflies'],
+
+      // Sadness cluster - keeping original emotions, adding physical/behavioral descriptions
+      'sadness': ['sad', 'down', 'depressed', 'blue', 'melancholy', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+      'sad': ['sadness', 'down', 'depressed', 'blue', 'melancholy', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+      'down': ['sadness', 'sad', 'depressed', 'blue', 'melancholy', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+      'depressed': ['sadness', 'sad', 'down', 'blue', 'melancholy', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+      'blue': ['sadness', 'sad', 'down', 'depressed', 'melancholy', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+      'melancholy': ['sadness', 'sad', 'down', 'depressed', 'blue', 'heavy', 'tired', 'no energy', 'don\'t want to get up', 'everything feels hard', 'crying', 'tears', 'low', 'drained', 'weighed down', 'dark cloud', 'can\'t enjoy anything'],
+
+      // Anger cluster - keeping original emotions, adding physical sensations and expressions
+      'anger': ['angry', 'mad', 'furious', 'rage', 'irritated', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+      'angry': ['anger', 'mad', 'furious', 'rage', 'irritated', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+      'mad': ['anger', 'angry', 'furious', 'rage', 'irritated', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+      'furious': ['anger', 'angry', 'mad', 'rage', 'irritated', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+      'rage': ['anger', 'angry', 'mad', 'furious', 'irritated', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+      'irritated': ['anger', 'angry', 'mad', 'furious', 'rage', 'hot', 'boiling', 'seeing red', 'clenched jaw', 'tight fists', 'want to scream', 'want to hit something', 'burning up', 'face feels hot', 'gritting teeth'],
+
+      // Stress cluster - keeping original emotions, adding overwhelm descriptions
+      'stress': ['stressed', 'overwhelmed', 'pressure', 'tension', 'too much', 'can\'t handle this', 'everything at once', 'tight chest', 'shallow breathing', 'headache', 'shoulders tense', 'brain fog', 'scattered'],
+      'stressed': ['stress', 'overwhelmed', 'pressure', 'tension', 'too much', 'can\'t handle this', 'everything at once', 'tight chest', 'shallow breathing', 'headache', 'shoulders tense', 'brain fog', 'scattered'],
+      'overwhelmed': ['stress', 'stressed', 'pressure', 'tension', 'too much', 'can\'t handle this', 'everything at once', 'tight chest', 'shallow breathing', 'headache', 'shoulders tense', 'brain fog', 'scattered'],
+      'pressure': ['stress', 'stressed', 'overwhelmed', 'tension', 'too much', 'can\'t handle this', 'everything at once', 'tight chest', 'shallow breathing', 'headache', 'shoulders tense', 'brain fog', 'scattered'],
+      'tension': ['stress', 'stressed', 'overwhelmed', 'pressure', 'too much', 'can\'t handle this', 'everything at once', 'tight chest', 'shallow breathing', 'headache', 'shoulders tense', 'brain fog', 'scattered'],
+
+      // Frustration cluster - keeping original emotions, adding behavioral descriptions
+      'frustration': ['frustrated', 'annoyed', 'irritated', 'why won\'t this work', 'nothing is going right', 'want to give up', 'banging head against wall', 'this is stupid', 'grr', 'ugh'],
+      'frustrated': ['frustration', 'annoyed', 'irritated', 'why won\'t this work', 'nothing is going right', 'want to give up', 'banging head against wall', 'this is stupid', 'grr', 'ugh'],
+      'annoyed': ['frustration', 'frustrated', 'irritated', 'why won\'t this work', 'nothing is going right', 'want to give up', 'banging head against wall', 'this is stupid', 'grr', 'ugh'],
+
+      // Guilt cluster - keeping original emotions, adding self-critical thoughts
+      'guilt': ['guilty', 'shame', 'regret', 'shouldn\'t have', 'I\'m terrible', 'I messed up', 'feel bad about', 'wish I hadn\'t', 'I\'m the worst', 'everyone hates me', 'I ruined everything'],
+      'guilty': ['guilt', 'shame', 'regret', 'shouldn\'t have', 'I\'m terrible', 'I messed up', 'feel bad about', 'wish I hadn\'t', 'I\'m the worst', 'everyone hates me', 'I ruined everything'],
+      'shame': ['guilt', 'guilty', 'regret', 'shouldn\'t have', 'I\'m terrible', 'I messed up', 'feel bad about', 'wish I hadn\'t', 'I\'m the worst', 'everyone hates me', 'I ruined everything'],
+      'regret': ['guilt', 'guilty', 'shame', 'shouldn\'t have', 'I\'m terrible', 'I messed up', 'feel bad about', 'wish I hadn\'t', 'I\'m the worst', 'everyone hates me', 'I ruined everything'],
+
+      // Loneliness cluster - keeping original emotions, adding social isolation descriptions
+      'loneliness': ['lonely', 'isolated', 'alone', 'no one understands', 'no one cares', 'by myself', 'left out', 'nobody called', 'sitting alone', 'no friends', 'everyone else has plans'],
+      'lonely': ['loneliness', 'isolated', 'alone', 'no one understands', 'no one cares', 'by myself', 'left out', 'nobody called', 'sitting alone', 'no friends', 'everyone else has plans'],
+      'isolated': ['loneliness', 'lonely', 'alone', 'no one understands', 'no one cares', 'by myself', 'left out', 'nobody called', 'sitting alone', 'no friends', 'everyone else has plans'],
+      'alone': ['loneliness', 'lonely', 'isolated', 'no one understands', 'no one cares', 'by myself', 'left out', 'nobody called', 'sitting alone', 'no friends', 'everyone else has plans'],
+
+      // Numbness cluster - keeping original emotions, adding disconnection descriptions
+      'numbness': ['numb', 'empty', 'disconnected', 'void', 'nothing matters', 'don\'t feel anything', 'going through motions', 'like a robot', 'autopilot', 'hollow inside', 'can\'t cry'],
+      'numb': ['numbness', 'empty', 'disconnected', 'void', 'nothing matters', 'don\'t feel anything', 'going through motions', 'like a robot', 'autopilot', 'hollow inside', 'can\'t cry'],
+      'empty': ['numbness', 'numb', 'disconnected', 'void', 'nothing matters', 'don\'t feel anything', 'going through motions', 'like a robot', 'autopilot', 'hollow inside', 'can\'t cry'],
+      'disconnected': ['numbness', 'numb', 'empty', 'void', 'nothing matters', 'don\'t feel anything', 'going through motions', 'like a robot', 'autopilot', 'hollow inside', 'can\'t cry'],
+      'void': ['numbness', 'numb', 'empty', 'disconnected', 'nothing matters', 'don\'t feel anything', 'going through motions', 'like a robot', 'autopilot', 'hollow inside', 'can\'t cry'],
+
+      // Happiness cluster - keeping original emotions, adding positive expressions
+      'happy': ['happiness', 'joy', 'excited', 'elated', 'good day', 'smiling', 'laughing', 'things went well', 'feeling good', 'bright', 'light', 'bouncy'],
+      'happiness': ['happy', 'joy', 'excited', 'elated', 'good day', 'smiling', 'laughing', 'things went well', 'feeling good', 'bright', 'light', 'bouncy'],
+      'joy': ['happy', 'happiness', 'excited', 'elated', 'good day', 'smiling', 'laughing', 'things went well', 'feeling good', 'bright', 'light', 'bouncy'],
+      'excited': ['happy', 'happiness', 'joy', 'elated', 'good day', 'smiling', 'laughing', 'things went well', 'feeling good', 'bright', 'light', 'bouncy'],
+      'elated': ['happy', 'happiness', 'joy', 'excited', 'good day', 'smiling', 'laughing', 'things went well', 'feeling good', 'bright', 'light', 'bouncy'],
+
+      // Calm cluster - keeping original emotions, adding peaceful descriptions
+      'calm': ['peaceful', 'serene', 'tranquil', 'relaxed', 'breathing easy', 'shoulders dropped', 'quiet mind', 'still', 'centered', 'at ease', 'soft'],
+      'peaceful': ['calm', 'serene', 'tranquil', 'relaxed', 'breathing easy', 'shoulders dropped', 'quiet mind', 'still', 'centered', 'at ease', 'soft'],
+      'serene': ['calm', 'peaceful', 'tranquil', 'relaxed', 'breathing easy', 'shoulders dropped', 'quiet mind', 'still', 'centered', 'at ease', 'soft'],
+      'tranquil': ['calm', 'peaceful', 'serene', 'relaxed', 'breathing easy', 'shoulders dropped', 'quiet mind', 'still', 'centered', 'at ease', 'soft'],
+      'relaxed': ['calm', 'peaceful', 'serene', 'tranquil', 'breathing easy', 'shoulders dropped', 'quiet mind', 'still', 'centered', 'at ease', 'soft']
     };
     
     // Try exact match first (normalized)

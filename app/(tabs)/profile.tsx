@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Linking, SafeAreaView } from 'react-native';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, CreditCard as Edit3, X, Plus, Trash2, Download, Brain, Zap, PenTool } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
 import { useEntries } from '@/contexts/EntriesContext';
@@ -8,10 +8,11 @@ import { useTheme } from '@/contexts/ThemeContext';
 import CrisisHelpModal from '@/components/CrisisHelpModal';
 import ActivityManagementModal from '@/components/ActivityManagementModal';
 import OpenMojiIcon from '@/components/OpenMojiIcon';
+import { router } from 'expo-router';
 
 export default function ProfileTab() {
   const { entries } = useEntries();
-  const { userProfile, updateUserName, updateAIPreference } = useOnboarding();
+  const { userProfile, updateUserName, updateAIPreference, resetOnboarding } = useOnboarding();
   const { colors } = useTheme();
   
   // Modal states
@@ -89,6 +90,29 @@ export default function ProfileTab() {
 
   // Get latest entry for activity display
   const latestEntry = entries.length > 0 ? entries[0] : null;
+
+  // Secret triple-tap state for dev onboarding reset
+  const [tapCount, setTapCount] = useState(0);
+  const tapTimeoutRef = useRef<any>(null);
+
+  const handleFooterTap = async () => {
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+    setTapCount(prev => {
+      const next = prev + 1;
+      if (next === 3) {
+        setTapCount(0);
+        setTimeout(async () => {
+          await resetOnboarding();
+          router.replace('/onboarding/welcome');
+        }, 150); // slight delay for UX
+      } else {
+        tapTimeoutRef.current = setTimeout(() => setTapCount(0), 1000);
+      }
+      return next === 3 ? 0 : next;
+    });
+  };
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -459,7 +483,9 @@ export default function ProfileTab() {
 
         {/* Footer */}
         <View style={dynamicStyles.footer}>
-          <Text style={dynamicStyles.footerText}>Reflect v1.0.0</Text>
+          <TouchableOpacity activeOpacity={1} onPress={handleFooterTap}>
+            <Text style={dynamicStyles.footerText}>Reflect v1.0.0</Text>
+          </TouchableOpacity>
           <Text style={dynamicStyles.footerSubtext}>Made with care for your wellbeing</Text>
         </View>
       </ScrollView>
