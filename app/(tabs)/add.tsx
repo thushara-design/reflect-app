@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
-import { PenTool, CirclePlus as PlusCircleIcon, Plus as PlusIcon } from 'lucide-react-native';
+import { PenTool, Plus as PlusIcon } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
 import OpenMojiIcon from '@/components/OpenMojiIcon';
 
