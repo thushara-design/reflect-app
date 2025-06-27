@@ -240,6 +240,12 @@ export default function ReflectionResultsPage() {
           <Text style={dynamicStyles.activityDescription}>{aiSuggestion.description}</Text>
         </TouchableOpacity>
       </ScrollView>
+      {/* Disclaimer at the bottom */}
+      <View style={{ padding: 24, paddingTop: 0 }}>
+        <Text style={{ fontSize: 13, color: colors.textSecondary, textAlign: 'center' }}>
+          Emotion detection isn't always perfect. What you feel is valid, even if the system misses it.
+        </Text>
+      </View>
     </View>
   );
 }

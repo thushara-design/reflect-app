@@ -14,16 +14,16 @@ export class ReframingService {
     }
 
     try {
-      const reframingPrompt = `As a cognitive behavioral therapist, help reframe this unhelpful thought:
+      const reframingPrompt = `As a cognitive behavioral therapist, help gently reframe this unhelpful thought:
 
 ORIGINAL THOUGHT: "${originalThought}"
 DISTORTION TYPE: ${distortionType}
 USER CONTEXT: "${userContext}"
 
-Provide a more balanced, realistic reframe that:
-1. Acknowledges the person's feelings
-2. Challenges the distortion with evidence
-3. Offers a more balanced perspective
+Provide a gentle, compassionate, and supportive reframe that:
+1. Acknowledges the person's feelings with empathy
+2. When challenging the distortion or presenting evidence, do so by asking gentle questions (e.g., "Is it possible that...?", "Could there be another way to see this?")
+3. Offers a more balanced, realistic perspective
 4. Is written in first person ("I" statements)
 
 Respond with ONLY the reframed thought, no additional text:`;
@@ -34,7 +34,7 @@ Respond with ONLY the reframed thought, no additional text:`;
           messages: [
             { 
               role: 'system', 
-              content: 'You are a cognitive behavioral therapist helping someone reframe unhelpful thoughts. Respond with only the reframed thought, nothing else.' 
+              content: 'You are a cognitive behavioral therapist helping someone reframe unhelpful thoughts gently. Respond with only the reframed thought, nothing else.' 
             },
             { 
               role: 'user', 
@@ -69,29 +69,29 @@ Respond with ONLY the reframed thought, no additional text:`;
   private generateFallbackReframe(originalThought: string, distortionType: string): string {
     const reframingTemplates: Record<string, string[]> = {
       'Catastrophizing': [
-        'While this situation is challenging, I can handle it step by step. Most outcomes aren\'t as extreme as I initially fear.',
-        'I\'ve faced difficult situations before and found ways through them. This situation likely has multiple possible outcomes.',
-        'Instead of focusing on the worst case, I can prepare for realistic scenarios and trust in my ability to cope.'
+        'This feels overwhelming right now, but is it possible that things might not turn out as badly as I fear?',
+        'I know I am worried, but could there be more than one possible outcome here?',
+        'Is it possible that I have handled difficult situations before, and I might be able to handle this too, one step at a time?'
       ],
       'All-or-Nothing Thinking': [
-        'This situation isn\'t completely good or bad - there are aspects I can acknowledge and learn from.',
-        'Progress happens gradually. Even partial success is still meaningful progress toward my goals.',
-        'I can recognize the gray areas in this situation rather than seeing it as completely one way or another.'
+        'I feel like this is all or nothing, but could there be some gray areas I am not seeing?',
+        'Is it possible that even small steps forward are still progress?',
+        'Could there be aspects of this situation that are both challenging and positive?'
       ],
       'Mind Reading': [
-        'I don\'t actually know what others are thinking. There could be many explanations for their behavior that have nothing to do with me.',
-        'People are usually focused on their own concerns. I can\'t read minds, so I\'ll focus on what I actually know.',
-        'Instead of assuming what others think, I can communicate directly or focus on my own actions and responses.'
+        'I feel like I know what others are thinking, but is it possible I don\'t have all the information?',
+        'Could there be other explanations for their behavior that have nothing to do with me?',
+        'Is it possible that I am focusing on what I imagine, rather than what I actually know?'
       ],
       'Fortune Telling': [
-        'I cannot predict the future with certainty. I can prepare for different outcomes while staying open to possibilities.',
-        'While I feel uncertain about what will happen, I can focus on what I can control right now.',
-        'My predictions about the future are just thoughts, not facts. I can take positive action despite uncertainty.'
+        'I am worried about what might happen, but is it possible that I can\'t predict the future with certainty?',
+        'Could things turn out differently than I expect?',
+        'Is it possible that I can focus on what I can control right now, even if I feel uncertain?'
       ],
       'Emotional Reasoning': [
-        'Just because I feel this way doesn\'t mean it\'s completely true. My emotions are valid, but they don\'t define reality.',
-        'I can acknowledge my feelings while also looking at the facts of the situation objectively.',
-        'My emotions are giving me information, but I can also consider evidence that might contradict how I\'m feeling.'
+        'I feel strongly about this, but could my feelings be just one part of the picture?',
+        'Is it possible that my emotions are valid, but they might not tell the whole story?',
+        'Could there be evidence that gently challenges how I\'m feeling right now?'
       ]
     };
 

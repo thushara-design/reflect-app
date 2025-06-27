@@ -548,7 +548,7 @@ export default function AIAnalysisCards({
 
                     {/* Grounding Facts */}
                     <View style={dynamicStyles.factsSection}>
-                      <Text style={dynamicStyles.factsTitle}>Let's check some facts:</Text>
+                      <Text style={dynamicStyles.factsTitle}>A different perspective</Text>
                       {distortion.evidence.slice(0, 3).map((fact, factIndex) => (
                         <Text key={factIndex} style={dynamicStyles.factItem}>
                           • {fact}
