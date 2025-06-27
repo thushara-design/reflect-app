@@ -94,7 +94,7 @@ export default function EntriesTab() {
       <View style={styles.entryHeader}>
         <Text style={[styles.entryDate, { color: colors.textSecondary }]}>{entry.date}</Text>
       </View>
-      <Text style={{ fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>
+      <Text style={{ fontSize: 15, color: colors.text, fontWeight: '400', lineHeight: 22 }}>
         {entry.preview}
       </Text>
     </TouchableOpacity>
