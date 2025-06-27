@@ -47,14 +47,14 @@ export default function AIPreferenceScreen() {
     title: {
       fontSize: 32,
       fontWeight: '300',
-      color: '#181818',
+      color: colors.primary,
       textAlign: 'left',
       marginBottom: 16,
       letterSpacing: -0.5,
       fontFamily: 'Nunito-Bold',
     },
     subtitle: {
-      fontSize: 16,
+      fontSize: 18,
       color: colors.textSecondary,
       textAlign: 'left',
       marginBottom: 60,
@@ -62,16 +62,16 @@ export default function AIPreferenceScreen() {
       fontFamily: 'Nunito-Regular',
     },
     aiCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.background,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 20,
+      borderRadius: 12,
       padding: 24,
       marginBottom: 32,
     },
     aiCardActive: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primary + '10',
+      borderColor: colors.border,
+      backgroundColor: colors.surface,
     },
     aiHeader: {
       flexDirection: 'row',
@@ -158,18 +158,9 @@ export default function AIPreferenceScreen() {
   });
 
   const aiFeatures = [
-    {
-      icon: Brain,
-      text: 'Emotion detection and analysis from your writing'
-    },
-    {
-      icon: Sparkles,
-      text: 'Identify unhelpful thinking patterns and suggest reframes'
-    },
-    {
-      icon: Activity,
-      text: 'Personalized activity suggestions based on your mood'
-    }
+    { text: 'Emotion detection and analysis from your writing' },
+    { text: 'Identify unhelpful thinking patterns and suggest reframes' },
+    { text: 'Personalized activity suggestions based on your mood' }
   ];
 
   // Only render after userProfile/isLoading are ready
@@ -212,7 +203,7 @@ export default function AIPreferenceScreen() {
               <View style={dynamicStyles.aiIcon}>
                 <Brain size={24} color={colors.primary} strokeWidth={1.5} />
               </View>
-              <Text style={dynamicStyles.aiTitle}>AI Analysis</Text>
+              <Text style={dynamicStyles.aiTitle}>AI Reflection</Text>
             </View>
             <Switch
               value={useAI}
@@ -224,12 +215,9 @@ export default function AIPreferenceScreen() {
 
           {useAI && (
             <View style={dynamicStyles.featuresList}>
-              {aiFeatures.map((feature, index) => (
-                <View key={index} style={dynamicStyles.featureItem}>
-                  <View style={dynamicStyles.featureIcon}>
-                    <feature.icon size={16} color={colors.primary} strokeWidth={1.5} />
-                  </View>
-                  <Text style={dynamicStyles.featureText}>{feature.text}</Text>
+              {aiFeatures.map((feature, idx) => (
+                <View key={idx} style={dynamicStyles.featureItem}>
+                  <Text style={dynamicStyles.featureText}>{'• '}{feature.text}</Text>
                 </View>
               ))}
             </View>
@@ -249,8 +237,7 @@ export default function AIPreferenceScreen() {
         )}
 
         <TouchableOpacity style={dynamicStyles.nextButton} onPress={handleNext}>
-          <Text style={dynamicStyles.nextButtonText}>Continue</Text>
-          <ArrowRight size={20} color={colors.background} strokeWidth={1.5} />
+          <Text style={dynamicStyles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

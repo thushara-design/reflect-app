@@ -5,6 +5,7 @@ import { Search } from 'lucide-react-native';
 import ReflectHeader from '@/components/ReflectHeader';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function EntriesTab() {
   const [searchText, setSearchText] = useState('');
@@ -12,6 +13,7 @@ export default function EntriesTab() {
   const { entries } = useEntries();
   const { userProfile, resetOnboarding, isLoading } = useOnboarding();
   const [resetting, setResetting] = useState(false);
+  const { colors } = useTheme();
 
   useEffect(() => {
     const onChange = (result: { window: any }) => {
@@ -82,32 +84,34 @@ export default function EntriesTab() {
         styles.entryCard, 
         { 
           width: cardWidth,
-          marginBottom: 12
+          marginBottom: 12,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
         }
       ]}
       onPress={() => handleEntryPress(entry)}
     >
       <View style={styles.entryHeader}>
-        <Text style={styles.entryDate}>{entry.date}</Text>
+        <Text style={[styles.entryDate, { color: colors.textSecondary }]}>{entry.date}</Text>
       </View>
-      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}>
+      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>
         {entry.preview}
       </Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ReflectHeader title="Entries" />
 
       <View style={styles.content}>
         <View style={styles.searchSection}>
-          <View style={styles.searchContainer}>
-            <Search size={18} color="#A5B8C8" strokeWidth={1.5} />
+          <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Search size={18} color={colors.textSecondary} strokeWidth={1.5} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: colors.text }]}
               placeholder="Search entries..."
-              placeholderTextColor="#A5B8C8"
+              placeholderTextColor={colors.textSecondary}
               value={searchText}
               onChangeText={setSearchText}
             />
@@ -121,10 +125,10 @@ export default function EntriesTab() {
         >
           {filteredEntries.length === 0 ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>
+              <Text style={[styles.emptyText, { color: colors.text }]}>
                 {searchText ? 'No entries found' : 'No entries yet'}
               </Text>
-              <Text style={styles.emptySubtext}>
+              <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
                 {searchText ? 'Try a different search term' : 'Start your reflection journey by creating your first entry'}
               </Text>
             </View>
@@ -140,31 +144,6 @@ export default function EntriesTab() {
             </View>
           )}
         </ScrollView>
-        {/* DEV ONLY: Reset Onboarding Button */}
-        {!isLoading && userProfile?.hasCompletedOnboarding && (
-          <TouchableOpacity
-            style={{
-              margin: 16,
-              padding: 14,
-              backgroundColor: '#FF6B6B',
-              borderRadius: 10,
-              alignItems: 'center',
-              opacity: resetting ? 0.5 : 1,
-            }}
-            onPress={async () => {
-              setResetting(true);
-              await resetOnboarding();
-              setResetting(false);
-              // Reload app to show onboarding
-              router.replace('/onboarding/welcome');
-            }}
-            disabled={resetting}
-          >
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-              Reset Onboarding (Dev)
-            </Text>
-          </TouchableOpacity>
-        )}
       </View>
     </View>
   );
@@ -173,7 +152,6 @@ export default function EntriesTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
   },
   content: {
     flex: 1,
@@ -185,9 +163,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
     borderWidth: 1,
-    borderColor: '#EAEAEA',
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -196,7 +172,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#181818',
     fontWeight: '300',
     fontFamily: 'Nunito-Regular',
   },
@@ -216,32 +191,20 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   entryCard: {
-    backgroundColor: '#FAFAFA',
     borderRadius: 16,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#CCD7E0',
-    shadowColor: '#FFFFFF',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
   },
   entryHeader: {
     marginBottom: 12,
   },
   entryDate: {
     fontSize: 11,
-    color: '#A5B8C8',
     fontWeight: '400',
     letterSpacing: 0.2,
   },
   entryPreview: {
     fontSize: 13,
-    color: '#181818',
     lineHeight: 18,
     fontWeight: '300',
     fontFamily: 'Nunito-Regular',
@@ -254,14 +217,12 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: '#181818',
     fontWeight: '300',
     marginBottom: 8,
     fontFamily: 'Nunito-Regular',
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#EAEAEA',
     fontWeight: '300',
     textAlign: 'center',
     fontFamily: 'Nunito-Regular',

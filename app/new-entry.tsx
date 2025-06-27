@@ -290,7 +290,7 @@ export default function NewEntryPage() {
     headerTitle: {
       fontSize: 18,
       fontWeight: '400',
-      color: '#181818',
+      color: colors.text,
       letterSpacing: -0.3,
       flex: 1,
       textAlign: 'center',
@@ -307,7 +307,7 @@ export default function NewEntryPage() {
     titleInput: {
       fontSize: 24,
       fontWeight: '600',
-      color: '#181818',
+      color: colors.text,
       lineHeight: 32,
       minHeight: 40,
       marginTop: 16,
@@ -316,7 +316,7 @@ export default function NewEntryPage() {
     },
     contentInput: {
       fontSize: 16,
-      color: '#181818',
+      color: colors.text,
       lineHeight: 24,
       fontWeight: '300',
       minHeight: 200,
@@ -335,13 +335,13 @@ export default function NewEntryPage() {
     userTextTitle: {
       fontSize: 16,
       fontWeight: '500',
-      color: '#181818',
+      color: colors.text,
       marginBottom: 12,
       fontFamily: 'Nunito-Bold',
     },
     userText: {
       fontSize: 14,
-      color: '#181818',
+      color: colors.text,
       lineHeight: 20,
       fontFamily: 'Nunito-Regular',
     },
@@ -374,7 +374,7 @@ export default function NewEntryPage() {
       <View style={dynamicStyles.container}>
         <View style={dynamicStyles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleCloseAnalysisCards}>
-            <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
+            <ArrowLeft size={24} color={colors.primary} strokeWidth={1.5} />
           </TouchableOpacity>
           
           <Text style={dynamicStyles.headerTitle}>
@@ -385,13 +385,13 @@ export default function NewEntryPage() {
             <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '500' }}>Save</Text>
           </TouchableOpacity>
         </View>
-
+        <View style={{ height: 16 }} />
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.content}>
             {/* User's Text Display */}
-            <View style={dynamicStyles.userTextSection}>
-              <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 8 }}>{'Your Entry'}</Text>
-              <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}>{content}</Text>
+            <View style={[dynamicStyles.userTextSection, { marginTop: 16 }]}>
+              <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}>{'Your Entry'}</Text>
+              <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>{content}</Text>
             </View>
 
             {/* Analysis Cards */}
@@ -416,7 +416,7 @@ export default function NewEntryPage() {
       <View style={dynamicStyles.container}>
         <View style={dynamicStyles.header}>
           <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-            <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
+            <ArrowLeft size={24} color={colors.primary} strokeWidth={1.5} />
           </TouchableOpacity>
           
           <Text style={dynamicStyles.headerTitle}>
@@ -425,7 +425,7 @@ export default function NewEntryPage() {
           
           <EntryActions
             onSavePress={handleSave}
-            onAIAnalysis={handleAIAnalysis} // Always show the sparkle button
+            onAIAnalysis={handleAIAnalysis}
             showContextMenu={showContextMenu}
             onEditPress={handleEdit}
             onDeletePress={handleDelete}
@@ -433,13 +433,14 @@ export default function NewEntryPage() {
             onRecordingChange={setIsRecording}
             onVoiceTranscript={handleVoiceTranscript}
             onVoiceError={handleVoiceError}
+            iconColor={colors.primary}
           />
         </View>
-
+        <View style={{ height: 16 }} />
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.content}>
             <TextInput
-              style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700', marginBottom: 8 }}
+              style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}
               placeholder="Title here"
               placeholderTextColor={colors.textSecondary}
               value={title}
@@ -448,7 +449,7 @@ export default function NewEntryPage() {
             />
 
             <TextInput
-              style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600', lineHeight: 22 }}
+              style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}
               placeholder="Start writing..."
               placeholderTextColor={colors.textSecondary}
               value={content}

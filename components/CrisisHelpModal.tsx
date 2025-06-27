@@ -106,17 +106,17 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
       paddingHorizontal: 24,
     },
     urgentSection: {
-      backgroundColor: '#FF6B6B10',
+      backgroundColor: colors.background,
       borderWidth: 1,
-      borderColor: '#FF6B6B',
-      borderRadius: 16,
-      padding: 20,
-      marginVertical: 20,
+      borderColor: colors.border,
+      borderRadius: 20,
+      padding: 24,
+      marginVertical: 24,
     },
     urgentTitle: {
       fontSize: 18,
       fontWeight: '500',
-      color: '#FF6B6B',
+      color: colors.error,
       marginBottom: 8,
       textAlign: 'center',
     },
@@ -131,13 +131,13 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
+      borderRadius: 16,
+      padding: 20,
+      marginBottom: 16,
     },
     urgentCard: {
-      borderColor: '#FF6B6B',
-      backgroundColor: '#FF6B6B05',
+      borderColor: colors.error,
+      backgroundColor: colors.background,
     },
     resourceHeader: {
       flexDirection: 'row',
@@ -151,17 +151,6 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
       color: colors.text,
       flex: 1,
     },
-    urgentBadge: {
-      backgroundColor: '#FF6B6B',
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 12,
-    },
-    urgentBadgeText: {
-      fontSize: 10,
-      color: 'white',
-      fontWeight: '500',
-    },
     resourceDescription: {
       fontSize: 14,
       color: colors.textSecondary,
@@ -171,21 +160,27 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
     actionButtons: {
       flexDirection: 'row',
       gap: 12,
+      marginTop: 8,
     },
     actionButton: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 12,
-      borderRadius: 8,
+      paddingVertical: 14,
+      borderRadius: 10,
       gap: 8,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.06,
+      shadowRadius: 2,
+      elevation: 1,
     },
     callButton: {
       backgroundColor: colors.primary,
     },
     textButton: {
-      backgroundColor: colors.accent,
+      backgroundColor: colors.accentSecondary,
     },
     actionButtonText: {
       fontSize: 14,
@@ -193,9 +188,11 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
     },
     callButtonText: {
       color: colors.background,
+      fontWeight: '600',
     },
     textButtonText: {
       color: colors.text,
+      fontWeight: '600',
     },
     sectionTitle: {
       fontSize: 18,
@@ -205,11 +202,13 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
       marginTop: 8,
     },
     disclaimer: {
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 16,
-      marginTop: 20,
-      marginBottom: 20,
+      backgroundColor: colors.accentSecondary,
+      borderRadius: 16,
+      padding: 20,
+      marginTop: 24,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: colors.accentSecondary,
     },
     disclaimerTitle: {
       fontSize: 14,
@@ -253,9 +252,7 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
               <View key={resource.id} style={[dynamicStyles.resourceCard, dynamicStyles.urgentCard]}>
                 <View style={dynamicStyles.resourceHeader}>
                   <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700' }}>{resource.name}</Text>
-                  <View style={dynamicStyles.urgentBadge}>
-                    <Text style={dynamicStyles.urgentBadgeText}>URGENT</Text>
-                  </View>
+
                 </View>
                 <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{resource.description}</Text>
                 <View style={dynamicStyles.actionButtons}>

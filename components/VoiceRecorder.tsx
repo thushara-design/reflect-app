@@ -9,13 +9,15 @@ interface VoiceRecorderProps {
   onError: (error: string) => void;
   isRecording: boolean;
   onRecordingChange: (recording: boolean) => void;
+  iconColor?: string;
 }
 
 export default function VoiceRecorder({ 
   onTranscript, 
   onError, 
   isRecording, 
-  onRecordingChange 
+  onRecordingChange,
+  iconColor
 }: VoiceRecorderProps) {
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -101,9 +103,9 @@ export default function VoiceRecorder({
 
   const getButtonIcon = () => {
     if (isRecording) {
-      return <Square size={16} color="#FAFAFA" strokeWidth={1.5} />;
+      return <Square size={16} color={iconColor || "#FAFAFA"} strokeWidth={1.5} />;
     }
-    return <Mic size={20} color={speechService.isSupported() ? '#A5B8C8' : '#EAEAEA'} strokeWidth={1.5} />;
+    return <Mic size={20} color={speechService.isSupported() ? (iconColor || '#A5B8C8') : '#EAEAEA'} strokeWidth={1.5} />;
   };
 
   return (

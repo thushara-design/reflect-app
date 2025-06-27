@@ -1,13 +1,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal, TextInput, Switch, Alert, Linking } from 'react-native';
 import { useState } from 'react';
-import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, CreditCard as Edit3, X, Plus, Trash2, Download, Brain, Zap } from 'lucide-react-native';
+import { Calendar, TrendingUp, Heart, Bell, ChartBar as BarChart3, Phone, Settings, CreditCard as Edit3, X, Plus, Trash2, Download, Brain, Zap, PenTool } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import EmotionChart from '@/components/EmotionChart';
 import CrisisHelpModal from '@/components/CrisisHelpModal';
 import ActivityManagementModal from '@/components/ActivityManagementModal';
+import SvgUri from 'react-native-svg-uri-reborn';
 
 export default function ProfileTab() {
   const { entries } = useEntries();
@@ -172,7 +172,7 @@ export default function ProfileTab() {
       borderColor: colors.border,
       borderRadius: 12,
       padding: 16,
-      alignItems: 'center',
+      alignItems: 'flex-start',
       position: 'relative',
     },
     statValue: {
@@ -389,25 +389,23 @@ export default function ProfileTab() {
         {/* Profile Header */}
         <View style={dynamicStyles.header}>
           <View style={dynamicStyles.avatarContainer}>
-            <View style={dynamicStyles.avatar}>
-              <Text style={dynamicStyles.avatarText}>
-                {userProfile?.name?.charAt(0)?.toUpperCase() || 'R'}
-              </Text>
+            <View style={[dynamicStyles.avatar, { backgroundColor: colors.accent }]}> 
+              <SvgUri width="48" height="48" source={{ uri: 'https://openmoji.org/data/black/svg/1F344.svg' }} />
             </View>
-            <TouchableOpacity 
-              style={dynamicStyles.editNameButton}
-              onPress={() => setShowEditName(true)}
-            >
-              <Edit3 size={16} color={colors.textSecondary} strokeWidth={1.5} />
-            </TouchableOpacity>
           </View>
-          
           <View style={dynamicStyles.welcomeContainer}>
             <Text style={dynamicStyles.welcomeText}>
-              {userProfile?.name ? `Hi, ${userProfile.name}` : 'Welcome back'}
+              {userProfile?.name ? `${userProfile.name}` : 'Welcome back'}
             </Text>
+            {userProfile?.name && (
+              <TouchableOpacity 
+                style={{ marginLeft: 8 }}
+                onPress={() => setShowEditName(true)}
+              >
+                <PenTool size={16} color={colors.textSecondary} strokeWidth={1.5} />
+              </TouchableOpacity>
+            )}
           </View>
-          <Text style={dynamicStyles.subtitle}>Your reflection journey</Text>
         </View>
 
         {/* Stats */}
@@ -418,7 +416,6 @@ export default function ProfileTab() {
               <View key={index} style={dynamicStyles.statCard}>
                 <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.value}</Text>
                 <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{stat.label}</Text>
-                <View style={[dynamicStyles.statIndicator, { backgroundColor: stat.color }]} />
               </View>
             ))}
           </View>
@@ -428,21 +425,10 @@ export default function ProfileTab() {
         <View style={dynamicStyles.featuresSection}>
           <Text style={dynamicStyles.sectionTitle}>Features</Text>
           
-          <TouchableOpacity style={dynamicStyles.featureItem} onPress={() => setShowCrisisHelp(true)}>
-            <View style={dynamicStyles.featureLeft}>
-              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.accent }]}>
-                <Phone size={20} color={colors.text} strokeWidth={1.5} />
-              </View>
-              <View style={dynamicStyles.featureContent}>
-                <Text style={dynamicStyles.featureTitle}>Crisis Help</Text>
-                <Text style={dynamicStyles.featureDescription}>24/7 support resources when you need them most</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-
+          {/* Suggested Activities */}
           <TouchableOpacity style={dynamicStyles.featureItem} onPress={() => setShowActivityManagement(true)}>
             <View style={dynamicStyles.featureLeft}>
-              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.primary + '15' }]}>
+              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.primary + '15' }]}> 
                 <Heart size={20} color={colors.primary} strokeWidth={1.5} />
               </View>
               <View style={dynamicStyles.featureContent}>
@@ -451,50 +437,38 @@ export default function ProfileTab() {
               </View>
             </View>
           </TouchableOpacity>
-        </View>
 
-        {/* Preferences */}
-        <View style={dynamicStyles.menuSection}>
-          <Text style={dynamicStyles.sectionTitle}>Preferences</Text>
-          
-          <View style={dynamicStyles.menuItem}>
-            <View style={dynamicStyles.menuLeft}>
-              <View style={dynamicStyles.menuIcon}>
-                <Bell size={18} color={colors.textSecondary} strokeWidth={1.5} />
+          {/* Use AI */}
+          <View style={dynamicStyles.featureItem}>
+            <View style={dynamicStyles.featureLeft}>
+              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.accent }]}> 
+                <Brain size={20} color={colors.primary} strokeWidth={1.5} />
               </View>
-              <Text style={dynamicStyles.menuTitle}>Notifications</Text>
+              <View style={dynamicStyles.featureContent}>
+                <Text style={dynamicStyles.featureTitle}>Use AI</Text>
+                <Text style={dynamicStyles.featureDescription}>Enable AI-powered insights and suggestions</Text>
+              </View>
+              <Switch
+                value={useAI}
+                onValueChange={handleAIToggle}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={colors.background}
+              />
             </View>
-            <Switch
-              value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
-            />
           </View>
 
-          <TouchableOpacity style={dynamicStyles.menuItem} onPress={handleExportData}>
-            <View style={dynamicStyles.menuLeft}>
-              <View style={dynamicStyles.menuIcon}>
-                <Download size={18} color={colors.textSecondary} strokeWidth={1.5} />
+          {/* Crisis Help */}
+          <TouchableOpacity style={dynamicStyles.featureItem} onPress={() => setShowCrisisHelp(true)}>
+            <View style={dynamicStyles.featureLeft}>
+              <View style={[dynamicStyles.featureIcon, { backgroundColor: colors.accentSecondary }]}> 
+                <Phone size={20} color={colors.text} strokeWidth={1.5} />
               </View>
-              <Text style={dynamicStyles.menuTitle}>Export Data</Text>
+              <View style={dynamicStyles.featureContent}>
+                <Text style={dynamicStyles.featureTitle}>Crisis Help</Text>
+                <Text style={dynamicStyles.featureDescription}>24/7 support resources when you need them most</Text>
+              </View>
             </View>
           </TouchableOpacity>
-
-          <View style={dynamicStyles.menuItem}>
-            <View style={dynamicStyles.menuLeft}>
-              <View style={dynamicStyles.menuIcon}>
-                <Brain size={18} color={colors.textSecondary} strokeWidth={1.5} />
-              </View>
-              <Text style={dynamicStyles.menuTitle}>Use AI</Text>
-            </View>
-            <Switch
-              value={useAI}
-              onValueChange={handleAIToggle}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
-            />
-          </View>
         </View>
 
         {/* Footer */}

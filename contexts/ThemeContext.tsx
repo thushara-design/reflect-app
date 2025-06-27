@@ -9,6 +9,7 @@ export interface ThemeColors {
   border: string;
   primary: string;
   accent: string;
+  accentSecondary: string;
   error: string;
 }
 
@@ -22,10 +23,11 @@ const lightColors: ThemeColors = {
   background: '#FDFDFD',        // Softer than pure white, reduces glare
   surface: '#FFFFFF',           // True white for cards, modals, elevated surfaces
   text: '#2A2A2A',              // Comfortable dark gray for body text
-  textSecondary: '#181818',     // Muted blue-gray for secondary info
+  textSecondary: '#6B7280',     // Muted blue-gray for secondary info
   border: '#E5E5E5',            // Light neutral gray for soft separation
-  primary: '#A5B8C8',           // Desaturated slate blue, soft and neutral
-  accent: '#EFCFD6',            // Cool misty blue for gentle accents
+  primary: '#1C1C1C',           // Desaturated slate blue, soft and neutral
+  accent: '#F1F9FF',
+  accentSecondary: "#FFF3EC",           // Cool misty blue for gentle accents
   error: '#FF6B6B',
 };
 
@@ -37,6 +39,7 @@ const darkColors: ThemeColors = {
   border: '#3A3A3A',
   primary: '#A5B8C8',
   accent: '#EFCFD6',
+  accentSecondary: "#EFCFD6",
   error: '#FF6B6B',
 };
 

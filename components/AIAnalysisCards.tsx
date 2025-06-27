@@ -104,6 +104,13 @@ export default function AIAnalysisCards({
   const userActivities = analysis.activities.filter(activity => activity.category === 'personal');
   const aiActivities = analysis.activities.filter(activity => activity.category !== 'personal');
 
+  // Limit total activities to 3, prioritizing user activities
+  let displayedUserActivities = userActivities.slice(0, 3);
+  let displayedAIActivities: typeof aiActivities = [];
+  if (displayedUserActivities.length < 3) {
+    displayedAIActivities = aiActivities.slice(0, 3 - displayedUserActivities.length);
+  }
+
   const dynamicStyles = StyleSheet.create({
     container: {
       gap: 20,
@@ -189,7 +196,7 @@ export default function AIAnalysisCards({
     activityTitle: {
       fontSize: 15,
       color: '#181818',
-      fontWeight: '600',
+      fontWeight: 'bold',
       marginBottom: 4,
       fontFamily: 'Nunito-SemiBold',
     },
@@ -211,7 +218,6 @@ export default function AIAnalysisCards({
     distortionCard: {
       backgroundColor: colors.background,
       borderRadius: 12,
-      borderWidth: 1,
       marginBottom: 12,
       overflow: 'hidden',
     },
@@ -392,15 +398,15 @@ export default function AIAnalysisCards({
         {analysis.activities.length > 0 ? (
           <>
             {/* User's Personal Activities */}
-            {userActivities.length > 0 && (
+            {displayedUserActivities.length > 0 && (
               <View style={dynamicStyles.activitiesSection}>
                 <Text style={dynamicStyles.sectionSubtitle}>Your Personal Strategies</Text>
-                {userActivities.map((activity, index) => (
+                {displayedUserActivities.map((activity, index) => (
                   <TouchableOpacity
                     key={activity.id}
                     style={[
                       dynamicStyles.activityItem,
-                      index === userActivities.length - 1 && { borderBottomWidth: 0 }
+                      index === displayedUserActivities.length - 1 && displayedAIActivities.length === 0 && { borderBottomWidth: 0 }
                     ]}
                     onPress={() => handleActivityToggle(activity.id)}
                   >
@@ -422,17 +428,17 @@ export default function AIAnalysisCards({
             )}
 
             {/* AI Suggested Activities or Predefined Activities */}
-            {aiActivities.length > 0 && (
+            {displayedAIActivities.length > 0 && (
               <View style={dynamicStyles.activitiesSection}>
                 <Text style={dynamicStyles.sectionSubtitle}>
                   {useAI ? 'AI Suggestions' : 'Suggested Activities'}
                 </Text>
-                {aiActivities.map((activity, index) => (
+                {displayedAIActivities.map((activity, index) => (
                   <TouchableOpacity
                     key={activity.id}
                     style={[
                       dynamicStyles.activityItem,
-                      index === aiActivities.length - 1 && { borderBottomWidth: 0 }
+                      index === displayedAIActivities.length - 1 && { borderBottomWidth: 0 }
                     ]}
                     onPress={() => handleActivityToggle(activity.id)}
                   >
@@ -465,7 +471,7 @@ export default function AIAnalysisCards({
 
       {/* Card 3: Positive Reframe - Only show if AI is enabled and distortions exist */}
       {useAI && analysis.distortions.length > 0 && (
-        <View style={dynamicStyles.card}>
+        <View style={[dynamicStyles.card, { borderWidth: 1, borderColor: colors.primary, borderRadius: 16 }]}>
           <View style={dynamicStyles.cardHeader}>
             <View style={[dynamicStyles.cardIcon, { backgroundColor: colors.primary + '15' }]}>
               <Sparkles size={20} color={colors.primary} strokeWidth={1.5} />
@@ -480,10 +486,7 @@ export default function AIAnalysisCards({
             return (
               <View 
                 key={index} 
-                style={[
-                  dynamicStyles.distortionCard,
-                  { borderColor: severityColor + '40' }
-                ]}
+                style={dynamicStyles.distortionCard}
               >
                 <TouchableOpacity
                   style={dynamicStyles.distortionHeader}

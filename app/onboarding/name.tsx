@@ -46,16 +46,16 @@ export default function NameScreen() {
       justifyContent: 'center',
     },
     title: {
-      fontSize: 32,
+      fontSize: 30,
       fontWeight: '300',
-      color: '#181818',
+      color: colors.primary,
       textAlign: 'left',
       marginBottom: 8,
       letterSpacing: -0.5,
       fontFamily: 'Nunito-Bold',
     },
     subtitle: {
-      fontSize: 16,
+      fontSize: 18,
       color: colors.textSecondary,
       textAlign: 'left',
       marginBottom: 40,
@@ -148,9 +148,8 @@ export default function NameScreen() {
             dynamicStyles.nextButtonText,
             !name.trim() && dynamicStyles.nextButtonTextDisabled
           ]}>
-            Continue
+            Next
           </Text>
-          <ArrowRight size={20} color={name.trim() ? colors.background : colors.textSecondary} strokeWidth={1.5} />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

@@ -14,6 +14,7 @@ interface EntryActionsProps {
   onRecordingChange?: (recording: boolean) => void;
   onVoiceTranscript?: (text: string) => void;
   onVoiceError?: (error: string) => void;
+  iconColor?: string;
 }
 
 export default function EntryActions({ 
@@ -25,7 +26,8 @@ export default function EntryActions({
   isRecording = false,
   onRecordingChange,
   onVoiceTranscript,
-  onVoiceError
+  onVoiceError,
+  iconColor
 }: EntryActionsProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -54,6 +56,7 @@ export default function EntryActions({
             onError={onVoiceError}
             isRecording={isRecording}
             onRecordingChange={onRecordingChange}
+            iconColor={iconColor}
           />
         )}
         
@@ -63,15 +66,15 @@ export default function EntryActions({
             style={styles.actionButton}
             onPress={onAIAnalysis}
           >
-            <Sparkles size={20} color="#A5B8C8" strokeWidth={1.5} />
+            <Sparkles size={20} color={iconColor || "#A5B8C8"} strokeWidth={1.5} />
           </TouchableOpacity>
         )}
         
         <TouchableOpacity 
-          style={[styles.actionButton, styles.saveButton]}
+          style={[styles.actionButton, iconColor ? { backgroundColor: iconColor, borderColor: iconColor } : styles.saveButton]}
           onPress={onSavePress}
         >
-          <Check size={20} color="#FAFAFA" strokeWidth={1.5} />
+          <Check size={20} color={"#FAFAFA"} strokeWidth={1.5} />
         </TouchableOpacity>
       </View>
     </>
