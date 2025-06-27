@@ -187,9 +187,21 @@ export default function NewEntryPage() {
       return;
     }
 
-    const preview = content.trim().length > 150 
-      ? content.trim().substring(0, 150) + '...'
-      : content.trim();
+    // Create a more intelligent preview that shows the beginning of the content
+    // but removes the #Sample prefix if it exists
+    const cleanContent = content.trim();
+    let preview = cleanContent;
+    
+    // If content starts with #Sample, remove it for the preview
+    if (cleanContent.toLowerCase().startsWith('#sample')) {
+      const withoutSample = cleanContent.replace(/^#sample\s*/i, '').trim();
+      preview = withoutSample.length > 0 ? withoutSample : cleanContent;
+    }
+    
+    // Truncate preview if it's too long
+    if (preview.length > 150) {
+      preview = preview.substring(0, 150) + '...';
+    }
 
     const determineMood = (text: string) => {
       const lowerText = text.toLowerCase();
