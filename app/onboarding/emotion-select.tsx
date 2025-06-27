@@ -24,7 +24,7 @@ export default function EmotionSelectScreen() {
 
   const handleSkip = async () => {
     await completeOnboarding();
-    router.replace('/(tabs)');
+    router.replace('/(tabs)/add');
   };
 
   const dynamicStyles = StyleSheet.create({

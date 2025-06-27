@@ -44,7 +44,7 @@ import {
     const [allSelections, setAllSelections] = useState<{ [emotion: string]: string[] }>({});
     const [selectedActions, setSelectedActions] = useState<string[]>([]);
     const [customAction, setCustomAction] = useState('');
-    const [showSuggestions, setShowSuggestions] = useState(true); // Show by default
+    const [showSuggestions, setShowSuggestions] = useState(false); // Hide by default
     const { colors } = useTheme();
     const { updateEmotionalToolkit, completeOnboarding, userProfile, setUserProfile } = useOnboarding();
   
@@ -122,7 +122,7 @@ import {
         setUserProfile && setUserProfile(updatedProfile);
         await AsyncStorage.setItem('@reflect_user_profile', JSON.stringify(updatedProfile));
         console.log('DEBUG: Saved full profile in onboarding:', updatedProfile);
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/add');
       }
     };
   
@@ -152,7 +152,7 @@ import {
         setUserProfile && setUserProfile(updatedProfile);
         await AsyncStorage.setItem('@reflect_user_profile', JSON.stringify(updatedProfile));
         console.log('DEBUG: Saved full profile in onboarding:', updatedProfile);
-        router.replace('/(tabs)');
+        router.replace('/(tabs)/add');
       }
     };
   
