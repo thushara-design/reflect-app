@@ -300,7 +300,9 @@ export default function NewEntryPage() {
       flex: 1,
     },
     content: {
+      flex: 1,
       paddingHorizontal: 24,
+      paddingTop: 20,
       paddingBottom: 20,
     },
     titleInput: {
@@ -309,17 +311,17 @@ export default function NewEntryPage() {
       color: colors.text,
       lineHeight: 32,
       minHeight: 40,
-      marginTop: 16,
-      marginBottom: 16,
+      marginBottom: 20,
+      paddingVertical: 8,
     },
     contentInput: {
       fontSize: 16,
       color: colors.text,
       lineHeight: 24,
       fontWeight: '300',
-      minHeight: 200,
+      flex: 1,
       textAlignVertical: 'top',
-      marginBottom: 20,
+      paddingVertical: 8,
     },
     userTextSection: {
       backgroundColor: colors.surface,
@@ -429,30 +431,28 @@ export default function NewEntryPage() {
             iconColor={colors.primary}
           />
         </View>
-        <View style={{ height: 16 }} />
-        <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
-          <View style={dynamicStyles.content}>
-            <TextInput
-              style={{ fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}
-              placeholder="Title here"
-              placeholderTextColor={colors.textSecondary}
-              value={title}
-              onChangeText={setTitle}
-              multiline
-            />
 
-            <TextInput
-              style={{ fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}
-              placeholder="Start writing..."
-              placeholderTextColor={colors.textSecondary}
-              value={content}
-              onChangeText={setContent}
-              multiline
-              textAlignVertical="top"
-              autoFocus={!isEditing}
-            />
-          </View>
-        </ScrollView>
+        <View style={dynamicStyles.content}>
+          <TextInput
+            style={dynamicStyles.titleInput}
+            placeholder="Title here"
+            placeholderTextColor={colors.textSecondary}
+            value={title}
+            onChangeText={setTitle}
+            multiline
+          />
+
+          <TextInput
+            style={dynamicStyles.contentInput}
+            placeholder="Start writing..."
+            placeholderTextColor={colors.textSecondary}
+            value={content}
+            onChangeText={setContent}
+            multiline
+            textAlignVertical="top"
+            autoFocus={!isEditing}
+          />
+        </View>
 
         <View style={dynamicStyles.bottomInfo}>
           {isEditing && (
