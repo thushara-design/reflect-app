@@ -26,7 +26,7 @@ export function EntriesProvider({ children }: { children: ReactNode }) {
     {
       id: 9,
       date: 'Fri Jun 27 10:42AM',
-      preview: '#Sample My brain feels scattered.',
+      preview: '#Sample',
       mood: 'overwhelmed',
       title: 'Brain Fog Morning',
       content: "Woke up late and couldn't follow through with my morning plan. My brain feels scattered, like tabs open everywhere but nothing loading. I kept pacing without doing anything. I remembered one of the activities I saved — the 5-4-3-2-1 grounding — and that helped a bit. Still, I wish it wasn't always this hard just to start.",
