@@ -295,7 +295,6 @@ export default function NewEntryPage() {
       flex: 1,
       textAlign: 'center',
       marginHorizontal: 16,
-      fontFamily: 'Nunito-Bold',
     },
     scrollContainer: {
       flex: 1,
@@ -312,7 +311,6 @@ export default function NewEntryPage() {
       minHeight: 40,
       marginTop: 16,
       marginBottom: 16,
-      fontFamily: 'Nunito-Bold',
     },
     contentInput: {
       fontSize: 16,
@@ -322,7 +320,6 @@ export default function NewEntryPage() {
       minHeight: 200,
       textAlignVertical: 'top',
       marginBottom: 20,
-      fontFamily: 'Nunito-Regular',
     },
     userTextSection: {
       backgroundColor: colors.surface,
@@ -337,13 +334,11 @@ export default function NewEntryPage() {
       fontWeight: '500',
       color: colors.text,
       marginBottom: 12,
-      fontFamily: 'Nunito-Bold',
     },
     userText: {
       fontSize: 14,
       color: colors.text,
       lineHeight: 20,
-      fontFamily: 'Nunito-Regular',
     },
     bottomInfo: {
       paddingVertical: 16,
@@ -358,14 +353,12 @@ export default function NewEntryPage() {
       color: colors.textSecondary,
       fontWeight: '300',
       textAlign: 'center',
-      fontFamily: 'Nunito-Regular',
     },
     analyzingText: {
       fontSize: 12,
       color: colors.textSecondary,
       fontStyle: 'italic',
       marginTop: 4,
-      fontFamily: 'Nunito-Italic',
     },
   });
 
@@ -390,8 +383,8 @@ export default function NewEntryPage() {
           <View style={dynamicStyles.content}>
             {/* User's Text Display */}
             <View style={[dynamicStyles.userTextSection, { marginTop: 16 }]}>
-              <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}>{'Your Entry'}</Text>
-              <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>{content}</Text>
+              <Text style={{ fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}>{'Your Entry'}</Text>
+              <Text style={{ fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>{content}</Text>
             </View>
 
             {/* Analysis Cards */}
@@ -440,7 +433,7 @@ export default function NewEntryPage() {
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
           <View style={dynamicStyles.content}>
             <TextInput
-              style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}
+              style={{ fontSize: 18, color: colors.text, fontWeight: '700', marginBottom: 8 }}
               placeholder="Title here"
               placeholderTextColor={colors.textSecondary}
               value={title}
@@ -449,7 +442,7 @@ export default function NewEntryPage() {
             />
 
             <TextInput
-              style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}
+              style={{ fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}
               placeholder="Start writing..."
               placeholderTextColor={colors.textSecondary}
               value={content}

@@ -251,10 +251,10 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
             {urgentResources.map((resource) => (
               <View key={resource.id} style={[dynamicStyles.resourceCard, dynamicStyles.urgentCard]}>
                 <View style={dynamicStyles.resourceHeader}>
-                  <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700' }}>{resource.name}</Text>
+                  <Text style={{ fontSize: 18, color: '#181818', fontWeight: '700' }}>{resource.name}</Text>
 
                 </View>
-                <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{resource.description}</Text>
+                <Text style={{ fontSize: 15, color: '#181818', fontWeight: '600' }}>{resource.description}</Text>
                 <View style={dynamicStyles.actionButtons}>
                   {resource.type === 'call' ? (
                     <TouchableOpacity
@@ -286,8 +286,8 @@ export default function CrisisHelpModal({ visible, onClose }: CrisisHelpModalPro
           
           {otherResources.map((resource) => (
             <View key={resource.id} style={dynamicStyles.resourceCard}>
-              <Text style={{ fontFamily: 'Nunito-Bold', fontSize: 18, color: '#181818', fontWeight: '700' }}>{resource.name}</Text>
-              <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: '#181818', fontWeight: '600' }}>{resource.description}</Text>
+              <Text style={{ fontSize: 18, color: '#181818', fontWeight: '700' }}>{resource.name}</Text>
+              <Text style={{ fontSize: 15, color: '#181818', fontWeight: '600' }}>{resource.description}</Text>
               <TouchableOpacity
                 style={[dynamicStyles.actionButton, dynamicStyles.callButton]}
                 onPress={() => handleCall(resource.number, resource.name)}

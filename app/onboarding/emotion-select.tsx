@@ -38,16 +38,15 @@ export default function EmotionSelectScreen() {
       paddingTop: 50,
       paddingBottom: 16,
     },
-    skip: { color: colors.textSecondary, fontWeight: '600', fontSize: 16, padding: 8, fontFamily: 'Nunito-Bold', textAlign: 'center' },
-    title: { fontSize: 28, fontWeight: '300', color: '#181818', textAlign: 'left', marginBottom: 8, fontFamily: 'Nunito-Bold' },
-    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'left', marginBottom: 30, lineHeight: 24, fontFamily: 'Nunito-Regular' },
+    skip: { color: colors.textSecondary, fontWeight: '600', fontSize: 16, padding: 8, textAlign: 'center' },
+    title: { fontSize: 28, fontWeight: '300', color: '#181818', textAlign: 'left', marginBottom: 8 },
+    subtitle: { fontSize: 16, color: colors.textSecondary, textAlign: 'left', marginBottom: 30, lineHeight: 24 },
     stepIndicator: {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
       textAlign: 'left',
       marginBottom: 20,
-      fontFamily: 'Nunito-Regular',
     },
     emotionsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: 30 },
     emotionCard: {
@@ -78,7 +77,7 @@ export default function EmotionSelectScreen() {
       zIndex: 2,
     },
     emotionEmoji: { fontSize: 38, marginBottom: 10 },
-    emotionName: { fontSize: 16, color: '#181818', fontWeight: '500', textAlign: 'left', fontFamily: 'Nunito-Bold' },
+    emotionName: { fontSize: 16, color: '#181818', fontWeight: '500', textAlign: 'left' },
     nextButtonContainer: {
       paddingBottom: 24,
       paddingHorizontal: 24,
@@ -91,7 +90,7 @@ export default function EmotionSelectScreen() {
       alignItems: 'center',
       marginTop: 8,
     },
-    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18, fontFamily: 'Nunito-Bold' },
+    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 },
   });
 
   return (

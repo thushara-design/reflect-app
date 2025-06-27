@@ -40,7 +40,6 @@ export default function AddTab() {
       color: colors.text,
       textAlign: 'center',
       letterSpacing: -0.5,
-      fontFamily: 'Nunito-Regular',
     },
     quickStartSection: {
       alignItems: 'center',
@@ -68,7 +67,6 @@ export default function AddTab() {
       fontSize: 18,
       color: colors.background,
       fontWeight: '400',
-      fontFamily: 'Nunito-Regular',
     },
   });
 

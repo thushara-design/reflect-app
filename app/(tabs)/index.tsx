@@ -94,7 +94,7 @@ export default function EntriesTab() {
       <View style={styles.entryHeader}>
         <Text style={[styles.entryDate, { color: colors.textSecondary }]}>{entry.date}</Text>
       </View>
-      <Text style={{ fontFamily: 'Nunito-SemiBold', fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>
+      <Text style={{ fontSize: 15, color: colors.text, fontWeight: '600', lineHeight: 22 }}>
         {entry.preview}
       </Text>
     </TouchableOpacity>
@@ -173,7 +173,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     fontWeight: '300',
-    fontFamily: 'Nunito-Regular',
   },
   entriesContainer: {
     flex: 1,
@@ -207,7 +206,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 18,
     fontWeight: '300',
-    fontFamily: 'Nunito-Regular',
   },
   emptyState: {
     flex: 1,
@@ -219,12 +217,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '300',
     marginBottom: 8,
-    fontFamily: 'Nunito-Regular',
   },
   emptySubtext: {
     fontSize: 14,
     fontWeight: '300',
     textAlign: 'center',
-    fontFamily: 'Nunito-Regular',
   },
 });

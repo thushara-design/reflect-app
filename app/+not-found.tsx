@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     color: '#181818',
-    fontFamily: 'Nunito-Bold',
   },
   link: {
     marginTop: 15,

@@ -137,7 +137,6 @@ export default function AIAnalysisCards({
       fontWeight: '700',
       color: '#181818',
       flex: 1,
-      fontFamily: 'Nunito-Bold',
     },
     emotionRow: {
       flexDirection: 'row',
@@ -157,20 +156,17 @@ export default function AIAnalysisCards({
       fontWeight: '600',
       color: '#181818',
       marginBottom: 4,
-      fontFamily: 'Nunito-SemiBold',
     },
     confidenceText: {
       fontSize: 12,
       color: colors.textSecondary,
       marginBottom: 8,
-      fontFamily: 'Nunito-Regular',
     },
     reflectionText: {
       fontSize: 15,
       color: '#181818',
       lineHeight: 22,
       fontStyle: 'normal',
-      fontFamily: 'Nunito-SemiBold',
     },
     activitiesSection: {
       marginBottom: 16,
@@ -180,7 +176,6 @@ export default function AIAnalysisCards({
       fontWeight: '400',
       color: '#181818',
       marginBottom: 12,
-      fontFamily: 'Nunito-Regular',
     },
     activityItem: {
       flexDirection: 'row',
@@ -198,13 +193,11 @@ export default function AIAnalysisCards({
       color: '#181818',
       fontWeight: 'bold',
       marginBottom: 4,
-      fontFamily: 'Nunito-SemiBold',
     },
     activityDescription: {
       fontSize: 15,
       color: '#181818',
       lineHeight: 22,
-      fontFamily: 'Nunito-SemiBold',
     },
     activityMeta: {
       fontSize: 11,
@@ -331,7 +324,6 @@ export default function AIAnalysisCards({
       fontSize: 14,
       color: colors.background,
       fontWeight: '400',
-      fontFamily: 'Nunito-Regular',
     },
     ignoreButton: {
       flex: 1,
@@ -346,7 +338,6 @@ export default function AIAnalysisCards({
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '400',
-      fontFamily: 'Nunito-Regular',
     },
     emptyState: {
       alignItems: 'center',
@@ -373,7 +364,7 @@ export default function AIAnalysisCards({
       <View style={[dynamicStyles.card, { backgroundColor: '#FFF3EC' }]}> 
         <View style={dynamicStyles.emotionRow}>
           <Text style={dynamicStyles.emotionEmoji}>{analysis.emotion.emoji}</Text>
-          <Text style={{ fontFamily: 'Nunito-Bold', color: '#181818', fontSize: 18, fontWeight: '700', flexShrink: 1, flexWrap: 'wrap' }}>
+          <Text style={{ fontSize: 18, color: '#181818', fontWeight: '700', flexShrink: 1, flexWrap: 'wrap' }}>
             You sound {analysis.emotion.emotion}, based on what you wrote.
           </Text>
         </View>

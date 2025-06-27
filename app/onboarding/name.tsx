@@ -38,7 +38,6 @@ export default function NameScreen() {
       fontSize: 14,
       color: colors.textSecondary,
       fontWeight: '300',
-      fontFamily: 'Nunito-Regular',
     },
     content: {
       flex: 1,
@@ -52,7 +51,6 @@ export default function NameScreen() {
       textAlign: 'left',
       marginBottom: 8,
       letterSpacing: -0.5,
-      fontFamily: 'Nunito-Bold',
     },
     subtitle: {
       fontSize: 18,
@@ -60,7 +58,6 @@ export default function NameScreen() {
       textAlign: 'left',
       marginBottom: 40,
       lineHeight: 24,
-      fontFamily: 'Nunito-Regular',
     },
     inputContainer: {
       marginBottom: 40,
@@ -75,7 +72,6 @@ export default function NameScreen() {
       fontSize: 18,
       color: '#181818',
       textAlign: 'center',
-      fontFamily: 'Nunito-Regular',
     },
     inputFocused: {
       borderColor: colors.primary,
@@ -96,11 +92,9 @@ export default function NameScreen() {
       fontSize: 16,
       color: colors.background,
       fontWeight: '400',
-      fontFamily: 'Nunito-Bold',
     },
     nextButtonTextDisabled: {
       color: colors.textSecondary,
-      fontFamily: 'Nunito-Regular',
     },
   });
 
