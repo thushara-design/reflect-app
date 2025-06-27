@@ -6,12 +6,23 @@ import { EntriesProvider } from '@/contexts/EntriesContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
 import { DataPersistenceProvider } from '@/contexts/DataPersistenceContext';
+import * as Font from 'expo-font';
 import { ActivityIndicator, View } from 'react-native';
 
 export default function RootLayout() {
   useFrameworkReady();
-  // Remove font loading logic, always set fontsLoaded to true
-  const fontsLoaded = true;
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      await Font.loadAsync({
+        'Nunito-Regular': require('../assets/fonts/Nunito-SemiBold.ttf'),
+        'Nunito-Bold': require('../assets/fonts/Nunito-Bold.ttf'),
+        'Nunito-Italic': require('../assets/fonts/Nunito-Italic.ttf'),
+      });
+      setFontsLoaded(true);
+    })();
+  }, []);
 
   if (!fontsLoaded) {
     return (
