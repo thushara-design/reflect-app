@@ -68,7 +68,7 @@ class AIService {
           messages: [
             { 
               role: 'system', 
-              content: 'You are an expert cognitive behavioral therapist. You MUST respond with valid JSON only. Do not include any text before or after the JSON object. Focus on identifying specific cognitive distortions with exact quotes from the user\'s text. For the reflection, acknowledge the specific content and emotions from the user\'s entry.' 
+              content: "You are a kind and thoughtful cognitive behavioral therapist. You MUST respond with valid JSON only — do not include any text before or after the JSON. Don't use the word user.\n\nGently identify any specific harmful cognitive distortions if any, using exact quotes from the user's text where possible. In your reflection, acknowledge the user's emotions and the heart of what they are expressing with care and empathy.\n\nYour goal is to offer a warm mirror, helping the user gently notice their thinking patterns without judgment. "
             },
             { 
               role: 'user', 
@@ -121,12 +121,12 @@ Respond with ONLY this JSON structure:
   "emotion": {
     "primary_emotion": "happy|sad|angry|anxious|stressed|calm|frustrated|excited|lonely|grateful|confused|hopeful|disappointed|content|overwhelmed",
     "confidence": 0.8,
-    "explanation": "brief explanation of why this emotion was detected"
+    "explanation": "brief gentle explanation of why this emotion was detected"
   },
   "cognitive_distortions": [
     {
       "type": "Catastrophizing|All-or-Nothing Thinking|Mind Reading|Fortune Telling|Emotional Reasoning|Mental Filter|Personalization",
-      "description": "Specific explanation of how this distortion appears in the user's text",
+      "description": "Give gentle and kind explanation of how this distortion appears in the user's text. Speak directly and gently, as though you are sitting with the person.",
       "user_quotes": ["exact quote 1 from user", "exact quote 2 from user"],
       "severity": "low|medium|high",
       "evidence_against": ["challenging fact 1", "challenging fact 2", "challenging fact 3"],
@@ -145,9 +145,10 @@ Respond with ONLY this JSON structure:
   ]
 }
 
-CRITICAL: 
-- Only include cognitive distortions if you find CLEAR evidence in the user's exact words. Include the exact quotes that demonstrate the distortion.
-- For the reflection, specifically reference what the user wrote about (their situation, feelings, experiences) rather than giving generic emotional validation.`;
+CRITICAL:
+- Use phrasing like "It sounds like...", "It feels like you're...", or "Reading this, I sense that you might..."
+- Only include cognitive distortions when there is clear and specific evidence in the user’s exact words. Quote those words directly.
+- In your reflection, thoughtfully refer to what the user actually shared — their situation, emotions, or experiences — rather than offering general affirmations. Let your response feel seen, not scripted.`;
   }
 
   private parseAIAnalysis(originalText: string, aiResponse: string, userToolkit: EmotionalToolkitItem[] = [], useAI: boolean = true): AIAnalysisResult {
