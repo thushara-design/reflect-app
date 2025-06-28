@@ -326,7 +326,7 @@ export default function DataExportModal({ visible, onClose }: DataExportModalPro
           <View style={dynamicStyles.warningBox}>
             <Text style={dynamicStyles.warningTitle}>Important Notes</Text>
             <Text style={dynamicStyles.warningText}>
-              • Backup files contain all your personal journal data{'\n'}
+              • Backup files contain all your journal data{'\n'}
               • Store backup files in a secure location{'\n'}
               • Importing data will replace all current data{'\n'}
               • Clearing data cannot be undone

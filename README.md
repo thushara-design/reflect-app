@@ -1,4 +1,4 @@
-# Reflect - Personal Journaling App
+# Reflect App
 
 A beautiful, AI-powered journaling app built with React Native and Expo that helps you track emotions, identify thinking patterns, and build mental resilience.
 
@@ -185,7 +185,7 @@ The app includes built-in crisis support resources:
 
 ## 🤝 Contributing
 
-This is a personal journaling app, but if you'd like to contribute:
+This is a journaling app, but if you'd like to contribute:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -193,7 +193,7 @@ This is a personal journaling app, but if you'd like to contribute:
 
 ## 📄 License
 
-MIT License - Feel free to use this code for your own personal journaling app.
+MIT License - Feel free to use this code for your own journaling app.
 
 ## 🙏 Acknowledgments
 
