@@ -130,18 +130,6 @@ export function OnboardingProvider({ children }: { children: ReactNode }) {
     await saveUserProfile(defaultProfile);
   };
 
-  useEffect(() => {
-    AsyncStorage.getItem('@reflect_user_profile').then(json => {
-      if (json) {
-        const parsed = JSON.parse(json);
-        console.log('DEBUG: Fetched from AsyncStorage again:', parsed);
-        if (parsed) {
-          setUserProfile(parsed);
-        }
-      }
-    });
-  }, []);
-
   return (
     <OnboardingContext.Provider value={{
       userProfile,

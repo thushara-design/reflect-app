@@ -15,6 +15,7 @@ interface EntryActionsProps {
   onVoiceTranscript?: (text: string) => void;
   onVoiceError?: (error: string) => void;
   iconColor?: string;
+  useAI?: boolean;
 }
 
 export default function EntryActions({ 
@@ -27,7 +28,8 @@ export default function EntryActions({
   onRecordingChange,
   onVoiceTranscript,
   onVoiceError,
-  iconColor
+  iconColor,
+  useAI = true
 }: EntryActionsProps) {
   const [showMenu, setShowMenu] = useState(false);
 
@@ -50,7 +52,7 @@ export default function EntryActions({
   return (
     <>
       <View style={styles.actionsContainer}>
-        {onVoiceTranscript && onVoiceError && onRecordingChange && (
+        {useAI && onVoiceTranscript && onVoiceError && onRecordingChange && (
           <VoiceRecorder
             onTranscript={onVoiceTranscript}
             onError={onVoiceError}
@@ -60,7 +62,6 @@ export default function EntryActions({
           />
         )}
         
-        {/* Always show the sparkle button for analysis */}
         {onAIAnalysis && (
           <TouchableOpacity 
             style={styles.actionButton}

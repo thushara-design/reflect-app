@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -18,7 +18,7 @@ export default function EmotionSelectScreen() {
 
   const handleNext = () => {
     if (selected.length > 0) {
-      router.push({ pathname: '/onboarding/emotion-activities', params: { emotions: JSON.stringify(selected) } } as any);
+      router.replace({ pathname: '/onboarding/emotion-activities', params: { emotions: JSON.stringify(selected) } } as any);
     }
   };
 
@@ -28,14 +28,13 @@ export default function EmotionSelectScreen() {
   };
 
   const dynamicStyles = StyleSheet.create({
-    safe: { flex: 1, backgroundColor: colors.background },
-    container: { flex: 1, paddingHorizontal: 24, paddingTop: 8 },
+    container: { flex: 1, backgroundColor: colors.background },
+    content: { flex: 1, paddingHorizontal: 24, paddingTop: 50 },
     header: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
       paddingHorizontal: 24,
-      paddingTop: 50,
       paddingBottom: 16,
     },
     skip: { color: colors.textSecondary, fontWeight: '600', fontSize: 16, padding: 8, textAlign: 'center' },
@@ -85,17 +84,21 @@ export default function EmotionSelectScreen() {
     },
     nextButton: {
       backgroundColor: selected.length > 0 ? colors.primary : colors.border,
-      borderRadius: 12,
-      padding: 18,
+      borderRadius: 16,
+      paddingVertical: 16,
       alignItems: 'center',
       marginTop: 8,
     },
-    nextButtonText: { color: '#fff', fontWeight: '700', fontSize: 18 },
+    nextButtonText: { 
+      color: colors.background, 
+      fontWeight: '400', 
+      fontSize: 16 
+    },
   });
 
   return (
-    <SafeAreaView style={dynamicStyles.safe}>
-      <View style={dynamicStyles.container}>
+    <View style={dynamicStyles.container}>
+      <View style={dynamicStyles.content}>
         <View style={dynamicStyles.header}>
           <View style={{ width: 24 }} />
           <Text style={dynamicStyles.stepIndicator}>Step 3 of 3</Text>
@@ -146,6 +149,6 @@ export default function EmotionSelectScreen() {
           <Text style={dynamicStyles.skip}>Skip</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

@@ -1,7 +1,6 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Platform } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
-import { ArrowLeft, ArrowRight } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 
@@ -13,12 +12,8 @@ export default function NameScreen() {
   const handleNext = async () => {
     if (name.trim()) {
       await updateUserName(name.trim());
-      router.push('/onboarding/ai-preference');
+      router.replace('/onboarding/ai-preference');
     }
-  };
-
-  const handleBack = () => {
-    router.back();
   };
 
   const dynamicStyles = StyleSheet.create({
@@ -99,14 +94,9 @@ export default function NameScreen() {
   });
 
   return (
-    <KeyboardAvoidingView 
-      style={dynamicStyles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={dynamicStyles.container}>
       <View style={dynamicStyles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
-        </TouchableOpacity>
+        <View style={styles.placeholder} />
         <Text style={dynamicStyles.stepIndicator}>Step 1 of 3</Text>
         <View style={styles.placeholder} />
       </View>
@@ -146,7 +136,7 @@ export default function NameScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 

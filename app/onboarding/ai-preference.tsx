@@ -1,162 +1,29 @@
-import { View, Text, StyleSheet, TouchableOpacity, Switch, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { useState, useCallback } from 'react';
+import React from 'react';
 import { router } from 'expo-router';
-import { ArrowLeft, ArrowRight, Brain, Sparkles, Activity } from 'lucide-react-native';
+import { Brain } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 
-export default function AIPreferenceScreen() {
+function AIPreferenceScreen() {
   const { colors } = useTheme();
   const { updateAIPreference, userProfile, isLoading } = useOnboarding();
+  
+  const [useAI, setUseAI] = useState(true);
 
-  const handleNext = async () => {
+  const handleNext = useCallback(async () => {
     if (!userProfile) return;
-    await updateAIPreference(userProfile.useAI);
-    router.push('/onboarding/emotion-select');
-  };
+    await updateAIPreference(useAI);
+    router.replace('/onboarding/emotion-select');
+  }, [userProfile, useAI, updateAIPreference]);
 
-  const handleBack = () => {
-    router.back();
-  };
+  const handleCardPress = useCallback(() => {
+    setUseAI(!useAI);
+  }, [useAI]);
 
-  const dynamicStyles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.background,
-    },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 24,
-      paddingTop: 50,
-      paddingBottom: 16,
-    },
-    stepIndicator: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      fontWeight: '300',
-      textAlign: 'left',
-    },
-    content: {
-      flex: 1,
-      paddingHorizontal: 24,
-      justifyContent: 'center',
-    },
-    title: {
-      fontSize: 32,
-      fontWeight: '300',
-      color: colors.primary,
-      textAlign: 'left',
-      marginBottom: 16,
-      letterSpacing: -0.5,
-    },
-    subtitle: {
-      fontSize: 18,
-      color: colors.textSecondary,
-      textAlign: 'left',
-      marginBottom: 60,
-      lineHeight: 24,
-    },
-    aiCard: {
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderRadius: 12,
-      padding: 24,
-      marginBottom: 32,
-    },
-    aiCardActive: {
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
-    },
-    aiHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginBottom: 20,
-    },
-    aiIconContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    aiIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 16,
-      backgroundColor: colors.primary + '20',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    aiTitle: {
-      fontSize: 20,
-      fontWeight: '400',
-      color: '#181818',
-    },
-    featuresList: {
-      gap: 16,
-    },
-    featureItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 12,
-    },
-    featureIcon: {
-      width: 32,
-      height: 32,
-      borderRadius: 8,
-      backgroundColor: colors.primary + '15',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    featureText: {
-      flex: 1,
-      fontSize: 14,
-      color: '#181818',
-      lineHeight: 20,
-    },
-    fallbackInfo: {
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 40,
-    },
-    fallbackTitle: {
-      fontSize: 16,
-      fontWeight: '400',
-      color: '#181818',
-      marginBottom: 8,
-    },
-    fallbackText: {
-      fontSize: 14,
-      color: colors.textSecondary,
-      lineHeight: 20,
-    },
-    nextButton: {
-      backgroundColor: colors.primary,
-      paddingVertical: 16,
-      borderRadius: 16,
-      alignItems: 'center',
-      flexDirection: 'row',
-      justifyContent: 'center',
-      gap: 8,
-    },
-    nextButtonText: {
-      fontSize: 16,
-      color: colors.background,
-      fontWeight: '400',
-    },
-  });
-
-  const aiFeatures = [
-    { text: 'Emotion detection and analysis from your writing' },
-    { text: 'Identify unhelpful thinking patterns and suggest reframes' },
-    { text: 'Personalized activity suggestions based on your mood' }
-  ];
-
-  // Only render after userProfile/isLoading are ready
-  if (isLoading || !userProfile) {
+  if (isLoading || userProfile?.useAI === undefined) {
+    console.log('[RENDER] Loading screen');
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -164,19 +31,107 @@ export default function AIPreferenceScreen() {
     );
   }
 
-  const useAI = userProfile.useAI;
+  console.log('[RENDER] Main component');
+
+  const dynamicStyles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: colors.background },
+    header: { 
+      flexDirection: 'row', 
+      alignItems: 'center', 
+      justifyContent: 'space-between', 
+      paddingHorizontal: 24, 
+      paddingTop: 50, 
+      paddingBottom: 16 
+    },
+    stepIndicator: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      fontWeight: '300',
+    },
+    content: { flex: 1, paddingHorizontal: 24, justifyContent: 'center' },
+    title: { 
+      fontSize: 32, 
+      fontWeight: '300', 
+      color: colors.primary, 
+      marginBottom: 16 
+    },
+    subtitle: { 
+      fontSize: 18, 
+      color: colors.textSecondary, 
+      marginBottom: 60 
+    },
+    card: { 
+      backgroundColor: colors.background, 
+      borderWidth: 1, 
+      borderColor: colors.border, 
+      borderRadius: 12, 
+      padding: 24, 
+      marginBottom: 32
+    },
+    cardHeader: { 
+      flexDirection: 'row', 
+      alignItems: 'center', 
+      justifyContent: 'space-between', 
+      marginBottom: 20 
+    },
+    cardLeft: { 
+      flexDirection: 'row', 
+      alignItems: 'center', 
+      gap: 12 
+    },
+    iconContainer: { 
+      width: 48, 
+      height: 48, 
+      borderRadius: 16, 
+      backgroundColor: colors.primary + '20', 
+      alignItems: 'center', 
+      justifyContent: 'center' 
+    },
+    cardTitle: { 
+      fontSize: 20, 
+      fontWeight: '400',
+      color: colors.text,
+    },
+    toggleContainer: {
+      width: 51,
+      height: 31,
+      borderRadius: 15.5,
+      backgroundColor: useAI ? colors.primary : colors.border,
+      padding: 2,
+      justifyContent: 'center',
+    },
+    toggleThumb: {
+      width: 27,
+      height: 27,
+      borderRadius: 13.5,
+      backgroundColor: colors.background,
+      transform: [{ translateX: useAI ? 20 : 0 }],
+    },
+    description: { 
+      fontSize: 14, 
+      color: colors.textSecondary, 
+      marginBottom: 40, 
+      lineHeight: 20 
+    },
+    nextButton: { 
+      backgroundColor: colors.primary, 
+      paddingVertical: 16, 
+      borderRadius: 16, 
+      alignItems: 'center' 
+    },
+    nextButtonText: { 
+      fontSize: 16, 
+      color: colors.background,
+      fontWeight: '400',
+    },
+  });
 
   return (
-    <KeyboardAvoidingView 
-      style={dynamicStyles.container} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={dynamicStyles.container}>
       <View style={dynamicStyles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <ArrowLeft size={24} color={colors.text} strokeWidth={1.5} />
-        </TouchableOpacity>
+        <View style={{ width: 24 }} />
         <Text style={dynamicStyles.stepIndicator}>Step 2 of 3</Text>
-        <View style={styles.placeholder} />
+        <View style={{ width: 24 }} />
       </View>
 
       <View style={dynamicStyles.content}>
@@ -186,58 +141,42 @@ export default function AIPreferenceScreen() {
         </Text>
 
         <TouchableOpacity 
-          style={[dynamicStyles.aiCard, useAI && dynamicStyles.aiCardActive]}
-          onPress={() => updateAIPreference(!useAI)}
-          activeOpacity={0.8}
+          style={dynamicStyles.card}
+          onPress={handleCardPress}
         >
-          <View style={dynamicStyles.aiHeader}>
-            <View style={dynamicStyles.aiIconContainer}>
-              <View style={dynamicStyles.aiIcon}>
+          <View style={dynamicStyles.cardHeader}>
+            <View style={dynamicStyles.cardLeft}>
+              <View style={dynamicStyles.iconContainer}>
                 <Brain size={24} color={colors.primary} strokeWidth={1.5} />
               </View>
-              <Text style={dynamicStyles.aiTitle}>AI Reflection</Text>
+              <Text style={dynamicStyles.cardTitle}>AI Reflection</Text>
             </View>
-            <Switch
-              value={useAI}
-              onValueChange={() => updateAIPreference(!useAI)}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={colors.background}
-            />
+            <TouchableOpacity
+              style={dynamicStyles.toggleContainer}
+              onPress={handleCardPress}
+              activeOpacity={0.8}
+            >
+              <View style={dynamicStyles.toggleThumb} />
+            </TouchableOpacity>
           </View>
-
-          {useAI && (
-            <View style={dynamicStyles.featuresList}>
-              {aiFeatures.map((feature, idx) => (
-                <View key={idx} style={dynamicStyles.featureItem}>
-                  <Text style={dynamicStyles.featureText}>{'• '}{feature.text}</Text>
-                </View>
-              ))}
-            </View>
-          )}
         </TouchableOpacity>
 
-        {!useAI && (
-          <View style={dynamicStyles.fallbackInfo}>
-            <Text style={dynamicStyles.fallbackTitle}>Without AI, you'll still get:</Text>
-            <Text style={dynamicStyles.fallbackText}>
-              • Your personalized coping activities{'\n'}
-              • Basic emotion tracking{'\n'}
-              • All journaling features{'\n'}
-              • Complete privacy - no data processing
-            </Text>
-          </View>
-        )}
+        <Text style={dynamicStyles.description}>
+          {useAI 
+            ? "With AI, you get deep insights like cognitive distortion detection, personalized reframes, and voice-to-text transcription."
+            : "Without AI, you still get core features like basic emotion tracking and your coping toolkit — all running locally, with full privacy and no data ever leaving your device."
+          }
+        </Text>
 
-        <TouchableOpacity style={dynamicStyles.nextButton} onPress={handleNext}>
+        <TouchableOpacity 
+          style={dynamicStyles.nextButton} 
+          onPress={handleNext}
+        >
           <Text style={dynamicStyles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  placeholder: {
-    width: 24,
-  },
-});
+export default AIPreferenceScreen;

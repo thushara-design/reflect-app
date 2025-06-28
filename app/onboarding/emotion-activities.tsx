@@ -241,15 +241,19 @@ import {
       },
       button: {
         backgroundColor: colors.primary,
-        padding: 14,
-        borderRadius: 8,
+        paddingVertical: 16,
+        borderRadius: 16,
         alignItems: 'center',
         marginBottom: 8,
       },
       buttonDisabled: {
         backgroundColor: colors.border,
       },
-      buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+      buttonText: { 
+        color: colors.background, 
+        fontSize: 16, 
+        fontWeight: '400' 
+      },
       skip: {
         alignItems: 'center',
         paddingVertical: 10,
@@ -258,7 +262,8 @@ import {
       progressText: {
         textAlign: 'center',
         color: colors.textSecondary,
-        fontSize: 12,
+        fontSize: 14,
+        fontWeight: '300',
         marginBottom: 10,
       },
       stepIndicator: {

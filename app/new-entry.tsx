@@ -455,6 +455,7 @@ export default function NewEntryPage() {
             onVoiceTranscript={handleVoiceTranscript}
             onVoiceError={handleVoiceError}
             iconColor={colors.primary}
+            useAI={userHasAI}
           />
         </View>
 

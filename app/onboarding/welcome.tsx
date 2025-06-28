@@ -7,7 +7,7 @@ export default function WelcomeScreen() {
   const { colors } = useTheme();
 
   const handleGetStarted = () => {
-    router.push('/onboarding/name');
+    router.replace('/onboarding/name');
   };
 
   const dynamicStyles = StyleSheet.create({
@@ -50,11 +50,11 @@ export default function WelcomeScreen() {
       backgroundColor: colors.primary,
       paddingHorizontal: 64,
       paddingVertical: 16,
-      borderRadius: 12,
+      borderRadius: 16,
       
     },
     getStartedText: {
-      fontSize: 18,
+      fontSize: 16,
       color: colors.background,
       fontWeight: '400',
     },
