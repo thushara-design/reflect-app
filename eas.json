@@ -21,12 +21,12 @@
     },
     "production": {
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease"
       },
       "ios": {
         "resourceClass": "m-medium"
-      },
-      "gradleCommand": ":app:bundleRelease"
+      }
     }
   },
   "submit": {
