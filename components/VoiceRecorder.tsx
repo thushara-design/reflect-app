@@ -128,7 +128,7 @@ export default function VoiceRecorder({
       {isTranscribing && (
         <View style={styles.transcribingContainer}>
           <ActivityIndicator size="small" color="#A5B8C8" />
-          <Text style={styles.transcribingText}>Transcribing...</Text>
+          <Text style={styles.transcribingText}>Transcribing</Text>
         </View>
       )}
       {!isRecording && !speechService.isSupported() && (
@@ -192,11 +192,8 @@ const styles = StyleSheet.create({
     top: 50,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
     borderRadius: 8,
     padding: 8,
-    borderWidth: 1,
-    borderColor: '#EAEAEA',
     maxWidth: 200,
     zIndex: 1000,
     gap: 8,

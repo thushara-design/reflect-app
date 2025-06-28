@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, TextInput, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
-import { X, Plus, Trash2, CreditCard as Edit3 } from 'lucide-react-native';
+import { X, Plus, Trash2, PenTool } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useOnboarding, EmotionalToolkitItem } from '@/contexts/OnboardingContext';
 import { COMMON_EMOTIONS } from '../app/onboarding/emotions';
@@ -191,6 +191,9 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
     activitiesSection: {
       flex: 1,
     },
+    activitiesList: {
+      flex: 1,
+    },
     sectionTitle: {
       fontSize: 18,
       fontWeight: '400',
@@ -230,7 +233,7 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
       paddingVertical: 16,
       borderRadius: 12,
       gap: 8,
-      marginTop: 16,
+      marginTop: 4,
     },
     addButtonText: {
       color: colors.background,
@@ -306,6 +309,11 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
       fontSize: 16,
       fontWeight: '300',
     },
+    bottomButtonContainer: {
+      padding: 24,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
   });
 
   return (
@@ -356,49 +364,55 @@ export default function ActivityManagementModal({ visible, onClose }: ActivityMa
                 Activities for {selectedEmotion}
               </Text>
 
-              {getActivitiesForEmotion(selectedEmotion).length === 0 ? (
-                <View style={dynamicStyles.emptyState}>
-                  <Text style={dynamicStyles.emptyText}>
-                    No activities added yet for {selectedEmotion.toLowerCase()}.{'\n'}
-                    Add some helpful coping activities below.
-                  </Text>
-                </View>
-              ) : (
-                getActivitiesForEmotion(selectedEmotion).map((activity, index) => (
-                  <View key={index} style={dynamicStyles.activityItem}>
-                    <Text style={dynamicStyles.activityText}>{activity}</Text>
-                    <View style={dynamicStyles.activityActions}>
-                      <TouchableOpacity
-                        style={dynamicStyles.actionButton}
-                        onPress={() => setEditingActivity({
-                          emotion: selectedEmotion,
-                          index,
-                          text: activity
-                        })}
-                      >
-                        <Edit3 size={16} color={colors.textSecondary} strokeWidth={1.5} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={dynamicStyles.actionButton}
-                        onPress={() => handleDeleteActivity(selectedEmotion, index)}
-                      >
-                        <Trash2 size={16} color={colors.accent} strokeWidth={1.5} />
-                      </TouchableOpacity>
-                    </View>
+              <View style={dynamicStyles.activitiesList}>
+                {getActivitiesForEmotion(selectedEmotion).length === 0 ? (
+                  <View style={dynamicStyles.emptyState}>
+                    <Text style={dynamicStyles.emptyText}>
+                      No activities added yet for {selectedEmotion.toLowerCase()}.{'\n'}
+                      Add some helpful coping activities below.
+                    </Text>
                   </View>
-                ))
-              )}
-
-              <TouchableOpacity
-                style={dynamicStyles.addButton}
-                onPress={() => setShowAddActivity(true)}
-              >
-                <Plus size={20} color={colors.background} strokeWidth={1.5} />
-                <Text style={dynamicStyles.addButtonText}>Add Activity</Text>
-              </TouchableOpacity>
+                ) : (
+                  getActivitiesForEmotion(selectedEmotion).map((activity, index) => (
+                    <View key={index} style={dynamicStyles.activityItem}>
+                      <Text style={dynamicStyles.activityText}>{activity}</Text>
+                      <View style={dynamicStyles.activityActions}>
+                        <TouchableOpacity
+                          style={dynamicStyles.actionButton}
+                          onPress={() => setEditingActivity({
+                            emotion: selectedEmotion,
+                            index,
+                            text: activity
+                          })}
+                        >
+                          <PenTool size={16} color={colors.textSecondary} strokeWidth={1.5} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={dynamicStyles.actionButton}
+                          onPress={() => handleDeleteActivity(selectedEmotion, index)}
+                        >
+                          <Trash2 size={16} color={colors.textSecondary} strokeWidth={1.5} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))
+                )}
+              </View>
             </View>
           )}
         </ScrollView>
+
+        {selectedEmotion && (
+          <View style={dynamicStyles.bottomButtonContainer}>
+            <TouchableOpacity
+              style={dynamicStyles.addButton}
+              onPress={() => setShowAddActivity(true)}
+            >
+              <Plus size={20} color={colors.background} strokeWidth={1.5} />
+              <Text style={dynamicStyles.addButtonText}>Add Activity</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Add Activity Modal */}
         <Modal
