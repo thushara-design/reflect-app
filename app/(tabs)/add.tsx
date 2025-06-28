@@ -91,7 +91,7 @@ export default function AddTab() {
         <View style={styles.quickStartSection}>
           <TouchableOpacity style={styles.newEntryButton} onPress={handleNewEntry}>
             <PlusIcon size={24} color={colors.background} strokeWidth={1.5} />
-            <Text style={styles.newEntryText}>Add a note</Text>
+            <Text style={styles.newEntryText}>Begin your reflection</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
