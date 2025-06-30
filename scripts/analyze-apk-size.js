@@ -30,4 +30,4 @@ console.log('\n📊 Total Estimated Savings: ~25-35% APK size reduction');
 console.log('\n🚀 To build optimized APK:');
 console.log('  npm run build:android');
 console.log('\n📱 To analyze final APK size:');
-console.log('  npx @expo/cli build:android --clear-cache'); 
+console.log('  npx @expo/cli build:android --clear-cache');

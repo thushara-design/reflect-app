@@ -7,7 +7,7 @@ export const loadFonts = async () => {
     await Font.loadAsync({
       'Nunito-Regular': require('../assets/fonts/Nunito-Regular.ttf'),
       'Nunito-Bold': require('../assets/fonts/Nunito-Bold.ttf'),
-      // Only load these if they're actually used in your app
+      // Removed unused font variants to reduce APK size:
       // 'Nunito-SemiBold': require('../assets/fonts/Nunito-SemiBold.ttf'),
       // 'Nunito-Italic': require('../assets/fonts/Nunito-Italic.ttf'),
     });
@@ -20,6 +20,7 @@ export const loadFonts = async () => {
 export const FONT_FAMILIES = {
   regular: 'Nunito-Regular',
   bold: 'Nunito-Bold',
+  // Removed unused font variants:
   // semiBold: 'Nunito-SemiBold',
   // italic: 'Nunito-Italic',
-} as const; 
+} as const;

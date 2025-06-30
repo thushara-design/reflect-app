@@ -25,7 +25,8 @@
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
-      ]
+      ],
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",
@@ -55,6 +56,10 @@
                 "shrinkResources": true,
                 "minifyEnabled": true
               }
+            },
+            "packagingOptions": {
+              "pickFirsts": ["**/libc++_shared.so", "**/libjsc.so"],
+              "excludes": ["META-INF/DEPENDENCIES", "META-INF/LICENSE", "META-INF/LICENSE.txt", "META-INF/NOTICE", "META-INF/NOTICE.txt"]
             }
           }
         }

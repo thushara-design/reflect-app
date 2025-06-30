@@ -16,4 +16,10 @@ config.transformer.minifierConfig = {
 // Enable bundle compression
 config.transformer.enableBabelRCLookup = false;
 
-module.exports = config; 
+// Exclude unnecessary files from bundle
+config.resolver.blacklistRE = /node_modules\/.*\/(Pods|\.git)\/.*/;
+
+// Asset optimization
+config.transformer.assetPlugins = ['expo-asset/tools/hashAssetFiles'];
+
+module.exports = config;
