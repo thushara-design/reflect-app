@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { PenTool, Plus as PlusIcon } from 'lucide-react-native';
 import TopNavBar from '@/components/TopNavBar';
 import OpenMojiIcon from '@/components/OpenMojiIcon';
+import BoltBadge from '@/components/BoltBadge';
 
 export default function AddTab() {
   const { colors } = useTheme();
@@ -15,6 +16,15 @@ export default function AddTab() {
     container: {
       flex: 1,
       backgroundColor: colors.background,
+    },
+    headerContainer: {
+      position: 'relative',
+    },
+    badgeContainer: {
+      position: 'absolute',
+      top: 50,
+      right: 16,
+      zIndex: 10,
     },
     content: {
       flex: 1,
@@ -72,7 +82,12 @@ export default function AddTab() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TopNavBar title="New Entry" />
+      <View style={styles.headerContainer}>
+        <TopNavBar title="New Entry" />
+        <View style={styles.badgeContainer}>
+          <BoltBadge size={32} />
+        </View>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Header */}
