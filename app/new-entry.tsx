@@ -5,7 +5,6 @@ import { ArrowLeft, Trash2 } from 'lucide-react-native';
 import EntryActions from '@/components/EntryActions';
 import PatternDetectionModal from '@/components/PatternDetectionModal';
 import AIAnalysisCards from '@/components/AIAnalysisCards';
-import BoltBadge from '@/components/BoltBadge';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -306,7 +305,6 @@ export default function NewEntryPage() {
       backgroundColor: colors.background,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
-      position: 'relative',
     },
     headerTitle: {
       fontSize: 18,
@@ -316,12 +314,6 @@ export default function NewEntryPage() {
       flex: 1,
       textAlign: 'center',
       marginHorizontal: 16,
-    },
-    badgeContainer: {
-      position: 'absolute',
-      top: 16,
-      right: 16,
-      zIndex: 10,
     },
     scrollContainer: {
       flex: 1,
@@ -413,11 +405,6 @@ export default function NewEntryPage() {
           <TouchableOpacity style={styles.backButton} onPress={handleSave}>
             <Text style={{ color: colors.primary, fontSize: 16, fontWeight: '500' }}>Save</Text>
           </TouchableOpacity>
-
-          {/* Bolt Badge in Analysis View */}
-          <View style={dynamicStyles.badgeContainer}>
-            <BoltBadge size={28} />
-          </View>
         </View>
         <View style={{ height: 16 }} />
         <ScrollView style={dynamicStyles.scrollContainer} showsVerticalScrollIndicator={false}>
@@ -470,11 +457,6 @@ export default function NewEntryPage() {
             iconColor={colors.primary}
             useAI={userHasAI}
           />
-
-          {/* Bolt Badge in Main Entry View */}
-          <View style={dynamicStyles.badgeContainer}>
-            <BoltBadge size={28} />
-          </View>
         </View>
 
         <View style={dynamicStyles.content}>

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { router } from 'expo-router';
 import { Search } from 'lucide-react-native';
 import ReflectHeader from '@/components/ReflectHeader';
+import BoltBadge from '@/components/BoltBadge';
 import { useEntries } from '@/contexts/EntriesContext';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -102,7 +103,12 @@ export default function EntriesTab() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ReflectHeader title="Entries" />
+      <View style={styles.headerContainer}>
+        <ReflectHeader title="Entries" />
+        <View style={styles.badgeContainer}>
+          <BoltBadge size={32} />
+        </View>
+      </View>
 
       <View style={styles.content}>
         <View style={styles.searchSection}>
@@ -152,6 +158,15 @@ export default function EntriesTab() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  headerContainer: {
+    position: 'relative',
+  },
+  badgeContainer: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    zIndex: 10,
   },
   content: {
     flex: 1,
